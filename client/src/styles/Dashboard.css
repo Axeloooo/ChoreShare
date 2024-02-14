@@ -85,7 +85,7 @@
 }
 
 .container-header p{
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: var(--darkgrey);
     cursor: pointer;
 }
@@ -144,12 +144,6 @@
     padding: 0 1rem;
 }
 
-.my-chore-info{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
 .my-chore-title{
     font-size: 0.8rem;
     font-weight: 400;
@@ -164,6 +158,12 @@
 
 .progress-edit{
     font-size: 0.7rem;
-    color: var(--darkgrey);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.edit{
+    font-size: 0.8rem;
     cursor: pointer;
 }
