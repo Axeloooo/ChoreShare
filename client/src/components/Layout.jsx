@@ -2,13 +2,13 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 import { Outlet } from "react-router-dom";
 
-function Layout({ sidebarOpen, setSidebarOpen }) {
+function Layout({ sidebarOpen, setSidebarOpen, user, setUser }) {
 
   return (
     <div className="app-layout">
-      <Header />
+      {user !== null ? <Header setUser={setUser}/> : null}
       <Outlet />
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+      {user !== null ? <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/> : null}
     </div>
   );
 }
