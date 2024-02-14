@@ -1,0 +1,9 @@
+
+.calendar-page{
+    background: blue;
+    height: 100%;
+    position: fixed;
+    top: 3.5rem;
+    right: 0;
+    width: calc(100% - 18rem);
+}

@@ -37,6 +37,9 @@ function Sidebar({sidebarOpen, setSidebarOpen}) {
                 <HouseholdMember />
                 <HouseholdMember />
                 <HouseholdMember />
+                <HouseholdMember />
+                <HouseholdMember />
+                <HouseholdMember />
             </div>
         </div>
     </div>

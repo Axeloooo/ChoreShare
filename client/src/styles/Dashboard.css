@@ -1,0 +1,169 @@
+
+.dashboard-page{
+    height: calc(100% - 3.5rem);
+    position: fixed;
+    top: 3.5rem;
+    right: 0;
+    width: calc(100% - 18rem);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboard-page.full-width{
+    width: 100%;
+}
+
+.grid-container{
+    display: grid;
+    grid-template-columns: 1.6fr 0.2fr 1.2fr;
+    grid-template-rows: 1.5fr 0.2fr 0.2fr 1fr 0.2fr 1.3fr;
+    grid-gap: 0;
+    height: 90%;
+    width: 90%;
+    max-width: 62rem;
+    overflow: hidden;
+}
+
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    border-radius: 0.3rem;
+    border: 1px solid var(--lightgrey);
+}
+
+.container:nth-child(1){
+    grid-row: 1 / span 2;
+    grid-column: 1 / 2;
+}
+
+.container:nth-child(2){
+    grid-row: 1 / span 4;
+    grid-column: 3 / 4;
+}
+
+.container:nth-child(3){
+    grid-row: 4 / span 3;
+    grid-column: 1 / 2;
+}
+
+.container:nth-child(4){
+    grid-row: 6 / span 2;
+    grid-column: 3 / 4;
+}
+
+.container-header{
+    width: 90%;
+    height: 3rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.container-header.space-between{
+    justify-content: space-between;
+}
+
+.container-header.center{
+    justify-content: center;
+}
+
+.container-header.together{
+    justify-content: flex-start
+}
+
+.container-header.together h3{
+    margin-right: 1rem;
+}
+
+.container-header h3{
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+
+.container-header p{
+    font-size: 0.8rem;
+    color: var(--darkgrey);
+    cursor: pointer;
+}
+
+.container-contents{
+    width: 95%;
+    height: calc(100% - 2.5rem);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Stats */
+
+.stats{
+    padding: 0 2.5rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.stat{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+.stat h3{
+    font-size: 2rem;
+    font-weight: 400;
+}
+
+.stat p{
+    font-size: 0.7rem;
+    color: var(--darkgrey);
+    max-width: 95%;
+    text-align: center;
+}
+
+/* ToDo */
+
+.todo-view .container-contents{
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow-y: auto;
+}
+
+.my-chore-container{
+    width: 100%;
+    min-height: 3rem;
+    display: flex;
+    flex-direction: row;
+    border-top: 1px solid var(--lightgrey);
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+}
+
+.my-chore-info{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.my-chore-title{
+    font-size: 0.8rem;
+    font-weight: 400;
+    margin-right: 1rem;
+}
+
+.progress{
+    padding: 0.2rem 0.5rem;
+    font-size: 0.7rem;
+    border-radius: 0.2rem;
+}
+
+.progress-edit{
+    font-size: 0.7rem;
+    color: var(--darkgrey);
+    cursor: pointer;
+}
