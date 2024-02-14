@@ -13,6 +13,11 @@
   --green: #27941E;
 }
 
+a{
+  text-decoration: none;
+  color: black;
+}
+
 
 *, *::after, *::before {
   margin: 0;

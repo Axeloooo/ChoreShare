@@ -1,4 +1,5 @@
 import '../styles/Dashboard.css';
+import {Link} from "react-router-dom";
 
 function Dashboard ({sidebarOpen}) {
 const tasks = [{title : "Wash Dishes", status : "Not Started"}, {title : "Clean Bathroom", status : "Complete"}, {title : "Vacuum", status : "Not Started"}, {title : "Wash Dishes", status : "Not Started"}, {title : "Wash Dishes", status : "Not Started"}, {title : "Wash Dishes", status : "Not Started"}]
@@ -10,7 +11,7 @@ const tasks = [{title : "Wash Dishes", status : "Not Started"}, {title : "Clean 
             <div className="todo-view container">
                 <div className="container-header together">
                     <h3>My ToDo</h3>
-                    <p>View All Chores</p>
+                    <Link to="/chore-list"><p>View All Chores</p></Link>
                 </div>
                 <div className="container-contents">
                     {tasks.map((task, index) => {

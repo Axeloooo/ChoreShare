@@ -28,7 +28,7 @@
     gap: 1rem;
     max-width: fit-content;
     padding: 0.2rem 0.4rem;
-    border-radius: 0.2rem;
+    border-radius: 0.3rem;
     background: var(--lightgrey);
 }
 
@@ -41,6 +41,6 @@
 
 .nav-item.active{
     background: white;
-    border-radius: 0.2rem;
+    border-radius: 0.3rem;
 }
 
