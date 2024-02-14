@@ -25,6 +25,7 @@ function ChoreList({sidebarOpen}){
             <div className="chore-container">
                 <div className="title">
                     <h3>11-17 Feb</h3>
+                    <p>+ Add Chore</p>
                 </div>
                 <div className="chore-list">
                     {threeColumns.map((column) => (

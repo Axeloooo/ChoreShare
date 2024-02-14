@@ -26,6 +26,17 @@
     width: 100%;
     height: fit-content;
     margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.title p{
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--darkgrey);
+    cursor: pointer;
 }
 
 .chore-list{
