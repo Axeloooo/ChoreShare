@@ -1,4 +1,4 @@
-package com.choresync.assignment.model;
+package com.choresync.userhousehold.model;
 
 import java.util.Date;
 
@@ -11,14 +11,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AssignmentRequest {
-  private Date assignmentDate;
+public class UserhouseholdResponse {
+  private String id;
 
-  private Date completionDate;
+  private String userId;
 
   private String householdId;
 
-  private String taskId;
+  private Date createdAt;
 
-  private String userId;
+  private Date updatedAt;
 }
