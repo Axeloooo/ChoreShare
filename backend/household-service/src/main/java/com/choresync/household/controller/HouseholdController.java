@@ -6,8 +6,6 @@ import com.choresync.household.model.HouseholdRequest;
 import com.choresync.household.model.HouseholdResponse;
 import com.choresync.household.service.HouseholdService;
 
-import brave.Response;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
