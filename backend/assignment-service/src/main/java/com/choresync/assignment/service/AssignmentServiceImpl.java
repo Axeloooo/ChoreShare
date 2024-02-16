@@ -18,7 +18,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     Assignment assignment = Assignment.builder()
         .assignmentDate(assignmentRequest.getAssignmentDate())
         .completionDate(assignmentRequest.getCompletionDate())
-        .huseholdId(assignmentRequest.getHuseholdId())
+        .huseholdId(assignmentRequest.getHouseholdId())
         .taskId(assignmentRequest.getTaskId())
         .userId(assignmentRequest.getUserId())
         .build();
