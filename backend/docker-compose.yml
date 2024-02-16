@@ -1,18 +1,26 @@
 version: "3"
 
 services:
-  postgres:
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+
+  choresync:
+    container_name: choresync
     image: postgres
-    environment:
-      POSTGRES_PASSWORD: root
     ports:
       - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: root
     volumes:
       - db:/var/lib/postgresql/data
     networks:
       - postgres
 
   pgadmin4:
+    container_name: pgadmin4
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.com
