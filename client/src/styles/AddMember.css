@@ -9,20 +9,25 @@
 }
 
 .add-member-window h1{
+    font-size: 1.5rem;
+    font-weight: 300;
     margin-bottom: 2rem;
 }
 
 .add-member-window label{
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
     margin-top: 1rem;
 }
 
 .add-member-form input{
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.7rem;
     border: 1px solid var(--midgrey);
     border-radius: 0.3rem;
     font-size: 1rem;
+    font-size: 0.8rem;
+    color: grey;
 }
 
 .add-member-form input:focus{

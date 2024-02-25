@@ -167,3 +167,11 @@
     font-size: 0.8rem;
     cursor: pointer;
 }
+
+
+
+.container-contents.empty{
+    justify-content: center;
+    align-items: center;
+    color: var(--darkgrey);
+}

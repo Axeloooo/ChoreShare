@@ -9,11 +9,13 @@
 }
 
 .create-chore-window h1{
+    font-size: 1.5rem;
+    font-weight: 300;
     margin-bottom: 2rem;
 }
 
 .create-chore-window label{
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     margin-top: 1rem;
 }
 
@@ -22,7 +24,8 @@
     padding: 0.5rem;
     border: 1px solid var(--midgrey);
     border-radius: 0.3rem;
-    font-size: 1rem;
+    font-size: 0.8rem;
+    color: grey;
 }
 
 .create-chore-form input:focus{
@@ -34,10 +37,12 @@
     min-width: 100%;
     max-width: 100%;
     min-height: 7rem;
-    padding: 0.5rem;
+    padding: 0.7rem;
     border: 1px solid var(--midgrey);
     border-radius: 0.3rem;
     font-size: 1rem;
+    font-size: 0.8rem;
+    color: grey;
 }
 
 .create-chore-form textarea:focus{

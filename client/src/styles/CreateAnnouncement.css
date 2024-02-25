@@ -9,25 +9,14 @@
 }
 
 .create-announce-window h1{
+    font-size: 1.5rem;
+    font-weight: 300;
     margin-bottom: 2rem;
 }
 
 .create-announce-window label{
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     margin-top: 1rem;
-}
-
-.create-announce-form input{
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid var(--midgrey);
-    border-radius: 0.3rem;
-    font-size: 1rem;
-}
-
-.create-announce-form input:focus{
-    outline: none;
-    border: 2px solid #2584FF;
 }
 
 .create-announce-form textarea{
@@ -38,6 +27,8 @@
     border: 1px solid var(--midgrey);
     border-radius: 0.3rem;
     font-size: 1rem;
+    font-size: 0.8rem;
+    color: black;
 }
 
 .create-announce-form textarea:focus{

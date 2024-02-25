@@ -16,6 +16,20 @@ function CreateAnnouncement(){
             <Select 
             options={options}
             defaultValue={options[0]}
+            styles={{
+                control: (base) => ({
+                  ...base,
+                  fontSize: '0.8rem',
+                }),
+                menu: (base) => ({
+                  ...base,
+                  fontSize: '0.8rem',
+                }),
+                option: (base) => ({
+                  ...base,
+                  fontSize: '0.8rem',
+                }),
+              }}
             />
             <form className="create-announce-form">
                 <label htmlFor="message">Message</label>

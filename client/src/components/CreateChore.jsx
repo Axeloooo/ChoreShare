@@ -83,6 +83,20 @@ function CreateChore(){
                 formatGroupLabel={formatGroupLabel}
                 onChange={handleChange}
                 value={selectedOptions}
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    fontSize: '0.8rem',
+                  }),
+                  menu: (base) => ({
+                    ...base,
+                    fontSize: '0.8rem',
+                  }),
+                  option: (base) => ({
+                    ...base,
+                    fontSize: '0.8rem',
+                  }),
+                }}
             />
             <form className="create-chore-form">
                 <label htmlFor="chore-title">Title</label>
