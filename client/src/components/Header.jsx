@@ -24,7 +24,7 @@ function Header({setUser}) {
           <Link to="/chore-list">Chore List</Link>
         </li>
         <li className={location.pathname === "/calendar" ? "nav-item active" : "nav-item"}>
-          <Link to="/calendar">Calendar</Link>
+          <Link to="/calendar">Household Calendar</Link>
         </li>
       </ul>
       <div className="user-auth">

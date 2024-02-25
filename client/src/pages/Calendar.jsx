@@ -1,33 +1,23 @@
+import CalendarWindow from '../components/CalendarWindow';
 import '../styles/Calendar.css';
+import { useOutletContext } from 'react-router-dom';
+import AddEvent from '../components/AddEvent';
+
 
 function Calendar({sidebarOpen}) {
-    let days = [];
+    const { showOverlay } = useOutletContext();
 
-    for (let i = 0; i < 35; i++) {
-      days.push({day: i + 1, events: []});
-    }
+    const handleShowCreateEvent = () => {
+        showOverlay(<AddEvent />); 
+    };
 
     return (
         <div className={sidebarOpen ? "calendar-page" : "calendar-page full-width"}>
-            <p className="calendar-month">February 2024</p>
             <div className="calendar-view">
-                <div className="calendar-week-days">
-                    <div className="calendar-week-day">Sun</div>
-                    <div className="calendar-week-day">Mon</div>
-                    <div className="calendar-week-day">Tue</div>
-                    <div className="calendar-week-day">Wed</div>
-                    <div className="calendar-week-day">Thu</div>
-                    <div className="calendar-week-day">Fri</div>
-                    <div className="calendar-week-day">Sat</div>
-                </div>
                 <div className="calendar-grid">
-                    {days.map((day, index) => {
-                        return (
-                            <div key={index} className="calendar-day">
-                            </div>
-                        )
-                    })}
+                    <CalendarWindow />
                 </div>
+                <button className="add-event-btn" onClick={handleShowCreateEvent}>+ Add Event</button>
             </div>
         </div>
     );

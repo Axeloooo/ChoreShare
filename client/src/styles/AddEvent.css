@@ -1,0 +1,61 @@
+
+.add-event-form{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 0.5rem 0 3rem 0;
+    width: 100%;
+}
+
+.add-event-window h1{
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin-bottom: 2rem;
+}
+
+.add-event-window label{
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+    margin-top: 1rem;
+}
+
+.add-event-form input{
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid var(--midgrey);
+    border-radius: 0.3rem;
+    font-size: 1rem;
+    font-size: 0.8rem;
+    color: grey;
+}
+
+.add-event-form input:focus{
+    outline: none;
+    border: 2px solid #2584FF;
+}
+
+.add-event-form button{
+    width:100%;
+    padding: 0.7rem;
+    margin-top: 2.5rem;
+    border: none;
+    border-radius: 0.2rem;
+    background: #2584FF;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.add-event-form .row{
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    flex-direction: row;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.add-event-form .row .row-entry{
+    width: 100%;
+}

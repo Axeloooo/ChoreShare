@@ -5,55 +5,52 @@
     top: 3.5rem;
     right: 0;
     width: calc(100% - 18rem);
-    padding: 1.2rem 4rem;
+    padding: 0.5rem 4rem;
 }
 
 .calendar-page.full-width{
     width: 100%;
 }
 
-.calendar-month{
-    font-size: 0.9rem;
-    margin-bottom: 0.7rem;
-    padding-left: 0.5rem;
-}
-
 .calendar-view{
     width: 100%;
-    height: 85%;
+    height: 92%;
     background: white;
     border-radius: 0.3rem;
     border: 1px solid var(--lightgrey);
-    padding: 1.5rem;
-}
-
-.calendar-week-days{
-    height: 5%;
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-gap: 1px;
-}
-
-.calendar-week-day{
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-start;
-    padding-left: 0.3rem;
-    font-size: 0.8rem;
-    padding-bottom: 0.2rem;
+    position: relative;
 }
 
 .calendar-grid{
-    border: 1px solid var(--lightgrey);
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    grid-gap: 1px;
-    background-color: var(--lightgrey);
     width: 100%;
-    height: 95%;
+    height: 100%;
 }
 
-.calendar-day{
-    background-color: white; /* or any preferred color for the day cell */
+.rs-calendar-panel .rs-calendar-table-cell-selected .rs-calendar-table-cell-content {
+    box-shadow: none;
 }
+
+.rs-calendar-panel .rs-calendar-table-cell-is-today .rs-calendar-table-cell-content{
+    background: rgba(52, 152, 255, 0.1);
+    box-shadow:inset 0 0 0 1.5px rgba(52, 152, 255, 0.2);
+}
+
+.rs-calendar-table-cell-content:hover{
+    background: white;
+}
+
+.add-event-btn{
+    position: absolute;
+    top: 1.2rem;
+    right: 5rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    background: none;
+    color: var(--darkgrey);
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    z-index: 1000;
+}
+
+
