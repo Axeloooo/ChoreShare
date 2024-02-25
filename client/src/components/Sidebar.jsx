@@ -1,7 +1,8 @@
 import '../styles/Sidebar.css';
 import HouseholdMember from './HouseholdMember';
+import AddMember from '../components/AddMember';
 
-function Sidebar({sidebarOpen, setSidebarOpen}) {
+function Sidebar({sidebarOpen, setSidebarOpen, showOverlay}) {
 
     const handleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
@@ -9,6 +10,10 @@ function Sidebar({sidebarOpen, setSidebarOpen}) {
 
     const email = "podgaietska9038@gmail.com"
     const phone = "123-456-7890"
+
+    const handleShowAddMember = () => {
+        showOverlay(<AddMember />); 
+    };
 
   return (
     <div className={sidebarOpen ? "sidebar" : "sidebar closed"}>
@@ -31,7 +36,7 @@ function Sidebar({sidebarOpen, setSidebarOpen}) {
         <div className="household-container">
             <div className="household-container-header">
                 <h3>My Household</h3>
-                <p>+Add Members</p>
+                <p onClick={handleShowAddMember}>+Add Members</p>
             </div>
             <div className="members-list">
                 <HouseholdMember />

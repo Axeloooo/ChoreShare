@@ -1,11 +1,16 @@
 import '../styles/Dashboard.css';
 import {Link} from "react-router-dom";
 import { FaPencil } from "react-icons/fa6";
-
+import { useOutletContext } from 'react-router-dom';
+import CreateAnnouncement from '../components/CreateAnnouncement';
 
 function Dashboard ({sidebarOpen}) {
 const tasks = [{title : "Wash Dishes", status : "Not Started"}, {title : "Clean Bathroom", status : "Complete"}, {title : "Vacuum", status : "Not Started"}, {title : "Wash Dishes", status : "Not Started"}, {title : "Wash Dishes", status : "Not Started"}, {title : "Wash Dishes", status : "Not Started"}]
+const { showOverlay } = useOutletContext();
 
+const handleShowCreateAnnouncement = () => {
+    showOverlay(<CreateAnnouncement />); 
+};
 
   return (
     <div className={sidebarOpen ? "dashboard-page" : "dashboard-page full-width"}>
@@ -36,7 +41,7 @@ const tasks = [{title : "Wash Dishes", status : "Not Started"}, {title : "Clean 
             <div className="all-chores-view container">
                 <div className="container-header space-between">
                     <h3>Announcements</h3>
-                    <p>+ Create</p>
+                    <p onClick={handleShowCreateAnnouncement}>+ Create</p>
                 </div>
                 <div className="container-contents">
                     
@@ -45,7 +50,7 @@ const tasks = [{title : "Wash Dishes", status : "Not Started"}, {title : "Clean 
             <div className="upcoming-events-view container">
                 <div className="container-header space-between">
                     <h3>Upcoming Events</h3>
-                    <p>View Full</p>
+                    <Link to="/calendar"><p>View Calendar</p></Link>
                 </div>
                 <div className="container-contents">
                     

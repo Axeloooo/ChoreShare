@@ -21,9 +21,9 @@ function App() {
             <Route index element={<Dashboard sidebarOpen={sidebarOpen}/>} />
             <Route path="calendar" element={<Calendar sidebarOpen={sidebarOpen}/>} />
             <Route path="chore-list" element={<ChoreList sidebarOpen={sidebarOpen}/>} />
-            <Route path="login" element={<LoginWindow />} />
-            <Route path="register" element={<SignupWindow />} />
           </Route>
+          <Route path="login" element={<LoginWindow />} />
+          <Route path="register" element={<SignupWindow />} />
         </Routes>
       </BrowserRouter>
     </div>

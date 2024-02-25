@@ -25,7 +25,7 @@ a{
   padding: 0;
   box-sizing: border-box;
   font-family: 'Source Sans 3', sans-serif;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .app-container {
@@ -36,6 +36,7 @@ a{
   padding: 0;
   overflow: hidden;
   background: var(--offwhite);
+  position: fixed;
 }
 
 .app-layout{
@@ -43,6 +44,11 @@ a{
   height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.select {
+  outline: none !important;
+
 }
 
 
