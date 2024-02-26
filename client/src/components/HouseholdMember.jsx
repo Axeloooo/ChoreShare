@@ -1,8 +1,14 @@
-function HouseholdMember() {
+function HouseholdMember({key, index, name, username}) {
+
+  console.log(index);
+
   return (
     <div className="member-container">
-        <p className="fullname">Mariia Podgaietska</p>
-        <p className="username">jhonny2784</p>
+      <div className="member-identifier" style={{backgroundColor: `var(--user-${index})`}}></div>
+      <div className="member-info">
+        <p className="fullname">{name}</p>
+        <p className="username">{username}</p>
+      </div>
     </div>
   );
 }

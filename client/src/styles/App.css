@@ -8,10 +8,19 @@
   --blackgrey: #545454;
   --red: #EB9494;
   --blue: #80A3D1;
-  --darkblue: #437dca;
-  --turq: #BCCCCD;
+  --turq: #bccccd;
   --orange: #F8B77C;
-  --green: #27941E;
+  --green: #6fbf83;
+  --purple: #BF95EF;
+  --bright-blue: #3498FF;
+  --usr-1: #F66756;
+  --user-2: #8ECAE6;
+  --user-3: #FFB700;
+  --user-4: #209DBC;
+  --user-5: #FF9D03;
+  --user-6: #146782;
+  --user-7: #FC8500;
+  --user-8: #013147;
 }
 
 a{

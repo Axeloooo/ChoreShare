@@ -6,9 +6,19 @@
     --blackgrey: #545454;
     --red: #EB9494;
     --blue: #80A3D1;
-    --turq: #BCCCCD;
+    --turq: #bccccd;
     --orange: #F8B77C;
-    --green: #27941E;
+    --green: #6fbf83;
+    --purple: #BF95EF;
+    --bright-blue: #3498FF;
+    --usr-1: #F66756;
+    --user-2: #8ECAE6;
+    --user-3: #FFB700;
+    --user-4: #209DBC;
+    --user-5: #FF9D03;
+    --user-6: #146782;
+    --user-7: #FC8500;
+    --user-8: #013147;
 }
 
 
@@ -50,17 +60,18 @@
 .user-identity{
     height: fit-content;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     width: fit-content;
     margin-bottom: 1.3rem;
 }
 
 .user-identifier{
     background-color: var(--blue);
-    height: 3.5rem;
-    width: 3.5rem;
+    height: 1rem;
+    width: 1rem;
     border-radius: 50%;
-    margin-right: 1rem;
+    margin-right: 0.7rem;
+    margin-top: 0.3rem;
 }
 
 .fullname{
@@ -123,17 +134,35 @@
     width: 100%;
     min-height: 4rem;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
     padding: 0 1rem;
     background: white;
     border: 1px solid var(--lightgrey);
     border-radius: 0.4rem;
 }
 
+.member-identifier{
+    height: 0.6rem;
+    width: 0.6rem;
+    border-radius: 50%;
+    background: var(--user-3);
+    margin-right: 0.5rem;
+    margin-bottom: 1rem;
+}
+
 .member-container .fullname{
     font-size: 0.8rem;
+}
+
+.member-info{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: fit-content;
+    font-size: 0.7rem;
+
 }
 
 .member-container .username{

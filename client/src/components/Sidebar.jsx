@@ -3,6 +3,7 @@ import HouseholdMember from './HouseholdMember';
 import AddMember from '../components/AddMember';
 
 function Sidebar({sidebarOpen, setSidebarOpen, showOverlay}) {
+    const members = [{name: "Smith Jhon", username: "smith2849"}, {name: "John Doe", username: "jhonny2784"}, {name: "Jane Doe", username: "janey2784"}, {name: "John Smith", username: "johnny2784"}, {name: "Jane Smith", username: "jane2784"}, {name: "John Johnson", username: "johnson2784"}]
 
     const handleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
@@ -39,12 +40,10 @@ function Sidebar({sidebarOpen, setSidebarOpen, showOverlay}) {
                 <p onClick={handleShowAddMember}>+Add Members</p>
             </div>
             <div className="members-list">
-                <HouseholdMember />
-                <HouseholdMember />
-                <HouseholdMember />
-                <HouseholdMember />
-                <HouseholdMember />
-                <HouseholdMember />
+                {members.map((member, index) => {
+                    return <HouseholdMember key={index} index={index} name={member.name} username={member.username} />
+                })
+                }
             </div>
         </div>
     </div>
