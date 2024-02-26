@@ -33,7 +33,7 @@ function CreateAnnouncement(){
             />
             <form className="create-announce-form">
                 <label htmlFor="message">Message</label>
-                <textarea id="message" name="message" />
+                <textarea id="message" name="message" placeholder="Message for the household..." required/>
                 <button type="submit">Create Announcement</button>
             </form>
         </div>

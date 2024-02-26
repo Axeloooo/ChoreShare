@@ -100,9 +100,9 @@ function CreateChore(){
             />
             <form className="create-chore-form">
                 <label htmlFor="chore-title">Title</label>
-                <input type="text" id="chore-title" name="chore-title" />
+                <input type="text" id="chore-title" name="chore-title" placeholder="Chore Title" required/>
                 <label htmlFor="chore-description">Description (optional)</label>
-                <textarea id="chore-description" name="chore-description" />
+                <textarea id="chore-description" name="chore-description" placeholder="Description of the chore..."/>
                 <button type="submit">Create Chore</button>
             </form>
         </div>
