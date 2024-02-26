@@ -9,7 +9,6 @@
     align-items: center;
 }
 
-
 .auth-window form{
     display: flex;
     flex-direction: column;
@@ -32,13 +31,13 @@
 
 .auth-window form input:focus{
     outline: none;
-    border: 1px solid var(--darkblue);
+    border: 1px solid var(--bright-blue);
 }
 
 .auth-window form button{
     width: 100%;
     height: 2.5rem;
-    background: var(--darkblue);
+    background: var(--bright-blue);
     color: white;
     border: none;
     cursor: pointer;
@@ -54,7 +53,7 @@
 }
 
 .auth-window a{
-    color: var(--darkblue);
+    color: var(--bright-blue);
     cursor: pointer;
 }
 
