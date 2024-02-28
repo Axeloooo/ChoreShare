@@ -25,14 +25,8 @@ public class Assignment {
   @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
 
-  @Column(name = "assignment_date")
-  private Date assignmentDate;
-
-  @Column(name = "completion_date")
-  private Date completionDate;
-
   @Column(name = "household_id")
-  private String huseholdId;
+  private String householdId;
 
   @Column(name = "task_id")
   private String taskId;
