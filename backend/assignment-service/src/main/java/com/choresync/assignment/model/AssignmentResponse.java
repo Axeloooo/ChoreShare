@@ -14,17 +14,33 @@ import lombok.NoArgsConstructor;
 public class AssignmentResponse {
   private String id;
 
-  private Date assignmentDate;
+  private String householdId;
 
-  private Date completionDate;
-
-  private String huseholdId;
-
-  private String taskId;
+  private Task task;
 
   private String userId;
 
   private Date createdAt;
 
   private Date updatedAt;
+
+  @Builder
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Task {
+    private String id;
+
+    private String name;
+
+    private String description;
+
+    private String status;
+
+    private Date dueDate;
+
+    private Date createdAt;
+
+    private Date updatedAt;
+  }
 }
