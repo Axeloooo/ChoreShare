@@ -1,0 +1,74 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: "optional:configserver:http://localhost:8080"
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: userhousehold-service
+          uri: lb://userhousehold-service
+          predicates:
+            - Path=/api/v1/userhousehold/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: userhousehold-service
+                fallbackUri: forward:/userhousehold-service-fallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+        - id: task-service
+          uri: lb://task-service
+          predicates:
+            - Path=/api/v1/task/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: task-service
+                fallbackUri: forward:/task-service-fallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+        - id: household-service
+          uri: lb://household-service
+          predicates:
+            - Path=/api/v1/household/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: household-service
+                fallbackUri: forward:/household-service-fallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+        - id: assignment-service
+          uri: lb://assignment-service
+          predicates:
+            - Path=/api/v1/assignment/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: assignment-service
+                fallbackUri: forward:/assignment-service-fallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+
+okta:
+  oauth2:
+    issuer: https://dev-64868999.okta.com/oauth2/default
+    audience: api://default
+    client-id: 0oaf8bdnawwBsjPiP5d7
+    client-secret:
+    scopes: openid, profile, email, offline_access
