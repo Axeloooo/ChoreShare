@@ -7,8 +7,14 @@ services:
     ports:
       - "9411:9411"
 
-  choresync:
-    container_name: choresync
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - "6379:6379"
+
+  postgres:
+    container_name: postgres
     image: postgres
     ports:
       - "5432:5432"
