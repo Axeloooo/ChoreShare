@@ -1,0 +1,17 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: announcement-service
+  config:
+    import: "optional:configserver:http://localhost:8080"
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/announcementdb
+    username: postgres
+    password: root
