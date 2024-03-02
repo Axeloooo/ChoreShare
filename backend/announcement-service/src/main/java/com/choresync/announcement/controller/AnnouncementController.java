@@ -2,6 +2,7 @@ package com.choresync.announcement.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.choresync.announcement.exception.AnnouncementNotFoundException;
@@ -61,6 +61,16 @@ public class AnnouncementController {
     return new ResponseEntity<>(announcement, HttpStatus.OK);
   }
 
+  // Get all announcements
+  // url: /api/v1/announcement/all, method: GET
+  // return type: ResponseEntity<List<AnnouncementResponse>>
+  @GetMapping("/all")
+  public ResponseEntity<List<AnnouncementResponse>> getAllAnnouncements() {
+    return new ResponseEntity<>(announcementService.getAllAnnouncements(), HttpStatus.OK);
+  }
+
+  // Delete announcement
+  // url: /api/v1/announcement/{id}, method: DELETE
   @DeleteMapping("/{id}")
   public ResponseEntity<Object> deleteAnnouncement(@PathVariable String id) {
     announcementService.deleteAnnouncement(id);

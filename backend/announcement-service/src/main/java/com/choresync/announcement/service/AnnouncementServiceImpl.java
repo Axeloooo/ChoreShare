@@ -1,5 +1,9 @@
 package com.choresync.announcement.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,8 +12,6 @@ import com.choresync.announcement.exception.AnnouncementNotFoundException;
 import com.choresync.announcement.model.AnnouncementRequest;
 import com.choresync.announcement.model.AnnouncementResponse;
 import com.choresync.announcement.repository.AnnouncementRepository;
-
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class AnnouncementServiceImpl implements AnnouncementService {
@@ -54,6 +56,30 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         .build();
 
     return announcementResponse;
+  }
+
+  @Override
+  public List<AnnouncementResponse> getAllAnnouncements() {
+    List<Announcement> announcements = announcementRepository.findAll();
+
+    if (announcements.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    List<AnnouncementResponse> announcementResponses = new ArrayList<>();
+
+    for (Announcement announcement : announcements) {
+      AnnouncementResponse announcementResponse = AnnouncementResponse.builder()
+          .id(announcement.getId())
+          .message(announcement.getMessage())
+          .userId(announcement.getUserId())
+          .createdAt(announcement.getCreatedAt())
+          .updatedAt(announcement.getUpdatedAt())
+          .build();
+      announcementResponses.add(announcementResponse);
+    }
+
+    return announcementResponses;
   }
 
   @Override
