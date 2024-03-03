@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class UserhouseholdRequest {
   private String userId;
 
-  private String householdId;
+  private String name;
 }

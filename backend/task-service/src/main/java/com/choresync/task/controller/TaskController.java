@@ -1,5 +1,7 @@
 package com.choresync.task.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,4 +35,15 @@ public class TaskController {
     return new ResponseEntity<>(task, HttpStatus.OK);
   }
 
+  @GetMapping("/user/{uid}")
+  public ResponseEntity<List<TaskResponse>> getAllTasksByUserId(@PathVariable("uid") String userId) {
+    List<TaskResponse> tasks = taskService.getAllTasksByUserId(userId);
+    return new ResponseEntity<>(tasks, HttpStatus.OK);
+  }
+
+  @GetMapping
+  public ResponseEntity<List<TaskResponse>> getAllTasks() {
+    List<TaskResponse> tasks = taskService.getAllTasks();
+    return new ResponseEntity<>(tasks, HttpStatus.OK);
+  }
 }

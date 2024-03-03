@@ -1,5 +1,8 @@
 package com.choresync.household.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +22,9 @@ public class HouseholdServiceImpl implements HouseholdService {
         .name(householdRequest.getName())
         .build();
 
-    householdRepository.save(household);
+    Household newHousehold = householdRepository.save(household);
 
-    return household.getId();
+    return newHousehold.getId();
   }
 
   @Override
@@ -38,4 +41,23 @@ public class HouseholdServiceImpl implements HouseholdService {
     return householdResponse;
   }
 
+  @Override
+  public List<HouseholdResponse> getAllHouseholds() {
+    List<Household> households = householdRepository.findAll();
+
+    List<HouseholdResponse> householdResponses = new ArrayList<>();
+
+    for (Household household : households) {
+      HouseholdResponse householdResponse = HouseholdResponse.builder()
+          .id(household.getId())
+          .name(household.getName())
+          .createdAt(household.getCreatedAt())
+          .updatedAt(household.getUpdatedAt())
+          .build();
+
+      householdResponses.add(householdResponse);
+    }
+
+    return householdResponses;
+  }
 }

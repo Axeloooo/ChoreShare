@@ -7,6 +7,9 @@ import com.choresync.userhousehold.model.UserhouseholdResponse;
 import com.choresync.userhousehold.service.UserhouseholdService;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +31,22 @@ public class UserhouseholdController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<UserhouseholdResponse> getUserhouseholdById(@PathVariable("id") String id) {
+  public ResponseEntity<UserhouseholdResponse> getUserhouseholdsById(@PathVariable("id") String id) {
     UserhouseholdResponse userhouseholdResponse = userhouseholdService.getUserhouseholdById(id);
     return new ResponseEntity<>(userhouseholdResponse, HttpStatus.OK);
   }
 
+  @GetMapping("/user/{uid}")
+  public ResponseEntity<List<UserhouseholdResponse>> getUserhouseholdsByUserId(@PathVariable("uid") String userId) {
+    List<UserhouseholdResponse> userhouseholdResponse = userhouseholdService.getUserhouseholdsByUserId(userId);
+    return new ResponseEntity<>(userhouseholdResponse, HttpStatus.OK);
+  }
+
+  @GetMapping("/household/{hid}")
+  public ResponseEntity<List<UserhouseholdResponse>> getUserhouseholdsByHouseholdId(
+      @PathVariable("hid") String householdId) {
+    List<UserhouseholdResponse> userhouseholdResponse = userhouseholdService
+        .getUserhouseholdsByHouseholdId(householdId);
+    return new ResponseEntity<>(userhouseholdResponse, HttpStatus.OK);
+  }
 }

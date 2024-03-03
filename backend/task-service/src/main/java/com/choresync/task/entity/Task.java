@@ -7,6 +7,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,13 +28,20 @@ public class Task {
   @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
 
-  private String name;
+  private String title;
 
   private String description;
 
-  private String status;
+  @Enumerated(EnumType.STRING)
+  private Status status;
 
-  private Date dueDate;
+  @Enumerated(EnumType.STRING)
+  private Frequency frequency;
+
+  @Enumerated(EnumType.STRING)
+  private Tag tag;
+
+  private String userId;
 
   @CreationTimestamp
   @Column(name = "created_at")
