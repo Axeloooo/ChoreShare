@@ -25,4 +25,9 @@ public class FallbackController {
   public String assignmentServiceFallback() {
     return "Assignment service is down. Please try again later";
   }
+
+  @GetMapping("/event-service-fallback")
+  public String eventServiceFallback() {
+    return "Event service is down. Please try again later";
+  }
 }

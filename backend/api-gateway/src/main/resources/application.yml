@@ -25,6 +25,7 @@ spring:
               args:
                 redis-rate-limiter.replenishRate: 1
                 redis-rate-limiter.burstCapacity: 1
+
         - id: task-service
           uri: lb://task-service
           predicates:
@@ -38,6 +39,7 @@ spring:
               args:
                 redis-rate-limiter.replenishRate: 1
                 redis-rate-limiter.burstCapacity: 1
+
         - id: household-service
           uri: lb://household-service
           predicates:
@@ -51,24 +53,17 @@ spring:
               args:
                 redis-rate-limiter.replenishRate: 1
                 redis-rate-limiter.burstCapacity: 1
-        - id: assignment-service
-          uri: lb://assignment-service
+
+        - id: event-service
+          uri: lb://event-service
           predicates:
-            - Path=/api/v1/assignment/**
+            - Path=/api/v1/event/**
           filters:
             - name: CircuitBreaker
               args:
-                name: assignment-service
-                fallbackUri: forward:/assignment-service-fallback
+                name: event-service
+                fallbackUri: forward:/event-service-fallback
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 1
                 redis-rate-limiter.burstCapacity: 1
-
-okta:
-  oauth2:
-    issuer: https://dev-64868999.okta.com/oauth2/default
-    audience: api://default
-    client-id: 0oaf8bdnawwBsjPiP5d7
-    client-secret:
-    scopes: openid, profile, email, offline_access

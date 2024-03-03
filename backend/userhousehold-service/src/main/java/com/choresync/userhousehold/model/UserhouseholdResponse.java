@@ -16,9 +16,23 @@ public class UserhouseholdResponse {
 
   private String userId;
 
-  private String householdId;
+  private Household household;
 
   private Date createdAt;
 
   private Date updatedAt;
+
+  @Builder
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class Household {
+    private String id;
+
+    private String name;
+
+    private Date createdAt;
+
+    private Date updatedAt;
+  }
 }

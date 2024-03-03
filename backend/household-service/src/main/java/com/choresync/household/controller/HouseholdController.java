@@ -6,6 +6,8 @@ import com.choresync.household.model.HouseholdRequest;
 import com.choresync.household.model.HouseholdResponse;
 import com.choresync.household.service.HouseholdService;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,12 @@ public class HouseholdController {
   public ResponseEntity<HouseholdResponse> getHouseholdById(@PathVariable("id") String id) {
     HouseholdResponse householdResponse = householdService.getHouseholdById(id);
     return new ResponseEntity<>(householdResponse, HttpStatus.OK);
+  }
+
+  @GetMapping
+  public ResponseEntity<List<HouseholdResponse>> getAllHouseholds() {
+    List<HouseholdResponse> householdResponses = householdService.getAllHouseholds();
+    return new ResponseEntity<>(householdResponses, HttpStatus.OK);
   }
 
 }
