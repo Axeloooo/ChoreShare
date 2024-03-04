@@ -30,4 +30,14 @@ public class FallbackController {
   public String eventServiceFallback() {
     return "Event service is down. Please try again later";
   }
+
+  @GetMapping("/auth-service-fallback")
+  public String authServiceFallback() {
+    return "Auth service is down. Please try again later";
+  }
+
+  @GetMapping("/announcement-service-fallback")
+  public String announcementServiceFallback() {
+    return "Announcement service is down. Please try again later";
+  }
 }
