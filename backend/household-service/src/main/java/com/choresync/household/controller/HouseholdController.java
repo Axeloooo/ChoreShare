@@ -24,9 +24,9 @@ public class HouseholdController {
   private HouseholdService householdService;
 
   @PostMapping
-  public ResponseEntity<String> createHousehold(@RequestBody HouseholdRequest householdRequest) {
-    String id = householdService.createHousehold(householdRequest);
-    return new ResponseEntity<>(id, HttpStatus.CREATED);
+  public ResponseEntity<HouseholdResponse> createHousehold(@RequestBody HouseholdRequest householdRequest) {
+    HouseholdResponse household = householdService.createHousehold(householdRequest);
+    return new ResponseEntity<>(household, HttpStatus.CREATED);
   }
 
   @GetMapping("/{id}")

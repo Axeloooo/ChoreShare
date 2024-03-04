@@ -24,9 +24,9 @@ public class TaskController {
   private TaskService taskService;
 
   @PostMapping
-  public ResponseEntity<String> createTask(@RequestBody TaskRequest taskRequest) {
-    String taskId = taskService.createTask(taskRequest);
-    return new ResponseEntity<>(taskId, HttpStatus.CREATED);
+  public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest taskRequest) {
+    TaskResponse task = taskService.createTask(taskRequest);
+    return new ResponseEntity<>(task, HttpStatus.CREATED);
   }
 
   @GetMapping("/{id}")

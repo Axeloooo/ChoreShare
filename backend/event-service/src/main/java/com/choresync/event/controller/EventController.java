@@ -23,9 +23,9 @@ public class EventController {
   private EventService eventService;
 
   @PostMapping
-  public ResponseEntity<String> createEvent(@RequestBody EventRequest eventRequest) {
-    String eventId = eventService.createEvent(eventRequest);
-    return new ResponseEntity<>(eventId, HttpStatus.CREATED);
+  public ResponseEntity<EventResponse> createEvent(@RequestBody EventRequest eventRequest) {
+    EventResponse event = eventService.createEvent(eventRequest);
+    return new ResponseEntity<>(event, HttpStatus.CREATED);
   }
 
   @GetMapping("/{id}")

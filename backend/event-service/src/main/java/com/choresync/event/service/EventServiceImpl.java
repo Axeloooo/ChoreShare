@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.choresync.event.entity.Event;
+import com.choresync.event.exception.EventCreationException;
+import com.choresync.event.exception.EventNotFoundException;
 import com.choresync.event.model.EventRequest;
 import com.choresync.event.model.EventResponse;
 import com.choresync.event.repository.EventRepository;
@@ -18,7 +20,11 @@ public class EventServiceImpl implements EventService {
   private EventRepository eventRepository;
 
   @Override
-  public String createEvent(EventRequest eventRequest) {
+  public EventResponse createEvent(EventRequest eventRequest) {
+    if (eventRequest == null) {
+      throw new EventCreationException("Missing fields in request body");
+    }
+
     Event event = Event
         .builder()
         .title(eventRequest.getTitle())
@@ -28,12 +34,22 @@ public class EventServiceImpl implements EventService {
 
     Event newEvent = eventRepository.save(event);
 
-    return newEvent.getId();
+    EventResponse eventResponse = EventResponse
+        .builder()
+        .id(newEvent.getId())
+        .title(newEvent.getTitle())
+        .startTime(newEvent.getStartTime())
+        .endTime(newEvent.getEndTime())
+        .createdAt(newEvent.getCreatedAt())
+        .updatedAt(newEvent.getUpdatedAt())
+        .build();
+
+    return eventResponse;
   }
 
   @Override
   public EventResponse getEventById(String id) {
-    Event event = eventRepository.findById(id).orElse(null);
+    Event event = eventRepository.findById(id).orElseThrow(() -> new EventNotFoundException("Event not found"));
 
     EventResponse eventResponse = EventResponse
         .builder()
@@ -69,5 +85,4 @@ public class EventServiceImpl implements EventService {
 
     return eventResponses;
   }
-
 }

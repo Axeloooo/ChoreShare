@@ -7,7 +7,7 @@ import com.choresync.event.model.EventResponse;
 
 public interface EventService {
 
-  String createEvent(EventRequest eventRequest);
+  EventResponse createEvent(EventRequest eventRequest);
 
   EventResponse getEventById(String id);
 

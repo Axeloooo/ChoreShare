@@ -1,4 +1,4 @@
-package com.choresync.announcement.model;
+package com.choresync.task.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,11 +7,8 @@ import lombok.NoArgsConstructor;
 
 @Builder
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class AnnouncementRequest {
-
+@AllArgsConstructor
+public class ErrorResponse {
   private String message;
-
-  private String userId;
 }

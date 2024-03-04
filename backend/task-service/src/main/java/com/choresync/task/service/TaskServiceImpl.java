@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.choresync.task.entity.Status;
 import com.choresync.task.entity.Task;
+import com.choresync.task.exception.TaskCreationException;
+import com.choresync.task.exception.TaskNotFoundException;
 import com.choresync.task.model.TaskRequest;
 import com.choresync.task.model.TaskResponse;
 import com.choresync.task.repository.TaskRepository;
@@ -18,7 +20,11 @@ public class TaskServiceImpl implements TaskService {
   private TaskRepository taskRepository;
 
   @Override
-  public String createTask(TaskRequest taskRequest) {
+  public TaskResponse createTask(TaskRequest taskRequest) {
+    if (taskRequest == null) {
+      throw new TaskCreationException("Missing fields in request body");
+    }
+
     Task task = Task.builder()
         .title(taskRequest.getTitle())
         .description(taskRequest.getDescription())
@@ -30,12 +36,26 @@ public class TaskServiceImpl implements TaskService {
 
     Task newTask = taskRepository.save(task);
 
-    return newTask.getId();
+    TaskResponse taskResponse = TaskResponse.builder()
+        .id(newTask.getId())
+        .title(newTask.getTitle())
+        .description(newTask.getDescription())
+        .status(newTask.getStatus())
+        .frequency(newTask.getFrequency())
+        .tag(newTask.getTag())
+        .userId(newTask.getUserId())
+        .createdAt(newTask.getCreatedAt())
+        .updatedAt(newTask.getUpdatedAt())
+        .build();
+
+    return taskResponse;
   }
 
   @Override
   public TaskResponse getTaskById(String id) {
-    Task task = taskRepository.findById(id).orElse(null);
+    Task task = taskRepository.findById(id).orElseThrow(() -> {
+      throw new TaskNotFoundException("Task not found");
+    });
 
     TaskResponse taskResponse = TaskResponse.builder()
         .id(task.getId())
@@ -54,6 +74,10 @@ public class TaskServiceImpl implements TaskService {
 
   @Override
   public List<TaskResponse> getAllTasksByUserId(String userId) {
+    if (userId == null) {
+      throw new TaskNotFoundException("Task not found");
+    }
+
     List<Task> tasks = taskRepository.findByUserId(userId);
 
     List<TaskResponse> taskResponses = new ArrayList<>();
