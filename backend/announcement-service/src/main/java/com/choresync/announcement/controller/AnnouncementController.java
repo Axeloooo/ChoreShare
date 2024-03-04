@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/v1/announcement")
@@ -30,21 +31,12 @@ public class AnnouncementController {
   @Autowired
   private AnnouncementService announcementService;
 
-  // Create announcement
-  // url: /api/v1/announcement, method: POST
-  // return type: ResponseEntity<AnnouncementResponse>
-  // NOTE: add check to see if user wanting to create announcement exists
   @PostMapping
   public ResponseEntity<AnnouncementResponse> createAnnouncement(@RequestBody AnnouncementRequest announcementRequest) {
     AnnouncementResponse newAnnouncement = announcementService.createAnnouncement(announcementRequest);
     return new ResponseEntity<>(newAnnouncement, HttpStatus.CREATED);
   }
 
-  // Update announcement
-  // url: /api/v1/announcement/{id}, request parameter: String (new message),
-  // method: PUT
-  // return type: ResponseEntity<AnnouncementResponse>
-  // NOTE: add check to see if user wanting to create announcement exists
   @PutMapping("/{id}")
   public ResponseEntity<AnnouncementResponse> editAnnouncement(@PathVariable String id,
       @RequestBody AnnouncementRequest announcementRequest) {
@@ -52,25 +44,22 @@ public class AnnouncementController {
     return new ResponseEntity<>(editedAnnouncement, HttpStatus.OK);
   }
 
-  // Get announcement by id
-  // url: /api/v1/announcement/{id}, method: GET
-  // return type: ResponseEntity<AnnouncementResponse>
   @GetMapping("/{id}")
   public ResponseEntity<AnnouncementResponse> getAnnouncementById(@PathVariable String id) {
     AnnouncementResponse announcement = announcementService.getAnnouncementById(id);
     return new ResponseEntity<>(announcement, HttpStatus.OK);
   }
 
-  // Get all announcements
-  // url: /api/v1/announcement/all, method: GET
-  // return type: ResponseEntity<List<AnnouncementResponse>>
-  @GetMapping("/all")
+  @GetMapping
   public ResponseEntity<List<AnnouncementResponse>> getAllAnnouncements() {
     return new ResponseEntity<>(announcementService.getAllAnnouncements(), HttpStatus.OK);
   }
 
-  // Delete announcement
-  // url: /api/v1/announcement/{id}, method: DELETE
+  @GetMapping("/user/{uid}")
+  public ResponseEntity<List<AnnouncementResponse>> getMethodName(@PathVariable("uid") String userId) {
+    return new ResponseEntity<>(announcementService.getAllAnnouncementsByUserId(userId), HttpStatus.OK);
+  }
+
   @DeleteMapping("/{id}")
   public ResponseEntity<Object> deleteAnnouncement(@PathVariable String id) {
     announcementService.deleteAnnouncement(id);
@@ -78,13 +67,4 @@ public class AnnouncementController {
     responseBody.put("message", "Announcement deleted successfully");
     return new ResponseEntity<>(responseBody, HttpStatus.OK);
   }
-
-  // Exception Handler for AnnouncementNotFoundException
-  @ExceptionHandler(AnnouncementNotFoundException.class)
-  public ResponseEntity<Object> handleAnnouncementNotFoundException(AnnouncementNotFoundException ex) {
-    Map<String, Object> responseBody = new HashMap<>();
-    responseBody.put("error", ex.getMessage());
-    return new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
-  }
-
 }

@@ -7,11 +7,8 @@ import lombok.NoArgsConstructor;
 
 @Builder
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class AnnouncementRequest {
-
+@AllArgsConstructor
+public class ErrorResponse {
   private String message;
-
-  private String userId;
 }

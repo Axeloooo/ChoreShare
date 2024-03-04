@@ -16,4 +16,6 @@ public interface AnnouncementService {
   AnnouncementResponse editAnnouncement(String id, AnnouncementRequest announcementRequest);
 
   void deleteAnnouncement(String id);
+
+  List<AnnouncementResponse> getAllAnnouncementsByUserId(String userId);
 }

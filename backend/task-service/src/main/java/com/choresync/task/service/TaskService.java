@@ -7,7 +7,7 @@ import com.choresync.task.model.TaskResponse;
 
 public interface TaskService {
 
-  String createTask(TaskRequest taskRequest);
+  TaskResponse createTask(TaskRequest taskRequest);
 
   TaskResponse getTaskById(String id);
 
