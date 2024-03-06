@@ -7,32 +7,34 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.choresync.user.model.ClientResponse;
-import com.choresync.user.entity.Client;
-import com.choresync.user.exceptions.UserAlreadyExistsException;
-import com.choresync.user.exceptions.UserNotFoundException;
-import com.choresync.user.model.ClientRequest;
-import com.choresync.user.repository.ClientRepository;
+import com.choresync.user.model.UserResponse;
+import com.choresync.user.entity.User;
+import com.choresync.user.exception.UserAlreadyExistsException;
+import com.choresync.user.exception.UserCreationException;
+import com.choresync.user.exception.UserNotFoundException;
+import com.choresync.user.model.AuthResponse;
+import com.choresync.user.model.UserRequest;
+import com.choresync.user.repository.UserRepository;
 
 @Service
-public class ClientServiceImpl implements ClientService {
+public class UserServiceImpl implements UserService {
 
   @Autowired
-  private ClientRepository clientRepository;
+  private UserRepository userRepository;
 
   @Override
-  public ClientResponse createUser(ClientRequest userRequest) {
-    // if (userRequest == null) {
-    // throw new RuntimeException("Client request must not be null");
-    // }
+  public AuthResponse createUser(UserRequest userRequest) {
+    if (userRequest == null) {
+      throw new UserCreationException("Invalid request body");
+    }
 
-    Client existingUser = clientRepository.findByEmail(userRequest.getEmail());
+    User existingUser = userRepository.findByEmail(userRequest.getEmail());
 
     if (existingUser != null) {
       throw new UserAlreadyExistsException("User with email " + userRequest.getEmail() + " already exists");
     }
 
-    Client user = Client.builder()
+    User user = User.builder()
         .firstName(userRequest.getFirstName())
         .lastName(userRequest.getLastName())
         .username(userRequest.getUsername())
@@ -43,36 +45,31 @@ public class ClientServiceImpl implements ClientService {
         .missedChores(0)
         .build();
 
-    Client newClient = clientRepository.save(user);
+    User newClient = userRepository.save(user);
 
-    ClientResponse userResponse = ClientResponse.builder()
+    AuthResponse authResponse = AuthResponse.builder()
         .id(newClient.getId())
-        .firstName(newClient.getFirstName())
-        .lastName(newClient.getLastName())
         .username(newClient.getUsername())
-        .email(newClient.getEmail())
-        .phone(newClient.getPhone())
-        .streak(newClient.getStreak())
-        .missedChores(newClient.getMissedChores())
+        .password(newClient.getPassword())
         .createdAt(newClient.getCreatedAt())
         .updatedAt(newClient.getUpdatedAt())
         .build();
 
-    return userResponse;
+    return authResponse;
   }
 
   @Override
-  public List<ClientResponse> getAllUsers() {
-    List<Client> users = clientRepository.findAll();
+  public List<UserResponse> getAllUsers() {
+    List<User> users = userRepository.findAll();
 
     if (users.isEmpty()) {
       return Collections.emptyList();
     }
 
-    List<ClientResponse> userListResponse = new ArrayList<>();
+    List<UserResponse> userListResponse = new ArrayList<>();
 
-    for (Client user : users) {
-      ClientResponse userResponse = ClientResponse.builder()
+    for (User user : users) {
+      UserResponse userResponse = UserResponse.builder()
           .id(user.getId())
           .firstName(user.getFirstName())
           .lastName(user.getLastName())
@@ -92,14 +89,10 @@ public class ClientServiceImpl implements ClientService {
   }
 
   @Override
-  public ClientResponse getUserById(String id) {
-    Client user = clientRepository.findById(id).orElse(null);
+  public UserResponse getUserById(String id) {
+    User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
 
-    if (user == null) {
-      throw new UserNotFoundException("User not found");
-    }
-
-    ClientResponse userResponse = ClientResponse.builder()
+    UserResponse userResponse = UserResponse.builder()
         .id(user.getId())
         .firstName(user.getFirstName())
         .lastName(user.getLastName())
@@ -117,33 +110,27 @@ public class ClientServiceImpl implements ClientService {
 
   @Override
   public void deleteUserById(String id) {
-    if (!clientRepository.existsById(id)) {
+    if (!userRepository.existsById(id)) {
       throw new UserNotFoundException("User not found");
     }
 
-    clientRepository.deleteById(id);
+    userRepository.deleteById(id);
   }
 
   @Override
-  public ClientResponse editUser(String id, ClientRequest userRequest) {
-    Client user = clientRepository.findById(id).orElse(null);
+  public UserResponse editUser(String id, UserRequest userRequest) {
+    User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
 
-    if (user == null) {
-      throw new UserNotFoundException("User not found");
-    }
-
-    // checko to ensure email is unique
     if (!userRequest.getEmail().equals(user.getEmail())) {
-      Client existingUser = clientRepository.findByEmail(userRequest.getEmail());
+      User existingUser = userRepository.findByEmail(userRequest.getEmail());
 
       if (existingUser != null) {
         throw new UserAlreadyExistsException("This email address is already in use! Please choose another email.");
       }
     }
 
-    // check to ensure phone is unique
     if (!userRequest.getPhone().equals(user.getPhone())) {
-      Client existingUser = clientRepository.findByPhone(userRequest.getPhone());
+      User existingUser = userRepository.findByPhone(userRequest.getPhone());
 
       if (existingUser != null) {
         throw new UserAlreadyExistsException("This phone number is already in use! Please choose another number.");
@@ -157,9 +144,9 @@ public class ClientServiceImpl implements ClientService {
     user.setPhone(userRequest.getPhone());
     user.setStreak(user.getStreak());
     user.setMissedChores(user.getMissedChores());
-    clientRepository.save(user);
+    userRepository.save(user);
 
-    ClientResponse userResponse = ClientResponse.builder()
+    UserResponse userResponse = UserResponse.builder()
         .id(user.getId())
         .firstName(user.getFirstName())
         .lastName(user.getLastName())
@@ -173,5 +160,24 @@ public class ClientServiceImpl implements ClientService {
         .build();
 
     return userResponse;
+  }
+
+  @Override
+  public AuthResponse getUserByUsername(String username) {
+    User user = userRepository.findByUsername(username);
+
+    if (user == null) {
+      throw new UserNotFoundException("User not found");
+    }
+
+    AuthResponse authResponse = AuthResponse.builder()
+        .id(user.getId())
+        .username(user.getUsername())
+        .password(user.getPassword())
+        .createdAt(user.getCreatedAt())
+        .updatedAt(user.getUpdatedAt())
+        .build();
+
+    return authResponse;
   }
 }
