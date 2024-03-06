@@ -1,4 +1,4 @@
-package com.choresync.user.exceptions;
+package com.choresync.user.exception;
 
 public class UserNotFoundException extends RuntimeException {
   public UserNotFoundException(String message) {

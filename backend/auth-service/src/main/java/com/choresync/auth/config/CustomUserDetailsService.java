@@ -1,26 +1,30 @@
 package com.choresync.auth.config;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
-import com.choresync.auth.entity.Auth;
-import com.choresync.auth.repository.AuthRepository;
+import com.choresync.auth.exception.AuthInternalCommunicationException;
+import com.choresync.auth.external.response.UserResponse;
 
 @Component
 public class CustomUserDetailsService implements UserDetailsService {
-
   @Autowired
-  private AuthRepository authRepository;
+  private RestTemplate restTemplate;
 
   @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    Optional<Auth> auth = authRepository.findByUsername(username);
-    return auth.map(CustomUserDetails::new).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
-  }
+  public UserDetails loadUserByUsername(String username) {
+    try {
+      UserResponse userResponse = restTemplate.getForObject(
+          "http://user-service/api/v1/user/username/" + username,
+          UserResponse.class);
 
+      return new CustomUserDetails(userResponse);
+    } catch (Exception e) {
+      throw new AuthInternalCommunicationException(
+          "Internal communication error with user-service - " + e.getMessage());
+    }
+  }
 }

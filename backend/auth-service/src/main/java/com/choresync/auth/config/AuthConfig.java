@@ -14,7 +14,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class AuthConfig {
-
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
@@ -36,7 +35,8 @@ public class AuthConfig {
     http
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(requests -> requests
-            .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/validate").permitAll());
+            .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/validate")
+            .permitAll());
     return http.build();
   }
 

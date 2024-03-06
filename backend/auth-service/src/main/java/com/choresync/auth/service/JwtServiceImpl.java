@@ -25,7 +25,7 @@ public class JwtServiceImpl implements JwtService {
     return createToken(claims, userName);
   }
 
-  private String createToken(Map<String, Object> claims, String userName) {
+  public String createToken(Map<String, Object> claims, String userName) {
     return Jwts.builder()
         .setClaims(claims)
         .setSubject(userName)
@@ -35,7 +35,7 @@ public class JwtServiceImpl implements JwtService {
         .compact();
   }
 
-  private Key getSignKey() {
+  public Key getSignKey() {
     byte[] keyBytes = Decoders.BASE64.decode(SECRET);
     return Keys.hmacShaKeyFor(keyBytes);
   }

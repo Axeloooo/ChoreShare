@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class FallbackController {
 
   @GetMapping("/userhousehold-service-fallback")
-  public String userServiceFallback() {
+  public String userhouseholdServiceFallback() {
     return "Userhousehold service is down. Please try again later";
   }
 
@@ -39,5 +39,10 @@ public class FallbackController {
   @GetMapping("/announcement-service-fallback")
   public String announcementServiceFallback() {
     return "Announcement service is down. Please try again later";
+  }
+
+  @GetMapping("/user-service-fallback")
+  public String userServiceFallback() {
+    return "User service is down. Please try again later";
   }
 }

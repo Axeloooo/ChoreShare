@@ -1,15 +1,19 @@
-package com.choresync.auth.external.request;
+package com.choresync.user.model;
+
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
-public class ClientRequest {
+@NoArgsConstructor
+public class UserResponse {
+  private String id;
+
   private String firstName;
 
   private String lastName;
@@ -18,7 +22,13 @@ public class ClientRequest {
 
   private String email;
 
-  private String password;
-
   private String phone;
+
+  private int streak;
+
+  private int missedChores;
+
+  private Date createdAt;
+
+  private Date updatedAt;
 }

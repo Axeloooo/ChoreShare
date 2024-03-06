@@ -36,7 +36,7 @@ public class AuthController {
         new UsernamePasswordAuthenticationToken(authLoginRequest.getUsername(), authLoginRequest.getPassword()));
 
     if (authentication.isAuthenticated()) {
-      return authService.loginUser(authLoginRequest.getUsername());
+      return authService.loginUser(authLoginRequest);
     } else {
       throw new RuntimeException("Invalid credentials");
     }

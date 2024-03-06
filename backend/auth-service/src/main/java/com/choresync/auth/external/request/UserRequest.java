@@ -1,4 +1,4 @@
-package com.choresync.auth.model;
+package com.choresync.auth.external.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthRegisterRequest {
+public class UserRequest {
   private String firstName;
 
   private String lastName;

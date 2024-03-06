@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClientRequest {
-
+public class UserRequest {
   private String firstName;
 
   private String lastName;

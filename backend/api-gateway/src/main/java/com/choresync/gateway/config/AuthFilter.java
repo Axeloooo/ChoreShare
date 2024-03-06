@@ -4,9 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Component;
 
+import com.choresync.gateway.exception.AuthMissingTokenException;
+import com.choresync.gateway.exception.AuthUnauthorizedAccessException;
 import com.choresync.gateway.util.JwtUtil;
 
+@Component
 public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> {
 
   @Autowired
@@ -28,7 +32,7 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
             .getRequest()
             .getHeaders()
             .containsKey(HttpHeaders.AUTHORIZATION)) {
-          throw new RuntimeException("Missing Authorization Token");
+          throw new AuthMissingTokenException("Missing Authorization Token");
         }
 
         String authHeader = exchange
@@ -43,7 +47,7 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
         try {
           jwtUtil.validateToken(authHeader);
         } catch (Exception e) {
-          throw new RuntimeException("Unauthorized Access");
+          throw new AuthUnauthorizedAccessException("Unauthorized Access");
         }
       }
       return chain.filter(exchange);
