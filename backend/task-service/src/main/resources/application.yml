@@ -5,7 +5,7 @@ spring:
   application:
     name: task-service
   config:
-    import: "optional:configserver:http://localhost:8080"
+    import: "optional:configserver:${CONFIG_SERVICE_URI:http://localhost:8080}"
   jpa:
     database: postgresql
     hibernate:
