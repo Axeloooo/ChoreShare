@@ -22,8 +22,6 @@ services:
       POSTGRES_PASSWORD: root
     volumes:
       - db:/var/lib/postgresql/data
-    networks:
-      - postgres
 
   pgadmin4:
     container_name: pgadmin4
@@ -33,14 +31,127 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"
-    networks:
-      - postgres
     volumes:
       - pgadmin:/var/lib/pgadmin
 
-networks:
-  postgres:
-    driver: bridge
+  registry-service:
+    container_name: registry-service
+    build: ./registry-service
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test:
+        ["CMD", "curl", "-f", "http://registry-service:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  config-service:
+    container_name: config-service
+    build: ./config-service
+    ports:
+      - "8080:8080"
+    environment:
+      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://config-service:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - registry-service
+
+  api-gateway:
+    container_name: api-gateway
+    build: ./api-gateway
+    ports:
+      - "8888:8888"
+    environment:
+      CONFIG_SERVICE_URI: http://config-service:8080
+    depends_on:
+      registry-service:
+        condition: service_healthy
+
+  auth-service:
+    container_name: auth-service
+    build: ./auth-service
+    ports:
+      - "8087:8087"
+    environment:
+      CONFIG_SERVICE_URI: http://config-service:8080
+    depends_on:
+      registry-service:
+        condition: service_healthy
+
+  user-service:
+    container_name: user-service
+    build: ./user-service
+    ports:
+      - "8086:8086"
+    environment:
+      CONFIG_SERVICE_URI: http://config-service:8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: userdb
+    depends_on:
+      registry-service:
+        condition: service_healthy
+
+  announcement-service:
+    container_name: announcement-service
+    build: ./announcement-service
+    ports:
+      - "8085:8085"
+    environment:
+      CONFIG_SERVICE_URI: http://config-service:8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: announcementdb
+    depends_on:
+      registry-service:
+        condition: service_healthy
+
+  event-service:
+    container_name: event-service
+    build: ./event-service
+    ports:
+      - "8083:8083"
+    environment:
+      CONFIG_SERVICE_URI: http://config-service:8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: eventdb
+    depends_on:
+      registry-service:
+        condition: service_healthy
+
+  household-service:
+    container_name: household-service
+    build: ./household-service
+    ports:
+      - "8082:8082"
+    environment:
+      CONFIG_SERVICE_URI: http://config-service:8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: householddb
+    depends_on:
+      registry-service:
+        condition: service_healthy
+
+  task-service:
+    container_name: task-service
+    build: ./task-service
+    ports:
+      - "8081:8081"
+    environment:
+      CONFIG_SERVICE_URI: http://config-service:8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: taskdb
+    depends_on:
+      registry-service:
+        condition: service_healthy
 
 volumes:
   db:
