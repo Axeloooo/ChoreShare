@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.choresync.auth.exception.AuthInternalCommunicationException;
@@ -22,9 +23,9 @@ public class CustomUserDetailsService implements UserDetailsService {
           UserResponse.class);
 
       return new CustomUserDetails(userResponse);
-    } catch (Exception e) {
+    } catch (RestClientException e) {
       throw new AuthInternalCommunicationException(
-          "Internal communication error with user-service - " + e.getMessage());
+          "User not found. " + e.getMessage());
     }
   }
 }
