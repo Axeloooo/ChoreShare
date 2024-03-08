@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -25,9 +26,10 @@ public class UserhouseholdController {
   private UserhouseholdService userhouseholdService;
 
   @PostMapping
-  public ResponseEntity<String> createUserhousehold(@RequestBody UserhouseholdRequest userhouseholdRequest) {
-    String id = userhouseholdService.createUserhousehold(userhouseholdRequest);
-    return new ResponseEntity<>(id, HttpStatus.CREATED);
+  public ResponseEntity<UserhouseholdResponse> createUserhousehold(
+      @RequestBody UserhouseholdRequest userhouseholdRequest) {
+    UserhouseholdResponse userhousehold = userhouseholdService.createUserhousehold(userhouseholdRequest);
+    return new ResponseEntity<>(userhousehold, HttpStatus.CREATED);
   }
 
   @GetMapping("/{id}")
@@ -48,5 +50,12 @@ public class UserhouseholdController {
     List<UserhouseholdResponse> userhouseholdResponse = userhouseholdService
         .getUserhouseholdsByHouseholdId(householdId);
     return new ResponseEntity<>(userhouseholdResponse, HttpStatus.OK);
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<String> deleteUserhouseholdById(@PathVariable("id") String id) {
+    userhouseholdService.deleteUserhouseholdById(id);
+
+    return new ResponseEntity<>("Userhousehold with id " + id + " has been deleted", HttpStatus.OK);
   }
 }

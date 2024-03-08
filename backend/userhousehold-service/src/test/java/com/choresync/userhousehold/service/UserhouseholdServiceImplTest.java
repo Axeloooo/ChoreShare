@@ -1,148 +1,207 @@
 package com.choresync.userhousehold.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.annotation.Description;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.choresync.userhousehold.entity.Userhousehold;
-import com.choresync.userhousehold.external.request.HouseholdResquest;
+import com.choresync.userhousehold.exception.HouseholdCreationException;
+import com.choresync.userhousehold.exception.HouseholdNotFoundException;
+import com.choresync.userhousehold.exception.UserhouseholdNotFoundException;
+import com.choresync.userhousehold.external.request.HouseholdRequest;
 import com.choresync.userhousehold.external.response.HouseholdResponse;
 import com.choresync.userhousehold.model.UserhouseholdRequest;
 import com.choresync.userhousehold.model.UserhouseholdResponse;
 import com.choresync.userhousehold.repository.UserhouseholdRepository;
 
-public class UserhouseholdServiceImplTest {
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-  @Mock
-  private UserhouseholdRepository userhouseholdRepository;
+import java.util.Date;
+import java.util.Optional;
 
-  @Mock
-  private RestTemplate restTemplate;
+class UserhouseholdServiceImplTest {
 
-  @InjectMocks
-  private UserhouseholdServiceImpl userhouseholdService;
+    @Mock
+    private UserhouseholdRepository userhouseholdRepository;
 
-  private HouseholdResquest householdRequest;
-  private Userhousehold userhousehold;
-  private UserhouseholdRequest userhouseholdRequest;
-  private UserhouseholdResponse userhouseholdResponse;
-  private HouseholdResponse householdResponse;
+    @Mock
+    private RestTemplate restTemplate;
 
-  @BeforeEach
-  public void setUp() {
-    MockitoAnnotations.openMocks(this);
+    @InjectMocks
+    private UserhouseholdServiceImpl userhouseholdService;
 
-    householdRequest = HouseholdResquest
-        .builder()
-        .name("Doe Family")
-        .build();
+    UserhouseholdRequest userhouseholdRequest;
+    HouseholdResponse fetchedHousehold;
+    Userhousehold userhousehold;
+    HouseholdRequest householdRequest;
+    HouseholdResponse householdResponse;
 
-    householdResponse = HouseholdResponse
-        .builder()
-        .id("1")
-        .name("Doe Family")
-        .build();
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
 
-    userhousehold = Userhousehold
-        .builder()
-        .id("1")
-        .householdId("1")
-        .userId("user1")
-        .build();
+        userhouseholdRequest = UserhouseholdRequest
+                .builder()
+                .name("Test Household")
+                .userId("1")
+                .build();
 
-    userhouseholdRequest = UserhouseholdRequest
-        .builder()
-        .name("Doe Family")
-        .userId("user1")
-        .build();
+        fetchedHousehold = HouseholdResponse
+                .builder()
+                .id("1")
+                .name("Test Household")
+                .createdAt(new Date())
+                .updatedAt(new Date())
+                .build();
 
-    userhouseholdResponse = UserhouseholdResponse
-        .builder()
-        .id("1")
-        .userId("user1")
-        .household(UserhouseholdResponse.Household.builder()
-            .id("1")
-            .name("Doe Family")
-            .build())
-        .build();
-  }
+        userhousehold = Userhousehold
+                .builder()
+                .id("1")
+                .userId("1")
+                .householdId("1")
+                .createdAt(new Date())
+                .updatedAt(new Date())
+                .build();
 
-  @Test
-  public void testCreateUserhousehold() {
-    when(restTemplate.postForObject(
-        "http://household-service/api/v1/household",
-        householdRequest,
-        String.class))
-        .thenReturn("1");
+        householdRequest = HouseholdRequest
+                .builder()
+                .name("Test Household")
+                .build();
 
-    when(userhouseholdRepository.save(any(Userhousehold.class)))
-        .thenReturn(userhousehold);
+        householdResponse = HouseholdResponse
+                .builder()
+                .id("1")
+                .name("Test Household")
+                .createdAt(new Date())
+                .updatedAt(new Date())
+                .build();
+    }
 
-    String userhouseholdId = userhouseholdService.createUserhousehold(userhouseholdRequest);
+    @Description("POST /api/v1/household - Test createUserhousehold")
+    @Test
+    void createUserhousehold_Success() {
+        when(restTemplate.postForObject(
+                "http://household-service/api/v1/household",
+                householdRequest,
+                HouseholdResponse.class))
+                .thenReturn(fetchedHousehold);
 
-    assertNotNull(userhouseholdId);
-    assertEquals(userhousehold.getId(), userhouseholdId);
-  }
+        when(userhouseholdRepository.save(any()))
+                .thenReturn(userhousehold);
 
-  @Test
-  public void testGetUserhouseholdById() {
-    when(userhouseholdRepository.findById("1"))
-        .thenReturn(Optional.ofNullable(userhousehold));
+        UserhouseholdResponse result = userhouseholdService.createUserhousehold(userhouseholdRequest);
 
-    when(restTemplate.getForObject(
-        "http://household-service/api/v1/household/1",
-        HouseholdResponse.class))
-        .thenReturn(householdResponse);
+        assertNotNull(result);
+        assertEquals("1", result.getId());
+        assertEquals("1", result.getUserId());
+        assertEquals("Test Household", result.getHousehold().getName());
 
-    UserhouseholdResponse result = userhouseholdService.getUserhouseholdById("1");
+        verify(restTemplate, times(1)).postForObject(
+                "http://household-service/api/v1/household",
+                householdRequest,
+                HouseholdResponse.class);
+        verify(userhouseholdRepository, times(1)).save(any());
+    }
 
-    assertNotNull(result);
-    assertEquals(userhouseholdResponse, result);
-  }
+    @Description("POST /api/v1/household - Test HouseholdCreationException")
+    @Test
+    void createUserhousehold_Failure_RestClientException() {
+        when(restTemplate.postForObject(
+                "http://household-service/api/v1/household",
+                householdRequest,
+                HouseholdResponse.class)).thenThrow(new RestClientException("Failed"));
 
-  @Test
-  public void testGetUserhouseholdsByUserId() {
-    when(userhouseholdRepository.findAllByUserId("user1"))
-        .thenReturn(Arrays.asList(userhousehold));
+        assertThrows(HouseholdCreationException.class,
+                () -> userhouseholdService.createUserhousehold(userhouseholdRequest));
+    }
 
-    when(restTemplate.getForObject(
-        "http://household-service/api/v1/household/1",
-        HouseholdResponse.class))
-        .thenReturn(householdResponse);
+    @Description("GET /api/v1/userhousehold/{id} - Test getUserhouseholdById")
+    @Test
+    void getUserhouseholdById_Success() {
+        when(userhouseholdRepository.findById(userhousehold.getId()))
+                .thenReturn(Optional.of(userhousehold));
 
-    List<UserhouseholdResponse> result = userhouseholdService.getUserhouseholdsByUserId("user1");
+        when(restTemplate.getForObject(
+                "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
+                HouseholdResponse.class))
+                .thenReturn(householdResponse);
 
-    assertNotNull(result);
-    assertEquals(1, result.size());
-    assertEquals(userhouseholdResponse, result.get(0));
-  }
+        UserhouseholdResponse result = userhouseholdService.getUserhouseholdById(userhousehold.getId());
 
-  @Test
-  public void testGetUserhouseholdsByHouseholdId() {
-    when(userhouseholdRepository.findAllByHouseholdId("1"))
-        .thenReturn(Arrays.asList(userhousehold));
+        assertNotNull(result);
+        assertEquals("1", result.getId());
+        assertEquals("Test Household", result.getHousehold().getName());
 
-    when(restTemplate.getForObject(
-        "http://household-service/api/v1/household/1",
-        HouseholdResponse.class))
-        .thenReturn(householdResponse);
+        verify(userhouseholdRepository, times(1)).findById(userhousehold.getId());
+        verify(restTemplate, times(1)).getForObject(
+                "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
+                HouseholdResponse.class);
+    }
 
-    List<UserhouseholdResponse> result = userhouseholdService.getUserhouseholdsByHouseholdId("1");
+    @Description("GET /api/v1/userhousehold/{id} - Test UserhouseholdNotFoundException")
+    @Test
+    void getUserhouseholdById_Failure_UserhouseholdNotFound() {
+        when(userhouseholdRepository.findById(userhousehold.getId()))
+                .thenReturn(Optional.empty());
 
-    assertNotNull(result);
-    assertEquals(1, result.size());
-    assertEquals(userhouseholdResponse, result.get(0));
-  }
+        assertThrows(UserhouseholdNotFoundException.class,
+                () -> userhouseholdService.getUserhouseholdById(userhousehold.getId()));
+
+        verify(userhouseholdRepository, times(1)).findById(userhousehold.getId());
+        verify(restTemplate, times(0)).getForObject(
+                "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
+                HouseholdResponse.class);
+    }
+
+    @Description("GET /api/v1/userhousehold/{id} - Test HouseholdNotFoundException")
+    @Test
+    void getUserhouseholdById_Failure_RestClientException() {
+        when(userhouseholdRepository.findById(userhousehold.getId()))
+                .thenReturn(Optional.of(userhousehold));
+
+        when(restTemplate.getForObject(
+                "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
+                HouseholdResponse.class))
+                .thenThrow(new RestClientException("Failed"));
+
+        assertThrows(HouseholdNotFoundException.class,
+                () -> userhouseholdService.getUserhouseholdById(userhousehold.getId()));
+
+        verify(userhouseholdRepository, times(1)).findById(userhousehold.getId());
+        verify(restTemplate, times(1)).getForObject(
+                "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
+                HouseholdResponse.class);
+    }
+
+    @Description("DELETE /api/v1/userhousehold/{id} - Test deleteUserhouseholdById")
+    @Test
+    void deleteUserhouseholdById_Success() {
+        when(userhouseholdRepository.findById(userhousehold.getId()))
+                .thenReturn(Optional.of(userhousehold));
+
+        userhouseholdService.deleteUserhouseholdById(userhousehold.getId());
+
+        verify(userhouseholdRepository, times(1)).findById(userhousehold.getId());
+        verify(userhouseholdRepository, times(1)).delete(userhousehold);
+    }
+
+    @Description("DELETE /api/v1/userhousehold/{id} - Test UserhouseholdNotFoundException")
+    @Test
+    void deleteUserhouseholdById_Failure_UserhouseholdNotFound() {
+        when(userhouseholdRepository.findById(userhousehold.getId()))
+                .thenReturn(Optional.empty());
+
+        assertThrows(UserhouseholdNotFoundException.class,
+                () -> userhouseholdService.deleteUserhouseholdById(userhousehold.getId()));
+
+        verify(userhouseholdRepository, times(1)).findById(userhousehold.getId());
+        verify(userhouseholdRepository, times(0)).delete(userhousehold);
+    }
 }

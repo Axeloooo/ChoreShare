@@ -14,6 +14,8 @@
 - [🧩 Architecture Overview](#🧩-architecture-overview)
 - [📱 Frontend Documentation](#📱-frontend-documentation)
 - [🚀 Backend Documentation](#🚀-backend-documentation)
+  - [Database Setup](#database-setup)
+  - [Running the Backend](#running-the-backend)
 
 ## 📝 Contributors
 
@@ -60,7 +62,7 @@ Roommate task board application. Many roommates living together can add and remo
 
 ## 🧩 Architecture Overview
 
-![ChoreSync Architecture](choresync_architecture.png)
+![ChoreSync Architecture](./images/choresync_architecture.png)
 
 ## 📱 Frontend Documentation
 
@@ -68,4 +70,96 @@ Coming soon...
 
 ## 🚀 Backend Documentation
 
-Coming soon...
+### Database Setup
+
+1. Open the terminal and clone this repository using HTTPS or SSH (The example below uses SSH).
+
+```bash
+git clone git@github.com:2BlackCats/ENSF401_Final_Project.git
+```
+
+2. `cd` into the `ENSF401_Final_Project` directory.
+
+```bash
+cd ENSF401_Final_Project
+```
+
+3. `cd` into the `backend` directory.
+
+```bash
+cd backend
+```
+
+4. Run the following command to start the PostgreSQL database using Docker.
+
+```bash
+docker-compose up postgres pgadmin4 -d
+```
+
+5. Open a web browser and navigate to `http://localhost:5050`. Log in to the pgAdmin4 web interface using the following credentials:
+
+- Email: `pgadmin4@pgadmin.com`
+
+- Password: `admin`
+
+![pgAdmin4 Login](./images/image1.png)
+
+6. Right-click on `Add New Server` in the `Quick Links` section.
+
+![Add New Server](./images/image2.png)
+
+7. Enter the following details in the `General` tab:
+
+- Name: `ChoreSync`
+
+![General Tab](./images/image3.png)
+
+8. Click on the `Connection` tab and enter the following details:
+
+- Host name/address: `postgres`
+
+- Port: `5432`
+
+- Username: `postgres`
+
+- Password: `root`
+
+- Save password?: `Yes`
+
+![Connection Tab](./images/image4.png)
+
+9. Click on the `Save` button to save the server configuration.
+
+10. Right-click on the `ChoreSync` server and select `Create > Database...`.
+
+![Create Database](./images/image5.png)
+
+11. Enter the following details in the `General` tab of the `Create - Database` dialog:
+
+- Database: `<service-name-db>`
+
+![Create Database](./images/image6.png)
+
+_Replace `<service-name>` with the name of the database you want to create. For example, `userdb`, `taskdb`, `householddb`, etc._
+
+12. Click on the `Save` button to create the database.
+
+13. If is the first time you are running the application, you will need repeat steps 10 to 12 for each database of each service.
+
+### Running the Backend
+
+1. If you have previously set up the database, you can proceed to run the backend. Otherwise, follow the instructions in the `Database Setup` section.
+
+2. Open a new terminal and from the root directory of the repository, `cd` into the `backend` directory.
+
+```bash
+cd backend
+```
+
+3. Run the following command to start the backend.
+
+```bash
+docker compose up -d
+```
+
+4. The backend should now be running.
