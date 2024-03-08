@@ -2,10 +2,6 @@ package com.choresync.task.model;
 
 import java.util.Date;
 
-import com.choresync.task.entity.Frequency;
-import com.choresync.task.entity.Status;
-import com.choresync.task.entity.Tag;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,11 +18,11 @@ public class TaskResponse {
 
   private String description;
 
-  private Status status;
+  private String status;
 
-  private Frequency frequency;
+  private String frequency;
 
-  private Tag tag;
+  private String tag;
 
   private String userId;
 

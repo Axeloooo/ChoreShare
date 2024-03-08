@@ -7,18 +7,14 @@ import lombok.NoArgsConstructor;
 
 @Builder
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class TaskRequest {
+@AllArgsConstructor
+public class TaskEditMetadataRequest {
   private String title;
 
   private String description;
 
-  private String status;
-
   private String frequency;
 
   private String tag;
-
-  private String userId;
 }
