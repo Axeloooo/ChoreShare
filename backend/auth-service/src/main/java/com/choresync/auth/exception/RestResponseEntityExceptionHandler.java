@@ -14,7 +14,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     super();
   }
 
-  @ExceptionHandler({ AuthRequestBodyException.class })
+  @ExceptionHandler(AuthRequestBodyException.class)
   protected ResponseEntity<ErrorResponse> handleInvalidRequest(AuthRequestBodyException exception) {
     return new ResponseEntity<>(
         ErrorResponse
@@ -22,5 +22,16 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
             .message(exception.getMessage())
             .build(),
         HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(AuthInternalCommunicationException.class)
+  protected ResponseEntity<ErrorResponse> handleInternalCommunicationError(
+      AuthInternalCommunicationException exception) {
+    return new ResponseEntity<>(
+        ErrorResponse
+            .builder()
+            .message(exception.getMessage())
+            .build(),
+        HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

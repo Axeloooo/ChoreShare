@@ -3,6 +3,7 @@ package com.choresync.auth.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.choresync.auth.exception.AuthInternalCommunicationException;
@@ -48,9 +49,9 @@ public class AuthServiceImpl implements AuthService {
           userRequest,
           UserResponse.class);
       return jwtService.generateToken(userResponse.getUsername());
-    } catch (Exception e) {
+    } catch (RestClientException e) {
       throw new AuthInternalCommunicationException(
-          "Internal communication error with user-service - " + e.getMessage());
+          "Failed to create user. " + e.getMessage());
     }
   }
 
