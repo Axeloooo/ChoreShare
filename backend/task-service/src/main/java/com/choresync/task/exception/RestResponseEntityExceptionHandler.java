@@ -31,4 +31,13 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
             .build(),
         HttpStatus.BAD_REQUEST);
   }
+
+  @ExceptionHandler(TaskUnforbiddenActionException.class)
+  public ResponseEntity<ErrorResponse> handleTaskUnforbiddenActionException(TaskUnforbiddenActionException exception) {
+    return new ResponseEntity<>(
+        ErrorResponse.builder()
+            .message(exception.getMessage())
+            .build(),
+        HttpStatus.FORBIDDEN);
+  }
 }

@@ -7,18 +7,10 @@ import lombok.NoArgsConstructor;
 
 @Builder
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class TaskRequest {
-  private String title;
-
-  private String description;
-
+@AllArgsConstructor
+public class TaskEditStatusRequest {
   private String status;
-
-  private String frequency;
-
-  private String tag;
 
   private String userId;
 }

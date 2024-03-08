@@ -9,11 +9,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.choresync.task.model.TaskEditMetadataRequest;
+import com.choresync.task.model.TaskEditStatusRequest;
 import com.choresync.task.model.TaskRequest;
 import com.choresync.task.model.TaskResponse;
 import com.choresync.task.service.TaskService;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -45,5 +49,39 @@ public class TaskController {
   public ResponseEntity<List<TaskResponse>> getAllTasks() {
     List<TaskResponse> tasks = taskService.getAllTasks();
     return new ResponseEntity<>(tasks, HttpStatus.OK);
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<TaskResponse> updateTask(@PathVariable("id") String id,
+      @RequestBody TaskEditMetadataRequest taskRequest) {
+    TaskResponse task = taskService.updateTask(id, taskRequest);
+    return new ResponseEntity<>(task, HttpStatus.OK);
+  }
+
+  @PutMapping("/{id}/assignee/{uid}")
+  public ResponseEntity<TaskResponse> assignTask(@PathVariable("id") String id,
+      @PathVariable("uid") String userId) {
+    TaskResponse task = taskService.assignTask(id, userId);
+    return new ResponseEntity<>(task, HttpStatus.OK);
+  }
+
+  @PutMapping("/{id}/unassign/{uid}")
+  public ResponseEntity<TaskResponse> unassignTask(@PathVariable("id") String id,
+      @PathVariable("uid") String userId) {
+    TaskResponse task = taskService.unassignTask(id, userId);
+    return new ResponseEntity<>(task, HttpStatus.OK);
+  }
+
+  @PutMapping("/{id}/status")
+  public ResponseEntity<TaskResponse> updateTaskStatus(@PathVariable("id") String id,
+      @RequestBody TaskEditStatusRequest taskRequest) {
+    TaskResponse task = taskService.updateTaskStatus(id, taskRequest);
+    return new ResponseEntity<>(task, HttpStatus.OK);
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<String> deleteTask(@PathVariable("id") String id) {
+    taskService.deleteTask(id);
+    return new ResponseEntity<>("Task deleted successfully", HttpStatus.OK);
   }
 }
