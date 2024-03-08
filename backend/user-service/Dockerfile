@@ -1,13 +1,10 @@
-FROM openjdk:17 as build
+FROM openjdk:17-slim as builder
 WORKDIR /app
-COPY .mvn/ .mvn
-COPY mvnw pom.xml ./
-RUN ./mvnw dependency:go-offline
-COPY ./src ./src
-RUN ./mvnw clean install
+COPY . .
+RUN ./mvnw clean install -DskipTests
 
 FROM openjdk:17
 WORKDIR /app
-COPY --from=build /app/target/*.jar /app/*.jar
+COPY --from=builder /app/target/*.jar user-service.jar
 EXPOSE 8086
-CMD ["java", "-jar", "/app/*.jar" ]
+CMD ["java", "-jar", "user-service.jar"]
