@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class HouseholdResquest {
+public class HouseholdRequest {
   private String name;
 }

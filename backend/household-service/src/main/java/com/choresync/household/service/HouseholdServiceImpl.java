@@ -20,8 +20,8 @@ public class HouseholdServiceImpl implements HouseholdService {
 
   @Override
   public HouseholdResponse createHousehold(HouseholdRequest householdRequest) {
-    if (householdRequest == null) {
-      throw new HouseholdCreationException("Missing household request");
+    if (householdRequest.getName() == null) {
+      throw new HouseholdCreationException("Invalid request body");
     }
 
     Household household = Household.builder()

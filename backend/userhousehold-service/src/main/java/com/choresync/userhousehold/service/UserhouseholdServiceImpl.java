@@ -5,10 +5,15 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.choresync.userhousehold.entity.Userhousehold;
-import com.choresync.userhousehold.external.request.HouseholdResquest;
+import com.choresync.userhousehold.exception.HouseholdCreationException;
+import com.choresync.userhousehold.exception.HouseholdNotFoundException;
+import com.choresync.userhousehold.exception.UserhouseholdCreationException;
+import com.choresync.userhousehold.exception.UserhouseholdNotFoundException;
+import com.choresync.userhousehold.external.request.HouseholdRequest;
 import com.choresync.userhousehold.external.response.HouseholdResponse;
 import com.choresync.userhousehold.model.UserhouseholdRequest;
 import com.choresync.userhousehold.model.UserhouseholdResponse;
@@ -23,38 +28,71 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
   private RestTemplate restTemplate;
 
   @Override
-  public String createUserhousehold(UserhouseholdRequest userhouseholdRequest) {
+  public UserhouseholdResponse createUserhousehold(UserhouseholdRequest userhouseholdRequest) {
+    if (userhouseholdRequest.getName() == null || userhouseholdRequest.getUserId() == null) {
+      throw new UserhouseholdCreationException("Invalid request body");
+    }
 
-    HouseholdResquest householdResquest = HouseholdResquest
+    HouseholdRequest householdResquest = HouseholdRequest
         .builder()
         .name(userhouseholdRequest.getName())
         .build();
 
-    String householdId = restTemplate
-        .postForObject(
-            "http://household-service/api/v1/household",
-            householdResquest,
-            String.class);
+    HouseholdResponse fetchedHousehold;
+
+    try {
+      fetchedHousehold = restTemplate
+          .postForObject(
+              "http://household-service/api/v1/household",
+              householdResquest,
+              HouseholdResponse.class);
+    } catch (RestClientException e) {
+      throw new HouseholdCreationException("Failed to create household. " + e.getMessage());
+    }
 
     Userhousehold userhousehold = Userhousehold
         .builder()
-        .householdId(householdId)
         .userId(userhouseholdRequest.getUserId())
+        .householdId(fetchedHousehold.getId())
         .build();
 
     Userhousehold newUserhousehold = userhouseholdRepository.save(userhousehold);
 
-    return newUserhousehold.getId();
+    UserhouseholdResponse.Household household = UserhouseholdResponse.Household
+        .builder()
+        .id(fetchedHousehold.getId())
+        .name(fetchedHousehold.getName())
+        .createdAt(fetchedHousehold.getCreatedAt())
+        .updatedAt(fetchedHousehold.getUpdatedAt())
+        .build();
+
+    UserhouseholdResponse userhouseholdResponse = UserhouseholdResponse
+        .builder()
+        .id(newUserhousehold.getId())
+        .userId(newUserhousehold.getUserId())
+        .household(household)
+        .createdAt(newUserhousehold.getCreatedAt())
+        .updatedAt(newUserhousehold.getUpdatedAt())
+        .build();
+
+    return userhouseholdResponse;
   }
 
   @Override
   public UserhouseholdResponse getUserhouseholdById(String id) {
-    Userhousehold userhousehold = userhouseholdRepository.findById(id).orElse(null);
+    Userhousehold userhousehold = userhouseholdRepository.findById(id).orElseThrow(
+        () -> new UserhouseholdNotFoundException("Userhousehold not found"));
 
-    HouseholdResponse householdResponse = restTemplate
-        .getForObject(
-            "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
-            HouseholdResponse.class);
+    HouseholdResponse householdResponse;
+
+    try {
+      householdResponse = restTemplate
+          .getForObject(
+              "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
+              HouseholdResponse.class);
+    } catch (RestClientException e) {
+      throw new HouseholdNotFoundException("Household not found. " + e.getMessage());
+    }
 
     UserhouseholdResponse.Household household = UserhouseholdResponse.Household
         .builder()
@@ -83,10 +121,16 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
     List<UserhouseholdResponse> userhouseholdResponses = new ArrayList<>();
 
     for (Userhousehold userhousehold : userhouseholds) {
-      HouseholdResponse householdResponse = restTemplate
-          .getForObject(
-              "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
-              HouseholdResponse.class);
+      HouseholdResponse householdResponse;
+
+      try {
+        householdResponse = restTemplate
+            .getForObject(
+                "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
+                HouseholdResponse.class);
+      } catch (RestClientException e) {
+        throw new HouseholdNotFoundException("Household not found. " + e.getMessage());
+      }
 
       UserhouseholdResponse.Household household = UserhouseholdResponse.Household
           .builder()
@@ -118,10 +162,16 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
     List<UserhouseholdResponse> userhouseholdResponses = new ArrayList<>();
 
     for (Userhousehold userhousehold : userhouseholds) {
-      HouseholdResponse householdResponse = restTemplate
-          .getForObject(
-              "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
-              HouseholdResponse.class);
+      HouseholdResponse householdResponse;
+
+      try {
+        householdResponse = restTemplate
+            .getForObject(
+                "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
+                HouseholdResponse.class);
+      } catch (RestClientException e) {
+        throw new HouseholdNotFoundException("Household not found. " + e.getMessage());
+      }
 
       UserhouseholdResponse.Household household = UserhouseholdResponse.Household
           .builder()
@@ -144,5 +194,13 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
     }
 
     return userhouseholdResponses;
+  }
+
+  @Override
+  public void deleteUserhouseholdById(String id) {
+    Userhousehold userhousehold = userhouseholdRepository.findById(id).orElseThrow(
+        () -> new UserhouseholdNotFoundException("Userhousehold not found"));
+
+    userhouseholdRepository.delete(userhousehold);
   }
 }
