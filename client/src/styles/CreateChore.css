@@ -1,0 +1,63 @@
+
+.create-chore-form{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 0.5rem 0 3rem 0;
+    width: 100%;
+}
+
+.create-chore-window h1{
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin-bottom: 2rem;
+}
+
+.create-chore-window label{
+    font-size: 0.8rem;
+    margin-top: 1rem;
+}
+
+.create-chore-form input{
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--midgrey);
+    border-radius: 0.3rem;
+    font-size: 0.8rem;
+    color: grey;
+}
+
+.create-chore-form input:focus{
+    outline: none;
+    border: 2px solid #2584FF;
+}
+
+.create-chore-form textarea{
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 7rem;
+    padding: 0.7rem;
+    border: 1px solid var(--midgrey);
+    border-radius: 0.3rem;
+    font-size: 1rem;
+    font-size: 0.8rem;
+    color: grey;
+}
+
+.create-chore-form textarea:focus{
+    outline: none;
+    border: 2px solid #2584FF;
+}
+
+.create-chore-form button{
+    width:100%;
+    padding: 0.7rem;
+    margin-top: 2.5rem;
+    border: none;
+    border-radius: 0.2rem;
+    background: #2584FF;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
