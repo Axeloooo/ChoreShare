@@ -45,4 +45,9 @@ public class FallbackController {
   public String userServiceFallback() {
     return "User service is down. Please try again later";
   }
+
+  @GetMapping("/email-service-fallback")
+  public String emailServiceFallback() {
+    return "Email service is down. Please try again later";
+  }
 }

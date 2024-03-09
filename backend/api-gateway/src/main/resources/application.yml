@@ -116,3 +116,18 @@ spring:
               args:
                 redis-rate-limiter.replenishRate: 1
                 redis-rate-limiter.burstCapacity: 1
+
+        - id: email-service
+          uri: lb://email-service
+          predicates:
+            - Path=/api/v1/email/**
+          filters:
+            - AuthFilter
+            - name: CircuitBreaker
+              args:
+                name: email-service
+                fallbackUri: forward:/email-service-fallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1

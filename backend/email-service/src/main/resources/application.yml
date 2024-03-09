@@ -1,0 +1,20 @@
+server:
+  port: 8088
+
+spring:
+  application:
+    name: email-service
+  config:
+    import: "optional:configserver:${CONFIG_SERVICE_URI:http://localhost:8080}"
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: choresync@gmail.com
+    password: tiww epiq vgfh zyuk
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

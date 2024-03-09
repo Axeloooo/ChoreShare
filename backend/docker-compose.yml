@@ -159,12 +159,23 @@ services:
     container_name: userhousehold-service
     build: ./userhousehold-service
     ports:
-      - "8086:8086"
+      - "8084:8084"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: userhouseholddb
+    depends_on:
+      config-service:
+        condition: service_healthy
+
+  email-service:
+    container_name: email-service
+    build: ./email-service
+    ports:
+      - "8088:8088"
+    environment:
+      CONFIG_SERVICE_URI: http://config-service:8080
     depends_on:
       config-service:
         condition: service_healthy
