@@ -29,10 +29,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  localStorage.removeItem("user");
-  localStorage.removeItem("token");
-  localStorage.removeItem("userId");
-
   useEffect(() => {
     let loadingToast = null;
 

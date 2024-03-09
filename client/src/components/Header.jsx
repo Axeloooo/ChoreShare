@@ -32,9 +32,15 @@ function Header({ logout }) {
           <Link to="/calendar">Household Calendar</Link>
         </li>
       </ul>
-      <div className="user-auth">
-        <p className="auth-username">podgaietska9038</p>
-        <FaArrowRightToBracket className="exit-icon" onClick={handleLogout} />
+      <div className="functionality-container">
+        <div className="household-buttons">
+          <button className="household-button">Create Household</button>
+          <button className="household-button">Join Household</button>
+        </div>
+        <div className="user-auth">
+          <p className="auth-username">podgaietska9038</p>
+          <FaArrowRightToBracket className="exit-icon" onClick={handleLogout} />
+        </div>
       </div>
     </div>
   );
