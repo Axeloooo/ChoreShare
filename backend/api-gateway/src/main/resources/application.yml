@@ -21,8 +21,7 @@ spring:
               - PUT
               - DELETE
             allowedHeaders:
-              - Content-Type
-              - Authorization
+              - "*"
             allowCredentials: true
       routes:
         - id: userhousehold-service

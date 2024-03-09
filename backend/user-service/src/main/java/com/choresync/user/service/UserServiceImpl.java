@@ -12,7 +12,7 @@ import com.choresync.user.entity.User;
 import com.choresync.user.exception.UserAlreadyExistsException;
 import com.choresync.user.exception.UserCreationException;
 import com.choresync.user.exception.UserNotFoundException;
-import com.choresync.user.model.AuthResponse;
+import com.choresync.user.model.UserAuthResponse;
 import com.choresync.user.model.UserRequest;
 import com.choresync.user.repository.UserRepository;
 
@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
   private UserRepository userRepository;
 
   @Override
-  public AuthResponse createUser(UserRequest userRequest) {
+  public UserAuthResponse createUser(UserRequest userRequest) {
     if (userRequest == null) {
       throw new UserCreationException("Invalid request body");
     }
@@ -32,6 +32,13 @@ public class UserServiceImpl implements UserService {
 
     if (existingUser != null) {
       throw new UserAlreadyExistsException("User with email " + userRequest.getEmail() + " already exists");
+    }
+
+    existingUser = userRepository.findByUsername(userRequest.getUsername());
+
+    if (existingUser != null) {
+      throw new UserAlreadyExistsException(
+          "User with username " + userRequest.getUsername() + " already exists. Please choose a different username.");
     }
 
     User user = User.builder()
@@ -47,7 +54,7 @@ public class UserServiceImpl implements UserService {
 
     User newClient = userRepository.save(user);
 
-    AuthResponse authResponse = AuthResponse.builder()
+    UserAuthResponse authResponse = UserAuthResponse.builder()
         .id(newClient.getId())
         .username(newClient.getUsername())
         .password(newClient.getPassword())
@@ -163,14 +170,14 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public AuthResponse getUserByUsername(String username) {
+  public UserAuthResponse getUserByUsername(String username) {
     User user = userRepository.findByUsername(username);
 
     if (user == null) {
       throw new UserNotFoundException("User not found");
     }
 
-    AuthResponse authResponse = AuthResponse.builder()
+    UserAuthResponse authResponse = UserAuthResponse.builder()
         .id(user.getId())
         .username(user.getUsername())
         .password(user.getPassword())

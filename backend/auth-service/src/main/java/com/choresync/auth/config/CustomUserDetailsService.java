@@ -8,7 +8,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.choresync.auth.exception.AuthInternalCommunicationException;
-import com.choresync.auth.external.response.UserResponse;
+import com.choresync.auth.external.response.UserAuthResponse;
 
 @Component
 public class CustomUserDetailsService implements UserDetailsService {
@@ -18,9 +18,9 @@ public class CustomUserDetailsService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) {
     try {
-      UserResponse userResponse = restTemplate.getForObject(
+      UserAuthResponse userResponse = restTemplate.getForObject(
           "http://user-service/api/v1/user/username/" + username,
-          UserResponse.class);
+          UserAuthResponse.class);
 
       return new CustomUserDetails(userResponse);
     } catch (RestClientException e) {

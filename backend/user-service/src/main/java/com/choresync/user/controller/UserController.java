@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.choresync.user.model.AuthResponse;
+import com.choresync.user.model.UserAuthResponse;
 import com.choresync.user.model.UserRequest;
 import com.choresync.user.model.UserResponse;
 import com.choresync.user.service.UserService;
@@ -30,8 +30,8 @@ public class UserController {
   private UserService userService;
 
   @PostMapping
-  public ResponseEntity<AuthResponse> createUser(@RequestBody UserRequest userRequest) {
-    AuthResponse authResponse = userService.createUser(userRequest);
+  public ResponseEntity<UserAuthResponse> createUser(@RequestBody UserRequest userRequest) {
+    UserAuthResponse authResponse = userService.createUser(userRequest);
     return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
   }
 
@@ -46,7 +46,7 @@ public class UserController {
   }
 
   @GetMapping("/username/{username}")
-  public ResponseEntity<AuthResponse> getUserByUsername(@PathVariable("username") String username) {
+  public ResponseEntity<UserAuthResponse> getUserByUsername(@PathVariable("username") String username) {
     return new ResponseEntity<>(userService.getUserByUsername(username), HttpStatus.OK);
   }
 
