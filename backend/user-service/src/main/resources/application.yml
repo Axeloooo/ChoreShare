@@ -1,0 +1,17 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: user-service
+  config:
+    import: "optional:configserver:${CONFIG_SERVICE_URI:http://localhost:8080}"
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:userdb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:root}

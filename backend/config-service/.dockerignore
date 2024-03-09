@@ -1,0 +1,29 @@
+# Maven files
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+# IDE settings
+.idea/
+*.iml
+*.ipr
+*.iws
+*.class
+*.log
+
+# System files
+.DS_Store
+*.swp
+*.swo
+Thumbs.db
+
+# Others
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+*.class
+*.log
+*.tmp
