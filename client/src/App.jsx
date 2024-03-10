@@ -12,22 +12,44 @@ import SignupWindow from "./pages/SignupWindow";
 import { toast } from "react-toastify";
 
 function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(
     localStorage.getItem("user")
       ? JSON.parse(localStorage.getItem("user"))
       : null
   );
-  const [token, setToken] = useState(
-    localStorage.getItem("token") ? localStorage.getItem("token") : null
-  );
-  const [userId, setUserId] = useState(
-    localStorage.getItem("userId")
-      ? JSON.parse(localStorage.getItem("userId"))
-      : null
-  );
+  const [token, setToken] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [households, setHouseholds] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [haveHousehold, setHaveHousehold] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    const storedUserId = localStorage.getItem("userId");
+    const storedHouseholds = localStorage.getItem("households");
+
+    if (storedToken && storedUserId) {
+      setToken(storedToken);
+      setUserId(JSON.parse(storedUserId));
+    }
+    if (storedHouseholds) {
+      const householdsData = JSON.parse(storedHouseholds);
+      setHouseholds(householdsData);
+
+      if (householdsData.length > 0) {
+        console.log("have household");
+        setHaveHousehold(true);
+      } else {
+        console.log("no household");
+        setHaveHousehold(false);
+      }
+    }
+  }, []);
+
+  console.log(haveHousehold);
 
   useEffect(() => {
     let loadingToast = null;
@@ -48,7 +70,7 @@ function App() {
   }, [isLoading]);
 
   useEffect(() => {
-    if (userId) {
+    if (userId && loginSuccess) {
       try {
         const fetchUser = async () => {
           const res = await fetch(
@@ -70,21 +92,61 @@ function App() {
           }
 
           const data = await res.json();
-          setIsLoading(false);
-          toast.success("Login successful!");
-          console.log(data);
           setUser(data);
-
-          navigate("/");
+          localStorage.setItem("user", JSON.stringify(data));
         };
         fetchUser();
       } catch (error) {
         setIsLoading(false);
         toast.error(error);
         console.error(error);
+      } finally {
+        fetchHousehold();
       }
     }
   }, [userId]);
+
+  const fetchHousehold = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:8888/api/v1/userhousehold/user/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const response = await res.json();
+        console.log(response);
+        return;
+      }
+
+      const data = await res.json();
+      const householdsData = data.map((item) => item.household);
+      setHouseholds(householdsData);
+      localStorage.setItem("households", JSON.stringify(householdsData));
+
+      if (householdsData.length > 0) {
+        setHaveHousehold(true);
+      }
+
+      setIsLoading(false);
+
+      if (loginSuccess) {
+        toast.success("Login successful!");
+      }
+
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoginSuccess(false);
+    }
+  };
 
   const login = (username, password) => {
     setIsLoading(true);
@@ -119,6 +181,8 @@ function App() {
       setIsLoading(false);
       toast.error(error);
       console.error(error);
+    } finally {
+      setLoginSuccess(true);
     }
   };
 
@@ -128,9 +192,12 @@ function App() {
       setUser(null);
       setToken(null);
       setUserId(null);
+      setHouseholds([]);
+      setHaveHousehold(false);
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
+      localStorage.removeItem("households");
       navigate("/login");
     }
   };
@@ -147,17 +214,31 @@ function App() {
                 setSidebarOpen={setSidebarOpen}
                 user={user}
                 logout={logout}
+                haveHousehold={haveHousehold}
               />
             }
           >
-            <Route index element={<Dashboard sidebarOpen={sidebarOpen} />} />
+            <Route
+              index
+              element={
+                <Dashboard
+                  sidebarOpen={sidebarOpen}
+                  haveHousehold={haveHousehold}
+                />
+              }
+            />
             <Route
               path="calendar"
               element={<Calendar sidebarOpen={sidebarOpen} />}
             />
             <Route
               path="chore-list"
-              element={<ChoreList sidebarOpen={sidebarOpen} />}
+              element={
+                <ChoreList
+                  sidebarOpen={sidebarOpen}
+                  haveHousehold={haveHousehold}
+                />
+              }
             />
           </Route>
         ) : (

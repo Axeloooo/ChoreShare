@@ -1,8 +1,15 @@
 import "../styles/Sidebar.css";
 import HouseholdMember from "./HouseholdMember";
 import AddMember from "../components/AddMember";
+import CreateHousehold from "../components/CreateHousehold";
 
-function Sidebar({ user, sidebarOpen, setSidebarOpen, showOverlay }) {
+function Sidebar({
+  user,
+  sidebarOpen,
+  setSidebarOpen,
+  showOverlay,
+  haveHousehold,
+}) {
   const members = [
     { name: "Smith Jhon", username: "smith2849" },
     { name: "John Doe", username: "jhonny2784" },
@@ -40,24 +47,31 @@ function Sidebar({ user, sidebarOpen, setSidebarOpen, showOverlay }) {
           <p className="user-phone">Phone: {user.phone}</p>
         </div>
       </div>
-      <div className="household-container">
-        <div className="household-container-header">
-          <h3>My Household</h3>
-          <p onClick={handleShowAddMember}>+Add Members</p>
+      {haveHousehold ? (
+        <div className="household-container">
+          <div className="household-container-header">
+            <h3>My Household</h3>
+            <p onClick={handleShowAddMember}>+Add Members</p>
+          </div>
+          <div className="members-list">
+            {members.map((member, index) => {
+              return (
+                <HouseholdMember
+                  key={index}
+                  index={index}
+                  name={member.name}
+                  username={member.username}
+                />
+              );
+            })}
+          </div>
         </div>
-        <div className="members-list">
-          {members.map((member, index) => {
-            return (
-              <HouseholdMember
-                key={index}
-                index={index}
-                name={member.name}
-                username={member.username}
-              />
-            );
-          })}
+      ) : (
+        <div className="no-household-container">
+          <h3>No Household Found</h3>
+          <h3>Could not get household info</h3>
         </div>
-      </div>
+      )}
     </div>
   );
 }

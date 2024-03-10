@@ -1,12 +1,22 @@
 import "../styles/Header.css";
 import { Link, useLocation } from "react-router-dom";
 import { FaArrowRightToBracket } from "react-icons/fa6";
+import CreateHousehold from "./CreateHousehold";
+import JoinHousehold from "./JoinHousehold";
 
-function Header({ logout }) {
+function Header({ logout, showOverlay }) {
   const location = useLocation();
 
   const handleLogout = () => {
     logout();
+  };
+
+  const handleShowCreateHousehold = () => {
+    showOverlay(<CreateHousehold />);
+  };
+
+  const handleShowJoinHousehold = () => {
+    showOverlay(<JoinHousehold />);
   };
 
   return (
@@ -34,8 +44,18 @@ function Header({ logout }) {
       </ul>
       <div className="functionality-container">
         <div className="household-buttons">
-          <button className="household-button">Create Household</button>
-          <button className="household-button">Join Household</button>
+          <button
+            className="household-button"
+            onClick={handleShowCreateHousehold}
+          >
+            Create Household
+          </button>
+          <button
+            className="household-button"
+            onClick={handleShowJoinHousehold}
+          >
+            Join Household
+          </button>
         </div>
         <div className="user-auth">
           <p className="auth-username">podgaietska9038</p>

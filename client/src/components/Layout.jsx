@@ -3,10 +3,11 @@ import Sidebar from "./Sidebar";
 import Overlay from "./Overlay";
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
+import CreateHousehold from "./CreateHousehold";
 
-function Layout({ sidebarOpen, setSidebarOpen, user, logout }) {
+function Layout({ sidebarOpen, setSidebarOpen, user, logout, haveHousehold }) {
   const [overlayVisible, setOverlayVisible] = useState(false);
-  const [overlayContent, setOverlayContent] = useState(null);
+  const [overlayContent, setOverlayContent] = useState(<CreateHousehold />);
 
   const showOverlay = (content) => {
     setOverlayContent(content);
@@ -19,7 +20,7 @@ function Layout({ sidebarOpen, setSidebarOpen, user, logout }) {
     <div className="app-layout">
       {user !== null ? (
         <>
-          <Header logout={logout} />
+          <Header logout={logout} showOverlay={showOverlay} />
           <Outlet context={{ showOverlay }} />
           {overlayVisible && (
             <Overlay content={overlayContent} closeOverlay={closeOverlay} />
@@ -29,6 +30,7 @@ function Layout({ sidebarOpen, setSidebarOpen, user, logout }) {
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
             showOverlay={showOverlay}
+            haveHousehold={haveHousehold}
           />
         </>
       ) : null}
