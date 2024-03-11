@@ -6,6 +6,10 @@ spring:
     name: api-gateway
   config:
     import: "optional:configserver:${CONFIG_SERVICE_URI:http://localhost:8080}"
+  data:
+    redis:
+      host: redis-svc
+      port: 6379
   cloud:
     gateway:
       discovery:

@@ -12,6 +12,6 @@ spring:
       ddl-auto: update
     show-sql: true
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:announcementdb}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:root}
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/announcementdb
+    username: postgres
+    password: root

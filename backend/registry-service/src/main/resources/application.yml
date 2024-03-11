@@ -7,7 +7,7 @@ spring:
 
 eureka:
   instance:
-    hostname: localhost
+    hostname: ${HOSTNAME:localhost}.eureka
   client:
     registerWithEureka: false
     fetchRegistry: false

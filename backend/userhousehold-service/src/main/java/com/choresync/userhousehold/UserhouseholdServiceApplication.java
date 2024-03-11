@@ -9,8 +9,8 @@ import org.springframework.web.client.RestTemplate;
 
 @EnableDiscoveryClient
 @SpringBootApplication
+@EnableDiscoveryClient
 public class UserhouseholdServiceApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(UserhouseholdServiceApplication.class, args);
 	}
