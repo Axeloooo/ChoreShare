@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-service-app
+spec:
+  selector:
+    matchLabels:
+      app: event-service-app
+  template:
+    metadata:
+      labels:
+        app: event-service-app
+    spec:
+      containers:
+        - name: event-service-app
+          image: axeloooo/event-service
+          ports:
+            - containerPort: 8083
+          env:
+            - name: REGISTRY_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: REGISTRY_SERVICE_URI
+            - name: CONFIG_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: CONFIG_SERVICE_URI
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-cm
+                  key: DB_HOST
+            - name: ZIPKIN_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: zipkin-cm
+                  key: ZIPKIN_SERVICE_URI
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-service-svc
+spec:
+  selector:
+    app: event-service-app
+  ports:
+    - port: 80
+      targetPort: 8083
