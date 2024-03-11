@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eureka-cm
+data:
+  REGISTRY_SERVICE_URI: http://eureka-0.eureka:8761/eureka
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-cm
+data:
+  CONFIG_SERVICE_URI: http://config-service-svc
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-cm
+data:
+  DB_HOST: postgres-0.postgres
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zipkin-cm
+data:
+  ZIPKIN_SERVICE_URI: http://zipkin-svc:9411

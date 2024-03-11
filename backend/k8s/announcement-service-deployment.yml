@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: announcement-service-app
+spec:
+  selector:
+    matchLabels:
+      app: announcement-service-app
+  template:
+    metadata:
+      labels:
+        app: announcement-service-app
+    spec:
+      containers:
+        - name: announcement-service-app
+          image: axeloooo/announcement-service
+          ports:
+            - containerPort: 8085
+          env:
+            - name: REGISTRY_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: REGISTRY_SERVICE_URI
+            - name: CONFIG_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: CONFIG_SERVICE_URI
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-cm
+                  key: DB_HOST
+            - name: ZIPKIN_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: zipkin-cm
+                  key: ZIPKIN_SERVICE_URI
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: announcement-service-svc
+spec:
+  selector:
+    app: announcement-service-app
+  ports:
+    - port: 80
+      targetPort: 8085

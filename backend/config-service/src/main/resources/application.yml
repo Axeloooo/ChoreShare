@@ -8,7 +8,7 @@ spring:
     config:
       server:
         git:
-          uri: ${DOCKER_CONFIG_GITHUB_URL:https://github.com/Axeloooo/dev-choresync-config-service}
+          uri: https://github.com/Axeloooo/choresync-config-service
           clone-on-start: true
 
 eureka:
