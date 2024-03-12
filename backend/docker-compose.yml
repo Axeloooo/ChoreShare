@@ -69,6 +69,8 @@ services:
       - "8888:8888"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
+      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      ZIPKIN_SERVICE_URI: http://zipkin:9411
     depends_on:
       config-service:
         condition: service_healthy
@@ -80,6 +82,8 @@ services:
       - "8087:8087"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
+      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      ZIPKIN_SERVICE_URI: http://zipkin:9411
     depends_on:
       config-service:
         condition: service_healthy
@@ -91,9 +95,9 @@ services:
       - "8086:8086"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
+      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      ZIPKIN_SERVICE_URI: http://zipkin:9411
       DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: userdb
     depends_on:
       config-service:
         condition: service_healthy
@@ -105,9 +109,9 @@ services:
       - "8085:8085"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
+      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      ZIPKIN_SERVICE_URI: http://zipkin:9411
       DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: announcementdb
     depends_on:
       config-service:
         condition: service_healthy
@@ -119,9 +123,9 @@ services:
       - "8083:8083"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
+      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      ZIPKIN_SERVICE_URI: http://zipkin:9411
       DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: eventdb
     depends_on:
       config-service:
         condition: service_healthy
@@ -133,9 +137,9 @@ services:
       - "8082:8082"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
+      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      ZIPKIN_SERVICE_URI: http://zipkin:9411
       DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: householddb
     depends_on:
       config-service:
         condition: service_healthy
@@ -147,9 +151,9 @@ services:
       - "8081:8081"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
+      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      ZIPKIN_SERVICE_URI: http://zipkin:9411
       DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: taskdb
     depends_on:
       config-service:
         condition: service_healthy
@@ -161,9 +165,9 @@ services:
       - "8084:8084"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
+      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      ZIPKIN_SERVICE_URI: http://zipkin:9411
       DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: userhouseholddb
     depends_on:
       config-service:
         condition: service_healthy
@@ -175,6 +179,8 @@ services:
       - "8088:8088"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
+      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      ZIPKIN_SERVICE_URI: http://zipkin:9411
     depends_on:
       config-service:
         condition: service_healthy
