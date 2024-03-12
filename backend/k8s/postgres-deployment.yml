@@ -70,12 +70,12 @@ metadata:
   name: postgres-initdb-cm
 data:
   init.sql: |
-    CREATE DATABASE IF NOT EXISTS announcementdb;
-    CREATE DATABASE IF NOT EXISTS eventdb;
-    CREATE DATABASE IF NOT EXISTS householddb;
-    CREATE DATABASE IF NOT EXISTS userdb;
-    CREATE DATABASE IF NOT EXISTS userhouseholddb;
-    CREATE DATABASE IF NOT EXISTS taskdb;
+    CREATE DATABASE announcementdb;
+    CREATE DATABASE eventdb;
+    CREATE DATABASE householddb;
+    CREATE DATABASE userdb;
+    CREATE DATABASE userhouseholddb;
+    CREATE DATABASE taskdb;
 
 ---
 apiVersion: v1
@@ -87,5 +87,5 @@ spec:
   selector:
     app: postgres
   ports:
-    - port: 80
+    - port: 5432
       targetPort: 5432
