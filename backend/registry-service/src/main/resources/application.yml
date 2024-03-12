@@ -6,6 +6,8 @@ spring:
     name: registry-service
 
 eureka:
+  server:
+    peer-node-read-timeout-ms: 10000
   instance:
     hostname: ${HOSTNAME:localhost}.eureka
   client:

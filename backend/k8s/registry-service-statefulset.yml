@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       app: eureka
-  serviceName: "eureka"
+  serviceName: eureka
   replicas: 1
   template:
     metadata:
@@ -16,6 +16,10 @@ spec:
       containers:
         - name: eureka
           image: axeloooo/registry-service
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
           ports:
             - containerPort: 8761
 
@@ -23,7 +27,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: eureka
+  name: eureka-svc
 spec:
   clusterIP: None
   selector:
@@ -36,9 +40,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: eureka-lb
+  name: eureka-lb-svc
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: eureka
   ports:
