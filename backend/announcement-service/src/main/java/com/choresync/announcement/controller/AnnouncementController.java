@@ -47,9 +47,10 @@ public class AnnouncementController {
     return new ResponseEntity<>(announcement, HttpStatus.OK);
   }
 
-  @GetMapping
-  public ResponseEntity<List<AnnouncementResponse>> getAllAnnouncements() {
-    return new ResponseEntity<>(announcementService.getAllAnnouncements(), HttpStatus.OK);
+  @GetMapping("/household/{hid}")
+  public ResponseEntity<List<AnnouncementResponse>> getAllAnnouncementsByHousehold(
+      @PathVariable("hid") String householdId) {
+    return new ResponseEntity<>(announcementService.getAllAnnouncementsByHousehold(householdId), HttpStatus.OK);
   }
 
   @GetMapping("/user/{uid}")

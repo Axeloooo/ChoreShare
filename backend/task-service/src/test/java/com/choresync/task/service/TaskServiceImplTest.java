@@ -162,32 +162,32 @@ public class TaskServiceImplTest {
     verify(taskRepository, times(0)).findByUserId(null);
   }
 
-  @Description("Get /api/v1/task - Test get all tasks")
-  @Test
-  public void testGetAllTasks() {
-    when(taskRepository.findAll()).thenReturn(Arrays.asList(task));
+  // @Description("Get /api/v1/task - Test get all tasks")
+  // @Test
+  // public void testGetAllTasks() {
+  // when(taskRepository.findAll()).thenReturn(Arrays.asList(task));
 
-    List<TaskResponse> result = taskService.getAllTasks();
+  // List<TaskResponse> result = taskService.getAllTasks();
 
-    assertNotNull(result);
-    assertEquals(1, result.size());
-    assertEquals(taskResponse, result.get(0));
+  // assertNotNull(result);
+  // assertEquals(1, result.size());
+  // assertEquals(taskResponse, result.get(0));
 
-    verify(taskRepository, times(1)).findAll();
-  }
+  // verify(taskRepository, times(1)).findAll();
+  // }
 
-  @Description("Get /api/v1/task - Test get all empty tasks")
-  @Test
-  public void testGetAllTasksEmpty() {
-    when(taskRepository.findAll()).thenReturn(Arrays.asList());
+  // @Description("Get /api/v1/task - Test get all empty tasks")
+  // @Test
+  // public void testGetAllTasksEmpty() {
+  // when(taskRepository.findAll()).thenReturn(Arrays.asList());
 
-    List<TaskResponse> result = taskService.getAllTasks();
+  // List<TaskResponse> result = taskService.getAllTasks();
 
-    assertNotNull(result);
-    assertEquals(0, result.size());
+  // assertNotNull(result);
+  // assertEquals(0, result.size());
 
-    verify(taskRepository, times(1)).findAll();
-  }
+  // verify(taskRepository, times(1)).findAll();
+  // }
 
   @Description("PUT /api/v1/task/{id} - Test update task")
   @Test

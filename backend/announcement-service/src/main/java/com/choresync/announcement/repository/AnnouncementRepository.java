@@ -10,4 +10,6 @@ import com.choresync.announcement.entity.Announcement;
 @Repository
 public interface AnnouncementRepository extends JpaRepository<Announcement, String> {
   List<Announcement> findByUserId(String userId);
+
+  List<Announcement> findByHouseholdId(String householdId);
 }

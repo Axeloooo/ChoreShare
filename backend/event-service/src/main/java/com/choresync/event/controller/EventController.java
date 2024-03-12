@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,9 +35,15 @@ public class EventController {
     return new ResponseEntity<>(event, HttpStatus.OK);
   }
 
-  @GetMapping
-  public ResponseEntity<List<EventResponse>> getAllEvents() {
-    List<EventResponse> events = eventService.getAllEvents();
+  @GetMapping("/household/{hid}")
+  public ResponseEntity<List<EventResponse>> getAllEventsByHouseholdId(@PathVariable("hid") String householdId) {
+    List<EventResponse> events = eventService.getAllEventsByHouseholdId(householdId);
     return new ResponseEntity<>(events, HttpStatus.OK);
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteEvent(@PathVariable("id") String id) {
+    eventService.deleteEvent(id);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 }

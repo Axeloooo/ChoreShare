@@ -1,4 +1,4 @@
-package com.choresync.announcement.model;
+package com.choresync.task.external.response;
 
 import java.util.Date;
 
@@ -7,21 +7,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnnouncementResponse {
-
+public class HouseholdResponse {
   private String id;
 
-  private String householdId;
-
-  private String message;
-
-  private String userId;
-
-  private String author;
+  private String name;
 
   private Date createdAt;
 

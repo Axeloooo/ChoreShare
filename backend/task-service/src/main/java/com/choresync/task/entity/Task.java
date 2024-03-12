@@ -31,6 +31,9 @@ public class Task {
 
   private String title;
 
+  @Column(name = "household_id")
+  private String householdId;
+
   private String description;
 
   @Enumerated(EnumType.STRING)

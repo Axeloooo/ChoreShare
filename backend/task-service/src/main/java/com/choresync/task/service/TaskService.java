@@ -15,7 +15,7 @@ public interface TaskService {
 
   List<TaskResponse> getAllTasksByUserId(String userId);
 
-  List<TaskResponse> getAllTasks();
+  List<TaskResponse> getAllTasksByHousehold(String householdId);
 
   TaskResponse updateTask(String id, TaskEditMetadataRequest taskRequest);
 

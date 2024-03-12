@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 public class TaskRequest {
   private String title;
 
+  private String householdId;
+
   private String description;
 
   private String status;

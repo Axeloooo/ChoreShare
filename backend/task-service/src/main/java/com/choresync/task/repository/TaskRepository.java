@@ -10,4 +10,6 @@ import com.choresync.task.entity.Task;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, String> {
   List<Task> findByUserId(String userId);
+
+  List<Task> findByHouseholdId(String householdId);
 }
