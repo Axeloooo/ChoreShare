@@ -27,7 +27,7 @@ kind: ConfigMap
 metadata:
   name: zipkin-cm
 data:
-  ZIPKIN_SERVICE_URI: http://zipkin-svc:9411
+  ZIPKIN_SERVICE_URI: http://zipkin-svc:9411/api/v2/spans
 
 ---
 apiVersion: v1

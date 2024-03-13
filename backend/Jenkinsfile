@@ -1,0 +1,91 @@
+pipeline {
+    agent any
+
+    environment {
+        REPO_URI = "${env.REGISTRY_URI}/${env.PROJECT_ID}/${env.REGISTRY_ID}"
+        IMAGE_TAG = "${env.BUILD_ID}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM', 
+                    branches: [[name: '*/main']], 
+                    extensions: [], 
+                    userRemoteConfigs: [[credentialsId: 'github', url: "https://github.com/Axeloooo/ChoreSync.git"]]
+                ])
+            }
+        }
+
+        stage("Build Images") {
+            steps {
+                script {
+                    def services = [
+                        "registry-service",
+                        "config-service",
+                        "api-gateway",
+                        "auth-service",
+                        "user-service",
+                        "task-service",
+                        "household-service",
+                        "userhousehold-service",
+                        "announcement-service",
+                        "event-service",
+                        "email-service"
+                    ]
+
+                    services.each { service ->
+                        sh "sudo docker build -t ${service}:${IMAGE_TAG} ./${service}"
+                    }
+                }
+            }
+        }
+
+        stage("Push Images") {
+            steps {
+                withCredentials([file(credentialsId: "gcp", variable: "GCP_KEY")]) {
+                    sh "gcloud auth activate-service-account --key-file=${GCP_KEY}"
+                    sh "gcloud auth configure-docker ${env.REGISTRY_URI}"
+                    script {
+                        def services = [
+                            "registry-service",
+                            "config-service",
+                            "api-gateway",
+                            "auth-service",
+                            "user-service",
+                            "task-service",
+                            "household-service",
+                            "userhousehold-service",
+                            "announcement-service",
+                            "event-service",
+                            "email-service"
+                        ]
+
+                        services.each { service ->
+                            sh "sudo docker push ${REPO_URI}/${service}:${IMAGE_TAG}"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Deploy to GKE") {
+            steps {
+                script {
+                    sh "sed -i 's|axeloooo|${REPO_URI}|g' k8s/*.yml"
+                    sh "sed -i 's|latest|${IMAGE_TAG}|g' k8s/*.yml"
+                    step([
+                        $class: 'KubernetesEngineBuilder', 
+                        projectId: "${env.PROJECT_ID}", 
+                        clusterName: "${env.CLUSTER_NAME}", 
+                        location: "${env.CLUSTER_LOCATION}", 
+                        credentialsId: "${env.PROJECT_ID}", 
+                        verifyDeployments: true,
+                        manifestPattern: "k8s/*.yml",
+                    ])
+                }
+            }
+        }
+    }
+}
