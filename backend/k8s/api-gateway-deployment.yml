@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-app
+spec:
+  selector:
+    matchLabels:
+      app: api-gateway-app
+  template:
+    metadata:
+      labels:
+        app: api-gateway-app
+    spec:
+      containers:
+        - name: api-gateway-app
+          image: axeloooo/api-gateway:latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          ports:
+            - containerPort: 8888
+          env:
+            - name: REGISTRY_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: REGISTRY_SERVICE_URI
+            - name: CONFIG_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: CONFIG_SERVICE_URI
+            - name: ZIPKIN_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: zipkin-cm
+                  key: ZIPKIN_SERVICE_URI
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: api-gateway-app
+  ports:
+    - port: 80
+      targetPort: 8888

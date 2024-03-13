@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgadmin
+spec:
+  selector:
+    matchLabels:
+      app: pgadmin
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      containers:
+        - name: pgadmin
+          image: dpage/pgadmin4
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          ports:
+            - containerPort: 80
+          env:
+            - name: PGADMIN_DEFAULT_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  name: pgadmin-cm
+                  key: PGADMIN_DEFAULT_EMAIL
+            - name: PGADMIN_DEFAULT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: pgadmin-cm
+                  key: PGADMIN_DEFAULT_PASSWORD
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgadmin-svc
+spec:
+  type: NodePort
+  selector:
+    app: pgadmin
+  ports:
+    - port: 80
+      targetPort: 80

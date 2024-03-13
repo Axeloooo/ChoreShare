@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task-service-app
+spec:
+  selector:
+    matchLabels:
+      app: task-service-app
+  template:
+    metadata:
+      labels:
+        app: task-service-app
+    spec:
+      containers:
+        - name: task-service-app
+          image: axeloooo/task-service:latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          ports:
+            - containerPort: 8081
+          env:
+            - name: REGISTRY_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: REGISTRY_SERVICE_URI
+            - name: CONFIG_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: CONFIG_SERVICE_URI
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-cm
+                  key: DB_HOST
+            - name: ZIPKIN_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: zipkin-cm
+                  key: ZIPKIN_SERVICE_URI
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: task-service-svc
+spec:
+  selector:
+    app: task-service-app
+  ports:
+    - port: 80
+      targetPort: 8081

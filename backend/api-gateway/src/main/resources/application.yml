@@ -1,0 +1,149 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: "optional:configserver:${CONFIG_SERVICE_URI:http://localhost:8080}"
+  data:
+    redis:
+      host: redis-svc
+      port: 6379
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      globalcors:
+        corsConfigurations:
+          "[/**]":
+            allowedOrigins: "http://localhost:*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+      routes:
+        - id: userhousehold-service
+          uri: lb://userhousehold-service
+          predicates:
+            - Path=/api/v1/userhousehold/**
+          filters:
+            - AuthFilter
+            - name: CircuitBreaker
+              args:
+                name: userhousehold-service
+                fallbackUri: forward:/userhousehold-service-fallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+
+        - id: task-service
+          uri: lb://task-service
+          predicates:
+            - Path=/api/v1/task/**
+          filters:
+            - AuthFilter
+            - name: CircuitBreaker
+              args:
+                name: task-service
+                fallbackUri: forward:/task-service-fallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+
+        - id: household-service
+          uri: lb://household-service
+          predicates:
+            - Path=/api/v1/household/**
+          filters:
+            - AuthFilter
+            - name: CircuitBreaker
+              args:
+                name: household-service
+                fallbackUri: forward:/household-service-fallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+
+        - id: event-service
+          uri: lb://event-service
+          predicates:
+            - Path=/api/v1/event/**
+          filters:
+            - AuthFilter
+            - name: CircuitBreaker
+              args:
+                name: event-service
+                fallbackUri: forward:/event-service-fallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+
+        - id: announcement-service
+          uri: lb://announcement-service
+          predicates:
+            - Path=/api/v1/announcement/**
+          filters:
+            - AuthFilter
+            - name: CircuitBreaker
+              args:
+                name: announcement-service
+                fallbackUri: forward:/announcement-service-fallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/v1/auth/**
+          filters:
+            - AuthFilter
+            - name: CircuitBreaker
+              args:
+                name: auth-service
+                fallbackUri: forward:/auth-service-fallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/user/**
+          filters:
+            - AuthFilter
+            - name: CircuitBreaker
+              args:
+                name: user-service
+                fallbackUri: forward:/user-service-fallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+
+        - id: email-service
+          uri: lb://email-service
+          predicates:
+            - Path=/api/v1/email/**
+          filters:
+            - AuthFilter
+            - name: CircuitBreaker
+              args:
+                name: email-service
+                fallbackUri: forward:/email-service-fallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1

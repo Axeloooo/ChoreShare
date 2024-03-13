@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-service-app
+spec:
+  selector:
+    matchLabels:
+      app: config-service-app
+  template:
+    metadata:
+      labels:
+        app: config-service-app
+    spec:
+      containers:
+        - name: config-service-app
+          image: axeloooo/config-service:latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          ports:
+            - containerPort: 8080
+          env:
+            - name: REGISTRY_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: REGISTRY_SERVICE_URI
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-service-svc
+spec:
+  selector:
+    app: config-service-app
+  ports:
+    - port: 80
+      targetPort: 8080

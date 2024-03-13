@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: email-service-app
+spec:
+  selector:
+    matchLabels:
+      app: email-service-app
+  template:
+    metadata:
+      labels:
+        app: email-service-app
+    spec:
+      containers:
+        - name: email-service-app
+          image: axeloooo/email-service:latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          ports:
+            - containerPort: 8088
+          env:
+            - name: REGISTRY_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: REGISTRY_SERVICE_URI
+            - name: CONFIG_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: CONFIG_SERVICE_URI
+            - name: ZIPKIN_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: zipkin-cm
+                  key: ZIPKIN_SERVICE_URI
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: email-service-svc
+spec:
+  selector:
+    app: email-service-app
+  ports:
+    - port: 80
+      targetPort: 8088

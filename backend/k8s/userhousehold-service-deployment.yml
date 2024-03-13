@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userhousehold-service-app
+spec:
+  selector:
+    matchLabels:
+      app: userhousehold-service-app
+  template:
+    metadata:
+      labels:
+        app: userhousehold-service-app
+    spec:
+      containers:
+        - name: userhousehold-service-app
+          image: axeloooo/userhousehold-service:latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          ports:
+            - containerPort: 8084
+          env:
+            - name: REGISTRY_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: REGISTRY_SERVICE_URI
+            - name: CONFIG_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: CONFIG_SERVICE_URI
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-cm
+                  key: DB_HOST
+            - name: ZIPKIN_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: zipkin-cm
+                  key: ZIPKIN_SERVICE_URI
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: userhousehold-service-svc
+spec:
+  selector:
+    app: userhousehold-service-app
+  ports:
+    - port: 80
+      targetPort: 8084
