@@ -1,4 +1,4 @@
-package com.choresync.user.model;
+package com.choresync.announcement.external.response;
 
 import java.util.Date;
 
@@ -7,18 +7,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthResponse {
+public class HouseholdResponse {
   private String id;
 
-  private String username;
-
-  private String password;
+  private String name;
 
   private Date createdAt;
 
   private Date updatedAt;
+
 }

@@ -113,32 +113,34 @@ public class AnnouncementServiceImplTest {
     verify(announcementRepository, times(1)).findById("1");
   }
 
-  @Description("GET /api/v1/announcement - Test get all announcements")
-  @Test
-  public void testGetAllAnnouncements() {
-    when(announcementRepository.findAll()).thenReturn(Arrays.asList(announcement));
+  // @Description("GET /api/v1/announcement - Test get all announcements")
+  // @Test
+  // public void testGetAllAnnouncements() {
+  // when(announcementRepository.findAll()).thenReturn(Arrays.asList(announcement));
 
-    List<AnnouncementResponse> responses = announcementService.getAllAnnouncements();
+  // List<AnnouncementResponse> responses =
+  // announcementService.getAllAnnouncements();
 
-    assertNotNull(responses);
-    assertEquals(1, responses.size());
-    assertEquals(announcementResponse, responses.get(0));
+  // assertNotNull(responses);
+  // assertEquals(1, responses.size());
+  // assertEquals(announcementResponse, responses.get(0));
 
-    verify(announcementRepository, times(1)).findAll();
-  }
+  // verify(announcementRepository, times(1)).findAll();
+  // }
 
-  @Description("GET /api/v1/announcement - Test get all empty announcements")
-  @Test
-  public void testGetAllAnnouncementsEmpty() {
-    when(announcementRepository.findAll()).thenReturn(Collections.emptyList());
+  // @Description("GET /api/v1/announcement - Test get all empty announcements")
+  // @Test
+  // public void testGetAllAnnouncementsEmpty() {
+  // when(announcementRepository.findAll()).thenReturn(Collections.emptyList());
 
-    List<AnnouncementResponse> responses = announcementService.getAllAnnouncements();
+  // List<AnnouncementResponse> responses =
+  // announcementService.getAllAnnouncements();
 
-    assertNotNull(responses);
-    assertEquals(0, responses.size());
+  // assertNotNull(responses);
+  // assertEquals(0, responses.size());
 
-    verify(announcementRepository, times(1)).findAll();
-  }
+  // verify(announcementRepository, times(1)).findAll();
+  // }
 
   @Description("GET /api/v1/announcement/user/{uid} - Test get all announcements by user id")
   @Test

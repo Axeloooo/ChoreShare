@@ -11,6 +11,8 @@ public interface EventService {
 
   EventResponse getEventById(String id);
 
-  List<EventResponse> getAllEvents();
+  List<EventResponse> getAllEventsByHouseholdId(String householdId);
+
+  void deleteEvent(String id);
 
 }

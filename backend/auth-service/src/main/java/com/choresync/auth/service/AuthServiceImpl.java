@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import com.choresync.auth.exception.AuthInternalCommunicationException;
 import com.choresync.auth.exception.AuthRequestBodyException;
 import com.choresync.auth.external.request.UserRequest;
-import com.choresync.auth.external.response.UserResponse;
+import com.choresync.auth.external.response.UserAuthResponse;
 import com.choresync.auth.model.AuthLoginRequest;
 import com.choresync.auth.model.AuthRegisterRequest;
 
@@ -44,11 +44,11 @@ public class AuthServiceImpl implements AuthService {
         .build();
 
     try {
-      UserResponse userResponse = restTemplate.postForObject(
+      UserAuthResponse userResponse = restTemplate.postForObject(
           "http://user-service/api/v1/user",
           userRequest,
-          UserResponse.class);
-      return jwtService.generateToken(userResponse.getUsername());
+          UserAuthResponse.class);
+      return jwtService.generateToken(userResponse.getId());
     } catch (RestClientException e) {
       throw new AuthInternalCommunicationException(
           "Failed to create user. " + e.getMessage());
@@ -60,7 +60,19 @@ public class AuthServiceImpl implements AuthService {
     if (authRequest.getUsername() == null || authRequest.getPassword() == null) {
       throw new AuthRequestBodyException("Invalid request body");
     }
-    return jwtService.generateToken(authRequest.getUsername());
+
+    UserAuthResponse userResponse;
+
+    try {
+      userResponse = restTemplate.getForObject(
+          "http://user-service/api/v1/user/username/" + authRequest.getUsername(),
+          UserAuthResponse.class);
+    } catch (RestClientException e) {
+      throw new AuthInternalCommunicationException(
+          "Failed to login user. " + e.getMessage());
+    }
+
+    return jwtService.generateToken(userResponse.getId());
   }
 
   @Override

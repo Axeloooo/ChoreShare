@@ -4,11 +4,11 @@ import com.choresync.user.model.UserResponse;
 
 import java.util.List;
 
-import com.choresync.user.model.AuthResponse;
+import com.choresync.user.model.UserAuthResponse;
 import com.choresync.user.model.UserRequest;
 
 public interface UserService {
-  AuthResponse createUser(UserRequest userRequest);
+  UserAuthResponse createUser(UserRequest userRequest);
 
   List<UserResponse> getAllUsers();
 
@@ -18,5 +18,5 @@ public interface UserService {
 
   UserResponse editUser(String id, UserRequest userRequest);
 
-  AuthResponse getUserByUsername(String username);
+  UserAuthResponse getUserByUsername(String username);
 }

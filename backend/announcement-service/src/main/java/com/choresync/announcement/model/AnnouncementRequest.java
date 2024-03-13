@@ -13,5 +13,9 @@ public class AnnouncementRequest {
 
   private String message;
 
+  private String householdId;
+
+  private String author;
+
   private String userId;
 }

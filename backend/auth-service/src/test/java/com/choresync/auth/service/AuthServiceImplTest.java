@@ -24,7 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import com.choresync.auth.exception.AuthInternalCommunicationException;
 import com.choresync.auth.exception.AuthRequestBodyException;
 import com.choresync.auth.external.request.UserRequest;
-import com.choresync.auth.external.response.UserResponse;
+import com.choresync.auth.external.response.UserAuthResponse;
 import com.choresync.auth.model.AuthLoginRequest;
 import com.choresync.auth.model.AuthRegisterRequest;
 
@@ -45,7 +45,7 @@ public class AuthServiceImplTest {
   private AuthLoginRequest authLoginRequest;
 
   private UserRequest userRequest;
-  private UserResponse userResponse;
+  private UserAuthResponse userResponse;
 
   private final String token = "jwtToken";
 
@@ -75,7 +75,7 @@ public class AuthServiceImplTest {
         .phone(authRegisterRequest.getPhone())
         .build();
 
-    userResponse = UserResponse
+    userResponse = UserAuthResponse
         .builder()
         .id("1")
         .username(authRegisterRequest.getUsername())
@@ -97,7 +97,7 @@ public class AuthServiceImplTest {
     when(restTemplate.postForObject(
         "http://user-service/api/v1/user",
         userRequest,
-        UserResponse.class))
+        UserAuthResponse.class))
         .thenReturn(userResponse);
 
     when(jwtService.generateToken(any(String.class)))
@@ -121,7 +121,7 @@ public class AuthServiceImplTest {
     when(restTemplate.postForObject(
         "http://user-service/api/v1/user",
         userRequest,
-        UserResponse.class))
+        UserAuthResponse.class))
         .thenThrow(new RuntimeException("Invalid request body"));
 
     assertThrows(AuthInternalCommunicationException.class, () -> {
@@ -132,7 +132,7 @@ public class AuthServiceImplTest {
     verify(restTemplate, times(1)).postForObject(
         "http://user-service/api/v1/user",
         userRequest,
-        UserResponse.class);
+        UserAuthResponse.class);
     verify(jwtService, times(0)).generateToken(any(String.class));
   }
 
@@ -149,7 +149,7 @@ public class AuthServiceImplTest {
     verify(restTemplate, times(0)).postForObject(
         "http://user-service/api/v1/user",
         userRequest,
-        UserResponse.class);
+        UserAuthResponse.class);
     verify(jwtService, times(0)).generateToken(any(String.class));
   }
 

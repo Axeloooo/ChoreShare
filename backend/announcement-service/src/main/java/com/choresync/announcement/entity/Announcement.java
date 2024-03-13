@@ -27,9 +27,14 @@ public class Announcement {
   @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
 
+  @Column(name = "household_id")
+  private String householdId;
+
   private String message;
 
   private String userId;
+
+  private String author;
 
   @CreationTimestamp
   @Column(name = "created_at")
