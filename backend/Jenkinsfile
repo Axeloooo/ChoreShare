@@ -36,7 +36,7 @@ pipeline {
                     ]
 
                     services.each { service ->
-                        sh "docker build -t ${service}:${IMAGE_TAG} ./${service}"
+                        sh "sudo docker build -t ${service}:${IMAGE_TAG} ./${service}"
                     }
                 }
             }
@@ -63,7 +63,7 @@ pipeline {
                         ]
 
                         services.each { service ->
-                            sh "docker push ${REPO_URI}/${service}:${IMAGE_TAG}"
+                            sh "sudo docker push ${REPO_URI}/${service}:${IMAGE_TAG}"
                         }
                     }
                 }
