@@ -4,7 +4,7 @@ import { FaArrowRightToBracket } from "react-icons/fa6";
 import CreateHousehold from "./CreateHousehold";
 import JoinHousehold from "./JoinHousehold";
 
-function Header({ logout, showOverlay }) {
+function Header({ logout, showOverlay, username }) {
   const location = useLocation();
 
   const handleLogout = () => {
@@ -58,7 +58,7 @@ function Header({ logout, showOverlay }) {
           </button>
         </div>
         <div className="user-auth">
-          <p className="auth-username">podgaietska9038</p>
+          <p className="auth-username">{username}</p>
           <FaArrowRightToBracket className="exit-icon" onClick={handleLogout} />
         </div>
       </div>
