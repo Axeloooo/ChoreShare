@@ -13,7 +13,11 @@ spec:
     spec:
       containers:
         - name: email-service-app
-          image: axeloooo/email-service
+          image: axeloooo/email-service:latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
           ports:
             - containerPort: 8088
           env:
