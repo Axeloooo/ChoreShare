@@ -23,8 +23,15 @@ function App() {
   const [households, setHouseholds] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const [registerSuccess, setRegisterSuccess] = useState(false);
   const [haveHousehold, setHaveHousehold] = useState(false);
   const navigate = useNavigate();
+
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("households");
+  console.log(userId);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -49,8 +56,6 @@ function App() {
     }
   }, []);
 
-  console.log(haveHousehold);
-
   useEffect(() => {
     let loadingToast = null;
 
@@ -70,7 +75,7 @@ function App() {
   }, [isLoading]);
 
   useEffect(() => {
-    if (userId && loginSuccess) {
+    if (userId && (loginSuccess || registerSuccess)) {
       try {
         const fetchUser = async () => {
           const res = await fetch(
@@ -94,6 +99,7 @@ function App() {
           const data = await res.json();
           setUser(data);
           localStorage.setItem("user", JSON.stringify(data));
+          console.log(data);
         };
         fetchUser();
       } catch (error) {
@@ -103,6 +109,9 @@ function App() {
       } finally {
         fetchHousehold();
       }
+    } else {
+      setIsLoading(false);
+      toast.error("Oops, there has been an issue. Please try again later.");
     }
   }, [userId]);
 
@@ -138,6 +147,8 @@ function App() {
 
       if (loginSuccess) {
         toast.success("Login successful!");
+      } else if (registerSuccess) {
+        toast.success("Registration successful!");
       }
 
       navigate("/");
@@ -149,6 +160,7 @@ function App() {
   };
 
   const login = (username, password) => {
+    console.log("logging in");
     setIsLoading(true);
     try {
       const fetchLogin = async () => {
@@ -175,6 +187,7 @@ function App() {
         const decoded = jwtDecode(token);
         localStorage.setItem("userId", JSON.stringify(decoded.sub));
         setUserId(decoded.sub);
+        console.log(decoded.sub);
       };
       fetchLogin();
     } catch (error) {
@@ -183,6 +196,49 @@ function App() {
       console.error(error);
     } finally {
       setLoginSuccess(true);
+    }
+  };
+
+  const register = (firstName, lastName, username, password, email, phone) => {
+    setIsLoading(true);
+    try {
+      const fetchRegister = async () => {
+        const res = await fetch("http://localhost:8888/api/v1/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            firstName: firstName,
+            lastName: lastName,
+            username: username,
+            password: password,
+            email: email,
+            phone: phone,
+          }),
+        });
+
+        if (!res.ok) {
+          setIsLoading(false);
+          const response = await res.json();
+          toast.error(response.message);
+          return;
+        }
+
+        const token = await res.text();
+        localStorage.setItem("token", token);
+        setToken(token);
+
+        const decoded = jwtDecode(token);
+        localStorage.setItem("userId", JSON.stringify(decoded.sub));
+        setUserId(decoded.sub);
+        console.log(decoded.sub);
+      };
+      fetchRegister();
+    } catch (error) {
+      setIsLoading(false);
+      toast.error(error);
+      console.error(error);
+    } finally {
+      setRegisterSuccess(true);
     }
   };
 
@@ -215,6 +271,7 @@ function App() {
                 user={user}
                 logout={logout}
                 haveHousehold={haveHousehold}
+                username={user.username}
               />
             }
           >
@@ -245,7 +302,7 @@ function App() {
           <Route path="*" element={<Navigate to="/login" replace />} />
         )}
         <Route path="login" element={<LoginWindow login={login} />} />
-        <Route path="register" element={<SignupWindow />} />
+        <Route path="register" element={<SignupWindow register={register} />} />
       </Routes>
     </div>
   );
