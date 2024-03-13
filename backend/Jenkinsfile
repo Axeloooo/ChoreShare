@@ -1,10 +1,12 @@
 pipeline {
     agent any
 
-    stages {
+    environment {
+        REPO_URI = "${env.REGISTRY_URI}/${env.PROJECT_ID}/${env.REGISTRY_ID}"
+        IMAGE_TAG = "${env.BUILD_ID}"
+    }
 
-        def REPO_URI = "${env.REGISTRY_URI}/${env.PROJECT_ID}/${env.REGISTRY_ID}"
-      
+    stages {
         stage('Checkout') {
             steps {
                 checkout([
@@ -18,32 +20,7 @@ pipeline {
 
         stage("Build Images") {
             steps {
-                def services = [
-                    "registry-service",
-                    "config-service",
-                    "api-gateway",
-                    "auth-service",
-                    "user-service",
-                    "task-service",
-                    "household-service",
-                    "userhousehold-service",
-                    "announcement-service",
-                    "event-service",
-                    "email-service"
-                ]
-
-                services.each { service ->
-                    sh "docker build -t ${service}:${env.BUILD_ID} ./${service}"
-                }
-            }
-        }
-
-        stage("Push Images") {
-            steps {
-                withCredentials([file(credentialsId: "gcp", variable: "GCP_KEY")]) {
-                    sh "gcloud auth activate-service-account --key-file=${GCP_KEY}"
-                    sh "gcloud auth configure-docker ${env.REGISTRY_URI}"
-
+                script {
                     def services = [
                         "registry-service",
                         "config-service",
@@ -59,7 +36,35 @@ pipeline {
                     ]
 
                     services.each { service ->
-                        sh "docker push ${REPO_URI}/${service}:${env.BUILD_ID}"
+                        sh "docker build -t ${service}:${IMAGE_TAG} ./${service}"
+                    }
+                }
+            }
+        }
+
+        stage("Push Images") {
+            steps {
+                withCredentials([file(credentialsId: "gcp", variable: "GCP_KEY")]) {
+                    sh "gcloud auth activate-service-account --key-file=${GCP_KEY}"
+                    sh "gcloud auth configure-docker ${env.REGISTRY_URI}"
+                    script {
+                        def services = [
+                            "registry-service",
+                            "config-service",
+                            "api-gateway",
+                            "auth-service",
+                            "user-service",
+                            "task-service",
+                            "household-service",
+                            "userhousehold-service",
+                            "announcement-service",
+                            "event-service",
+                            "email-service"
+                        ]
+
+                        services.each { service ->
+                            sh "docker push ${REPO_URI}/${service}:${IMAGE_TAG}"
+                        }
                     }
                 }
             }
@@ -67,17 +72,19 @@ pipeline {
 
         stage("Deploy to GKE") {
             steps {
-                sh "sed -i 's|axeloooo|${REPO_URI}|g' k8s/*.yml"
-                sh "sed -i 's|latest|${env.BUILD_ID}|g' k8s/*.yml"
-                step([
-                    $class: 'KubernetesEngineBuilder', 
-                    projectId: "${env.PROJECT_ID}", 
-                    clusterName: "${env.CLUSTER_NAME}", 
-                    location: "${env.CLUSTER_LOCATION}", 
-                    credentialsId: "${env.PROJECT_ID}", 
-                    verifyDeployments: true,
-                    manifestPattern: "k8s/*.yml",
-                ])
+                script {
+                    sh "sed -i 's|axeloooo|${REPO_URI}|g' k8s/*.yml"
+                    sh "sed -i 's|latest|${IMAGE_TAG}|g' k8s/*.yml"
+                    step([
+                        $class: 'KubernetesEngineBuilder', 
+                        projectId: "${env.PROJECT_ID}", 
+                        clusterName: "${env.CLUSTER_NAME}", 
+                        location: "${env.CLUSTER_LOCATION}", 
+                        credentialsId: "${env.PROJECT_ID}", 
+                        verifyDeployments: true,
+                        manifestPattern: "k8s/*.yml",
+                    ])
+                }
             }
         }
     }
