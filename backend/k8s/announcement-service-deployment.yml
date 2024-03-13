@@ -13,7 +13,11 @@ spec:
     spec:
       containers:
         - name: announcement-service-app
-          image: axeloooo/announcement-service
+          image: axeloooo/announcement-service:latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
           ports:
             - containerPort: 8085
           env:

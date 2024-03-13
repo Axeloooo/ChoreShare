@@ -70,7 +70,7 @@ services:
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
       REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
-      ZIPKIN_SERVICE_URI: http://zipkin:9411
+      ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
     depends_on:
       config-service:
         condition: service_healthy
@@ -83,7 +83,7 @@ services:
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
       REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
-      ZIPKIN_SERVICE_URI: http://zipkin:9411
+      ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
     depends_on:
       config-service:
         condition: service_healthy
@@ -96,7 +96,7 @@ services:
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
       REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
-      ZIPKIN_SERVICE_URI: http://zipkin:9411
+      ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
       DB_HOST: postgres
     depends_on:
       config-service:
@@ -110,7 +110,7 @@ services:
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
       REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
-      ZIPKIN_SERVICE_URI: http://zipkin:9411
+      ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
       DB_HOST: postgres
     depends_on:
       config-service:
@@ -124,7 +124,7 @@ services:
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
       REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
-      ZIPKIN_SERVICE_URI: http://zipkin:9411
+      ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
       DB_HOST: postgres
     depends_on:
       config-service:
@@ -138,7 +138,7 @@ services:
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
       REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
-      ZIPKIN_SERVICE_URI: http://zipkin:9411
+      ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
       DB_HOST: postgres
     depends_on:
       config-service:
@@ -152,7 +152,7 @@ services:
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
       REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
-      ZIPKIN_SERVICE_URI: http://zipkin:9411
+      ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
       DB_HOST: postgres
     depends_on:
       config-service:
@@ -166,7 +166,7 @@ services:
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
       REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
-      ZIPKIN_SERVICE_URI: http://zipkin:9411
+      ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
       DB_HOST: postgres
     depends_on:
       config-service:
@@ -180,7 +180,7 @@ services:
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
       REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
-      ZIPKIN_SERVICE_URI: http://zipkin:9411
+      ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
     depends_on:
       config-service:
         condition: service_healthy

@@ -13,7 +13,11 @@ spec:
     spec:
       containers:
         - name: userhousehold-service-app
-          image: axeloooo/userhousehold-service
+          image: axeloooo/userhousehold-service:latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
           ports:
             - containerPort: 8084
           env:

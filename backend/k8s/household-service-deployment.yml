@@ -13,7 +13,11 @@ spec:
     spec:
       containers:
         - name: household-service-app
-          image: axeloooo/household-service
+          image: axeloooo/household-service:latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
           ports:
             - containerPort: 8082
           env:

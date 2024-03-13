@@ -1,18 +1,18 @@
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: postgres-pv
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: manual
-  hostPath:
-    path: /mnt/data
-    type: DirectoryOrCreate
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: postgres-pv
+# spec:
+#   capacity:
+#     storage: 1Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   storageClassName: manual
+#   hostPath:
+#     path: /mnt/data
+#     type: DirectoryOrCreate
 
----
+# ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -23,7 +23,7 @@ spec:
       storage: 1Gi
   accessModes:
     - ReadWriteOnce
-  storageClassName: manual
+  storageClassName: standard
 
 ---
 apiVersion: apps/v1

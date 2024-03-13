@@ -14,6 +14,10 @@ spec:
       containers:
         - name: redis
           image: redis
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
           ports:
             - containerPort: 6379
           command: ["redis-server", "--protected-mode", "no"]

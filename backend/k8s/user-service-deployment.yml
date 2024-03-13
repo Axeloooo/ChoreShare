@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: user-service-app
-          image: axeloooo/user-service
+          image: axeloooo/user-service:latest
           resources:
             limits:
               cpu: "1"
