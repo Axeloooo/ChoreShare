@@ -22,7 +22,7 @@ import com.choresync.user.entity.User;
 import com.choresync.user.exception.UserAlreadyExistsException;
 import com.choresync.user.exception.UserCreationException;
 import com.choresync.user.exception.UserNotFoundException;
-import com.choresync.user.model.AuthResponse;
+import com.choresync.user.model.UserAuthResponse;
 import com.choresync.user.model.UserRequest;
 import com.choresync.user.model.UserResponse;
 import com.choresync.user.repository.UserRepository;
@@ -69,7 +69,7 @@ class UserServiceImplTest {
   @Description("POST /api/v1/user - Test create user success")
   @Test
   public void testCreateUserSuccess() {
-    AuthResponse authResponse = AuthResponse
+    UserAuthResponse authResponse = UserAuthResponse
         .builder()
         .id(user.getId())
         .username(user.getUsername())
@@ -81,7 +81,7 @@ class UserServiceImplTest {
     when(userRepository.findByEmail(anyString())).thenReturn(null);
     when(userRepository.save(any(User.class))).thenReturn(user);
 
-    AuthResponse result = userService.createUser(userRequest);
+    UserAuthResponse result = userService.createUser(userRequest);
 
     assertNotNull(result);
     assertEquals(authResponse, result);
@@ -215,7 +215,7 @@ class UserServiceImplTest {
   public void testGetUserByUsernameSuccess() {
     when(userRepository.findByUsername(anyString())).thenReturn(user);
 
-    AuthResponse authResponse = userService.getUserByUsername("johndoe");
+    UserAuthResponse authResponse = userService.getUserByUsername("johndoe");
 
     assertNotNull(authResponse);
     assertEquals(user.getUsername(), authResponse.getUsername());

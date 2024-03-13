@@ -45,9 +45,9 @@ public class TaskController {
     return new ResponseEntity<>(tasks, HttpStatus.OK);
   }
 
-  @GetMapping
-  public ResponseEntity<List<TaskResponse>> getAllTasks() {
-    List<TaskResponse> tasks = taskService.getAllTasks();
+  @GetMapping("/household/{hid}")
+  public ResponseEntity<List<TaskResponse>> getAllTasksByHousehold(@PathVariable("hid") String householdId) {
+    List<TaskResponse> tasks = taskService.getAllTasksByHousehold(householdId);
     return new ResponseEntity<>(tasks, HttpStatus.OK);
   }
 

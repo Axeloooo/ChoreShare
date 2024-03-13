@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.choresync.auth.external.response.UserResponse;
+import com.choresync.auth.external.response.UserAuthResponse;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -13,7 +13,7 @@ public class CustomUserDetails implements UserDetails {
 
   private String password;
 
-  public CustomUserDetails(UserResponse user) {
+  public CustomUserDetails(UserAuthResponse user) {
     this.username = user.getUsername();
     this.password = user.getPassword();
   }

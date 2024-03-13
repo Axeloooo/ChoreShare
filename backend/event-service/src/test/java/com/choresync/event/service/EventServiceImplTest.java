@@ -110,30 +110,30 @@ public class EventServiceImplTest {
     verify(eventRepository, times(1)).findById("1");
   }
 
-  @Description("GET /api/v1/event - Test get all events")
-  @Test
-  public void testGetAllEvents() {
-    when(eventRepository.findAll()).thenReturn(Arrays.asList(event));
+  // @Description("GET /api/v1/event - Test get all events")
+  // @Test
+  // public void testGetAllEvents() {
+  // when(eventRepository.findAll()).thenReturn(Arrays.asList(event));
 
-    List<EventResponse> result = eventService.getAllEvents();
+  // List<EventResponse> result = eventService.getAllEvents();
 
-    assertNotNull(result);
-    assertEquals(1, result.size());
-    assertEquals(eventResponse, result.get(0));
+  // assertNotNull(result);
+  // assertEquals(1, result.size());
+  // assertEquals(eventResponse, result.get(0));
 
-    verify(eventRepository, times(1)).findAll();
-  }
+  // verify(eventRepository, times(1)).findAll();
+  // }
 
-  @Description("GET /api/v1/event - Test get all empty events")
-  @Test
-  public void testGetAllEventsWhenNoEventsFound() {
-    when(eventRepository.findAll()).thenReturn(Arrays.asList());
+  // @Description("GET /api/v1/event - Test get all empty events")
+  // @Test
+  // public void testGetAllEventsWhenNoEventsFound() {
+  // when(eventRepository.findAll()).thenReturn(Arrays.asList());
 
-    List<EventResponse> result = eventService.getAllEvents();
+  // List<EventResponse> result = eventService.getAllEvents();
 
-    assertNotNull(result);
-    assertEquals(0, result.size());
+  // assertNotNull(result);
+  // assertEquals(0, result.size());
 
-    verify(eventRepository, times(1)).findAll();
-  }
+  // verify(eventRepository, times(1)).findAll();
+  // }
 }

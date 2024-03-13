@@ -27,7 +27,16 @@ public class Event {
   @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
 
+  @Column(name = "household_id")
+  private String householdId;
+
   private String title;
+
+  @Column(name = "user_id")
+  private String userId;
+
+  @Column(name = "username")
+  private String username;
 
   @Column(name = "start_time")
   private Date startTime;

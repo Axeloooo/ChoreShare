@@ -5,14 +5,18 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import com.choresync.task.entity.Frequency;
 import com.choresync.task.entity.Status;
 import com.choresync.task.entity.Tag;
 import com.choresync.task.entity.Task;
+import com.choresync.task.exception.HouseholdNotFoundException;
 import com.choresync.task.exception.TaskCreationException;
 import com.choresync.task.exception.TaskNotFoundException;
 import com.choresync.task.exception.TaskUnforbiddenActionException;
+import com.choresync.task.external.response.HouseholdResponse;
 import com.choresync.task.model.TaskEditMetadataRequest;
 import com.choresync.task.model.TaskEditStatusRequest;
 import com.choresync.task.model.TaskRequest;
@@ -24,16 +28,36 @@ public class TaskServiceImpl implements TaskService {
   @Autowired
   private TaskRepository taskRepository;
 
+  @Autowired
+  private RestTemplate restTemplate;
+
   @Override
   public TaskResponse createTask(TaskRequest taskRequest) {
     if (taskRequest == null) {
       throw new TaskCreationException("Missing fields in request body");
     }
 
+    HouseholdResponse householdResponse;
+
+    try {
+      householdResponse = restTemplate.getForObject(
+          "http://household-service/api/v1/household/" + taskRequest.getHouseholdId(),
+          HouseholdResponse.class);
+
+    } catch (RestClientException e) {
+      throw new HouseholdNotFoundException(
+          "Could not find a household. " + e.getMessage());
+    }
+
+    if (householdResponse == null) {
+      throw new HouseholdNotFoundException("Could not find a household");
+    }
+
     Task task = Task.builder()
         .title(taskRequest.getTitle())
+        .householdId(taskRequest.getHouseholdId())
         .description(taskRequest.getDescription())
-        .status(Status.valueOf(taskRequest.getStatus()))
+        .status(Status.PENDING)
         .frequency(Frequency.valueOf(taskRequest.getFrequency()))
         .tag(Tag.valueOf(taskRequest.getTag()))
         .userId(taskRequest.getUserId())
@@ -44,6 +68,7 @@ public class TaskServiceImpl implements TaskService {
     TaskResponse taskResponse = TaskResponse.builder()
         .id(newTask.getId())
         .title(newTask.getTitle())
+        .householdId(newTask.getHouseholdId())
         .description(newTask.getDescription())
         .status(newTask.getStatus().name())
         .frequency(newTask.getFrequency().name())
@@ -65,6 +90,7 @@ public class TaskServiceImpl implements TaskService {
     TaskResponse taskResponse = TaskResponse.builder()
         .id(task.getId())
         .title(task.getTitle())
+        .householdId(task.getHouseholdId())
         .description(task.getDescription())
         .status(task.getStatus().name())
         .frequency(task.getFrequency().name())
@@ -91,6 +117,7 @@ public class TaskServiceImpl implements TaskService {
       TaskResponse taskResponse = TaskResponse.builder()
           .id(task.getId())
           .title(task.getTitle())
+          .householdId(task.getHouseholdId())
           .description(task.getDescription())
           .status(task.getStatus().name())
           .frequency(task.getFrequency().name())
@@ -107,8 +134,9 @@ public class TaskServiceImpl implements TaskService {
   }
 
   @Override
-  public List<TaskResponse> getAllTasks() {
-    List<Task> tasks = taskRepository.findAll();
+  public List<TaskResponse> getAllTasksByHousehold(String householdId) {
+
+    List<Task> tasks = taskRepository.findByHouseholdId(householdId);
 
     List<TaskResponse> taskResponses = new ArrayList<>();
 
@@ -116,6 +144,7 @@ public class TaskServiceImpl implements TaskService {
       TaskResponse taskResponse = TaskResponse.builder()
           .id(task.getId())
           .title(task.getTitle())
+          .householdId(task.getHouseholdId())
           .description(task.getDescription())
           .status(task.getStatus().name())
           .frequency(task.getFrequency().name())
@@ -152,6 +181,7 @@ public class TaskServiceImpl implements TaskService {
     TaskResponse taskResponse = TaskResponse.builder()
         .id(updatedTask.getId())
         .title(updatedTask.getTitle())
+        .householdId(updatedTask.getHouseholdId())
         .description(updatedTask.getDescription())
         .status(updatedTask.getStatus().name())
         .frequency(updatedTask.getFrequency().name())
@@ -185,6 +215,7 @@ public class TaskServiceImpl implements TaskService {
     TaskResponse taskResponse = TaskResponse.builder()
         .id(updatedTask.getId())
         .title(updatedTask.getTitle())
+        .householdId(updatedTask.getHouseholdId())
         .description(updatedTask.getDescription())
         .status(updatedTask.getStatus().name())
         .frequency(updatedTask.getFrequency().name())
@@ -223,6 +254,7 @@ public class TaskServiceImpl implements TaskService {
     TaskResponse taskResponse = TaskResponse.builder()
         .id(updatedTask.getId())
         .title(updatedTask.getTitle())
+        .householdId(updatedTask.getHouseholdId())
         .description(updatedTask.getDescription())
         .status(updatedTask.getStatus().name())
         .frequency(updatedTask.getFrequency().name())
@@ -256,6 +288,7 @@ public class TaskServiceImpl implements TaskService {
     TaskResponse taskResponse = TaskResponse.builder()
         .id(updatedTask.getId())
         .title(updatedTask.getTitle())
+        .householdId(updatedTask.getHouseholdId())
         .description(updatedTask.getDescription())
         .status(updatedTask.getStatus().name())
         .frequency(updatedTask.getFrequency().name())

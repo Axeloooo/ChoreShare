@@ -15,9 +15,13 @@ public class AnnouncementResponse {
 
   private String id;
 
+  private String householdId;
+
   private String message;
 
   private String userId;
+
+  private String author;
 
   private Date createdAt;
 

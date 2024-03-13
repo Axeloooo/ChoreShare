@@ -14,7 +14,13 @@ import lombok.NoArgsConstructor;
 public class EventResponse {
   private String id;
 
+  private String householdId;
+
   private String title;
+
+  private String userId;
+
+  private String username;
 
   private Date startTime;
 

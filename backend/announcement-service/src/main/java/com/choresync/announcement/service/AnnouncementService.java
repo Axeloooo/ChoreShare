@@ -11,7 +11,7 @@ public interface AnnouncementService {
 
   AnnouncementResponse getAnnouncementById(String id);
 
-  List<AnnouncementResponse> getAllAnnouncements();
+  List<AnnouncementResponse> getAllAnnouncementsByHousehold(String householdId);
 
   AnnouncementResponse editAnnouncement(String id, AnnouncementRequest announcementRequest);
 
