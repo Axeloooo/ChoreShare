@@ -13,7 +13,11 @@ spec:
     spec:
       containers:
         - name: event-service-app
-          image: axeloooo/event-service
+          image: axeloooo/event-service:latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
           ports:
             - containerPort: 8083
           env:

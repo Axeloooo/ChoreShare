@@ -13,7 +13,11 @@ spec:
     spec:
       containers:
         - name: task-service-app
-          image: axeloooo/task-service
+          image: axeloooo/task-service:latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
           ports:
             - containerPort: 8081
           env:
