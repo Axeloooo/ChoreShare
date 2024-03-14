@@ -10,11 +10,14 @@ function Layout({
   setSidebarOpen,
   user,
   logout,
-  haveHousehold,
+  setCurrentHousehold,
+  currentHousehold,
   username,
+  createHousehold,
+  households,
 }) {
   const [overlayVisible, setOverlayVisible] = useState(false);
-  const [overlayContent, setOverlayContent] = useState(<CreateHousehold />);
+  const [overlayContent, setOverlayContent] = useState(null);
 
   const showOverlay = (content) => {
     setOverlayContent(content);
@@ -31,6 +34,8 @@ function Layout({
             logout={logout}
             showOverlay={showOverlay}
             username={username}
+            createHousehold={createHousehold}
+            closeOverlay={closeOverlay}
           />
           <Outlet context={{ showOverlay }} />
           {overlayVisible && (
@@ -41,7 +46,9 @@ function Layout({
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
             showOverlay={showOverlay}
-            haveHousehold={haveHousehold}
+            currentHousehold={currentHousehold}
+            households={households}
+            setCurrentHousehold={setCurrentHousehold}
           />
         </>
       ) : null}

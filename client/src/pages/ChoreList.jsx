@@ -4,7 +4,7 @@ import ChoreCard from "../components/ChoreCard";
 import CreateChore from "../components/CreateChore";
 import { useOutletContext } from "react-router-dom";
 
-function ChoreList({ sidebarOpen, haveHousehold }) {
+function ChoreList({ sidebarOpen, currentHousehold }) {
   const chores = [
     {
       title: "Clean Bathroom",
@@ -100,7 +100,7 @@ function ChoreList({ sidebarOpen, haveHousehold }) {
 
   return (
     <>
-      {haveHousehold ? (
+      {currentHousehold != null ? (
         <div className={sidebarOpen ? "chore-page" : "chore-page full-width"}>
           <div className="chore-container">
             <div className="title">
