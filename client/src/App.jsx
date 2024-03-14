@@ -20,11 +20,24 @@ function App() {
   );
   const [token, setToken] = useState(null);
   const [userId, setUserId] = useState(null);
-  const [households, setHouseholds] = useState([]);
-  const [currentHousehold, setCurrentHousehold] = useState(null);
+  const [households, setHouseholds] = useState(
+    localStorage.getItem("households")
+      ? JSON.parse(localStorage.getItem("households"))
+      : []
+  );
+  const [currentHousehold, setCurrentHousehold] = useState(
+    localStorage.getItem("currentHousehold")
+      ? JSON.parse(localStorage.getItem("currentHousehold"))
+      : null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
+  const [allChores, setAllChores] = useState(
+    localStorage.getItem(
+      "allChores" ? JSON.parse(localStorage.getItem("allChores")) : []
+    )
+  );
   const navigate = useNavigate();
 
   localStorage.removeItem("user");
@@ -34,21 +47,15 @@ function App() {
   console.log(userId);
   console.log(households);
   console.log(currentHousehold);
+  console.log(allChores);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUserId = localStorage.getItem("userId");
-    const storedHouseholds = localStorage.getItem("households");
-    const storedCurrentHousehold = localStorage.getItem("currentHousehold");
 
     if (storedToken && storedUserId) {
       setToken(storedToken);
       setUserId(JSON.parse(storedUserId));
-    }
-    if (storedHouseholds && storedCurrentHousehold) {
-      const householdsData = JSON.parse(storedHouseholds);
-      setHouseholds(householdsData);
-      setCurrentHousehold(JSON.parse(storedCurrentHousehold));
     }
   }, []);
 
@@ -141,6 +148,77 @@ function App() {
         JSON.stringify(currentHousehold)
       );
 
+      console.log("householdsData", householdsData);
+
+      fetchChores(currentHousehold.id);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  };
+
+  const createHousehold = async (householdName, closeOverlay) => {
+    try {
+      const res = await fetch("http://localhost:8888/api/v1/userhousehold", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userId: userId,
+          name: householdName,
+        }),
+      });
+
+      if (!res.ok) {
+        const response = await res.json();
+        toast.error(response.message);
+        return;
+      }
+
+      const data = await res.json();
+      const householdData = data.household;
+      setHouseholds([...households, householdData]);
+      localStorage.setItem(
+        "households",
+        JSON.stringify([...households, householdData])
+      );
+      setCurrentHousehold(householdData);
+      localStorage.setItem(
+        "currentHousehold",
+        JSON.stringify(currentHousehold)
+      );
+      toast.success("Household created successfully!");
+      closeOverlay();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchChores = async (householdId) => {
+    try {
+      const res = await fetch(
+        `http://localhost:8888/api/v1/task/household/${householdId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const response = await res.json();
+        toast.error(response.message);
+        return;
+      }
+
+      const data = await res.json();
+      setAllChores(data);
+      localStorage.setItem("allChores", JSON.stringify(data));
+
       setIsLoading(false);
 
       if (loginSuccess) {
@@ -152,85 +230,88 @@ function App() {
       navigate("/");
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoginSuccess(false);
     }
   };
 
-  const createHousehold = (householdName, closeOverlay) => {
+  const createChore = async (
+    title,
+    description,
+    frequence,
+    tag,
+    closeOverlay
+  ) => {
     try {
-      const createHousehold = async () => {
-        const res = await fetch("http://localhost:8888/api/v1/userhousehold", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            userId: userId,
-            name: householdName,
-          }),
-        });
+      console.log(
+        JSON.stringify({
+          title: title,
+          householdId: currentHousehold.id,
+          description: description,
+          status: null,
+          frequency: frequence,
+          tag: tag,
+          userId: null,
+        })
+      );
+      const res = await fetch("http://localhost:8888/api/v1/task", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: title,
+          householdId: currentHousehold.id,
+          description: description,
+          status: null,
+          frequency: frequence,
+          tag: tag,
+          userId: null,
+        }),
+      });
 
-        if (!res.ok) {
-          const response = await res.json();
-          toast.error(response.message);
-          return;
-        }
+      if (!res.ok) {
+        const response = await res.json();
+        toast.error(response.message);
+        return;
+      }
 
-        const data = await res.json();
-        console.log(data);
-        const householdData = data.household;
-        setHouseholds([...households, householdData]);
-        localStorage.setItem(
-          "households",
-          JSON.stringify([...households, householdData])
-        );
-        setCurrentHousehold(householdData);
-        localStorage.setItem(
-          "currentHousehold",
-          JSON.stringify(currentHousehold)
-        );
-        toast.success("Household created successfully!");
-        closeOverlay();
-      };
-      createHousehold();
+      const data = await res.json();
+      setAllChores([...allChores, data]);
+      localStorage.setItem("allChores", JSON.stringify([...allChores, data]));
+      toast.success("Chore created successfully!");
+      closeOverlay();
     } catch (error) {
       console.error(error);
     }
   };
 
-  const login = (username, password) => {
-    console.log("logging in");
+  const login = async (username, password) => {
     setIsLoading(true);
     try {
-      const fetchLogin = async () => {
-        const res = await fetch("http://localhost:8888/api/v1/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username: username,
-            password: password,
-          }),
-        });
+      const res = await fetch("http://localhost:8888/api/v1/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      });
 
-        if (!res.ok) {
-          setIsLoading(false);
-          const response = await res.json();
-          toast.error(response.message);
-          return;
-        }
+      if (!res.ok) {
+        setIsLoading(false);
+        const response = await res.json();
+        toast.error(response.message);
+        return;
+      }
 
-        const token = await res.text();
-        localStorage.setItem("token", token);
-        setToken(token);
+      const token = await res.text();
+      localStorage.setItem("token", token);
+      setToken(token);
 
-        const decoded = jwtDecode(token);
-        localStorage.setItem("userId", JSON.stringify(decoded.sub));
-        setUserId(decoded.sub);
-        console.log(decoded.sub);
-      };
-      fetchLogin();
+      const decoded = jwtDecode(token);
+      localStorage.setItem("userId", JSON.stringify(decoded.sub));
+      setUserId(decoded.sub);
+      console.log(decoded.sub);
     } catch (error) {
       setIsLoading(false);
       toast.error(error);
@@ -240,43 +321,44 @@ function App() {
     }
   };
 
-  const register = (firstName, lastName, username, password, email, phone) => {
+  const register = async (
+    firstName,
+    lastName,
+    username,
+    password,
+    email,
+    phone
+  ) => {
     setIsLoading(true);
     try {
-      const fetchRegister = async () => {
-        const res = await fetch("http://localhost:8888/api/v1/auth/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            firstName: firstName,
-            lastName: lastName,
-            username: username,
-            password: password,
-            email: email,
-            phone: phone,
-          }),
-        });
+      const res = await fetch("http://localhost:8888/api/v1/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: firstName,
+          lastName: lastName,
+          username: username,
+          password: password,
+          email: email,
+          phone: phone,
+        }),
+      });
 
-        if (!res.ok) {
-          setIsLoading(false);
-          const response = await res.json();
-          toast.error(response.message);
-          return;
-        }
+      if (!res.ok) {
+        setIsLoading(false);
+        const response = await res.json();
+        toast.error(response.message);
+        return;
+      }
 
-        const token = await res.text();
-        localStorage.setItem("token", token);
-        setToken(token);
+      const token = await res.text();
+      localStorage.setItem("token", token);
+      setToken(token);
 
-        const decoded = jwtDecode(token);
-        localStorage.setItem("userId", JSON.stringify(decoded.sub));
-        setUserId(decoded.sub);
-        console.log(decoded.sub);
-      };
-      fetchRegister();
+      const decoded = jwtDecode(token);
+      localStorage.setItem("userId", JSON.stringify(decoded.sub));
+      setUserId(decoded.sub);
     } catch (error) {
-      setIsLoading(false);
-      toast.error(error);
       console.error(error);
     } finally {
       setRegisterSuccess(true);
@@ -291,11 +373,13 @@ function App() {
       setUserId(null);
       setHouseholds([]);
       setCurrentHousehold(null);
+      setAllChores([]);
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
       localStorage.removeItem("households");
       localStorage.removeItem("currentHousehold");
+      localStorage.removeItem("allChores");
       navigate("/login");
     }
   };
@@ -339,6 +423,8 @@ function App() {
                 <ChoreList
                   sidebarOpen={sidebarOpen}
                   currentHousehold={currentHousehold}
+                  allChores={allChores}
+                  createChore={createChore}
                 />
               }
             />

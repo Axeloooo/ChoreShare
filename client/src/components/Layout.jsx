@@ -37,7 +37,7 @@ function Layout({
             createHousehold={createHousehold}
             closeOverlay={closeOverlay}
           />
-          <Outlet context={{ showOverlay }} />
+          <Outlet context={{ showOverlay, closeOverlay }} />
           {overlayVisible && (
             <Overlay content={overlayContent} closeOverlay={closeOverlay} />
           )}

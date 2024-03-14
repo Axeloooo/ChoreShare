@@ -4,7 +4,7 @@ import ChoreCard from "../components/ChoreCard";
 import CreateChore from "../components/CreateChore";
 import { useOutletContext } from "react-router-dom";
 
-function ChoreList({ sidebarOpen, currentHousehold }) {
+function ChoreList({ sidebarOpen, currentHousehold, allChores, createChore }) {
   const chores = [
     {
       title: "Clean Bathroom",
@@ -78,10 +78,10 @@ function ChoreList({ sidebarOpen, currentHousehold }) {
     },
   ];
   const [threeColumns, setthreeColumns] = useState([]);
-  const { showOverlay } = useOutletContext();
+  const { showOverlay, closeOverlay } = useOutletContext();
 
   useEffect(() => {
-    const threeColumns = chores.reduce(function (columns, item, index) {
+    const threeColumns = allChores.reduce(function (columns, item, index) {
       const columnIndex = index % 3;
       const rowIndex = Math.floor(index / 3);
       if (!columns[columnIndex]) {
@@ -92,10 +92,12 @@ function ChoreList({ sidebarOpen, currentHousehold }) {
     }, []);
 
     setthreeColumns(threeColumns);
-  }, []);
+  }, [allChores]);
 
   const handleShowCreateChore = () => {
-    showOverlay(<CreateChore />);
+    showOverlay(
+      <CreateChore createChore={createChore} closeOverlay={closeOverlay} />
+    );
   };
 
   return (
