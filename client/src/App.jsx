@@ -157,7 +157,7 @@ function App() {
     }
   };
 
-  const createHousehold = (householdName) => {
+  const createHousehold = (householdName, closeOverlay) => {
     try {
       const createHousehold = async () => {
         const res = await fetch("http://localhost:8888/api/v1/userhousehold", {
@@ -192,6 +192,7 @@ function App() {
           JSON.stringify(currentHousehold)
         );
         toast.success("Household created successfully!");
+        closeOverlay();
       };
       createHousehold();
     } catch (error) {

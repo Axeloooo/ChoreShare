@@ -1,12 +1,12 @@
 import "../styles/CreateHousehold.css";
 import { useState } from "react";
 
-function CreateHousehold({ createHousehold }) {
+function CreateHousehold({ createHousehold, closeOverlay }) {
   const [householdName, setHouseholdName] = useState("");
 
   const handleCreateHousehold = (e) => {
     e.preventDefault();
-    createHousehold(householdName);
+    createHousehold(householdName, closeOverlay);
   };
 
   return (

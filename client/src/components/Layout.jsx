@@ -35,6 +35,7 @@ function Layout({
             showOverlay={showOverlay}
             username={username}
             createHousehold={createHousehold}
+            closeOverlay={closeOverlay}
           />
           <Outlet context={{ showOverlay }} />
           {overlayVisible && (

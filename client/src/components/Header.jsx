@@ -4,7 +4,13 @@ import { FaArrowRightToBracket } from "react-icons/fa6";
 import CreateHousehold from "./CreateHousehold";
 import JoinHousehold from "./JoinHousehold";
 
-function Header({ logout, showOverlay, username, createHousehold }) {
+function Header({
+  logout,
+  showOverlay,
+  username,
+  createHousehold,
+  closeOverlay,
+}) {
   const location = useLocation();
 
   const handleLogout = () => {
@@ -12,7 +18,12 @@ function Header({ logout, showOverlay, username, createHousehold }) {
   };
 
   const handleShowCreateHousehold = () => {
-    showOverlay(<CreateHousehold createHousehold={createHousehold} />);
+    showOverlay(
+      <CreateHousehold
+        createHousehold={createHousehold}
+        closeOverlay={closeOverlay}
+      />
+    );
   };
 
   const handleShowJoinHousehold = () => {
