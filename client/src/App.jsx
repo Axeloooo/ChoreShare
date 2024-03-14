@@ -21,10 +21,10 @@ function App() {
   const [token, setToken] = useState(null);
   const [userId, setUserId] = useState(null);
   const [households, setHouseholds] = useState([]);
+  const [currentHousehold, setCurrentHousehold] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
-  const [haveHousehold, setHaveHousehold] = useState(false);
   const navigate = useNavigate();
 
   localStorage.removeItem("user");
@@ -32,27 +32,23 @@ function App() {
   localStorage.removeItem("userId");
   localStorage.removeItem("households");
   console.log(userId);
+  console.log(households);
+  console.log(currentHousehold);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUserId = localStorage.getItem("userId");
     const storedHouseholds = localStorage.getItem("households");
+    const storedCurrentHousehold = localStorage.getItem("currentHousehold");
 
     if (storedToken && storedUserId) {
       setToken(storedToken);
       setUserId(JSON.parse(storedUserId));
     }
-    if (storedHouseholds) {
+    if (storedHouseholds && storedCurrentHousehold) {
       const householdsData = JSON.parse(storedHouseholds);
       setHouseholds(householdsData);
-
-      if (householdsData.length > 0) {
-        console.log("have household");
-        setHaveHousehold(true);
-      } else {
-        console.log("no household");
-        setHaveHousehold(false);
-      }
+      setCurrentHousehold(JSON.parse(storedCurrentHousehold));
     }
   }, []);
 
@@ -109,9 +105,6 @@ function App() {
       } finally {
         fetchHousehold();
       }
-    } else {
-      setIsLoading(false);
-      toast.error("Oops, there has been an issue. Please try again later.");
     }
   }, [userId]);
 
@@ -140,8 +133,13 @@ function App() {
       localStorage.setItem("households", JSON.stringify(householdsData));
 
       if (householdsData.length > 0) {
-        setHaveHousehold(true);
+        setCurrentHousehold(householdsData[0]);
       }
+
+      localStorage.setItem(
+        "currentHousehold",
+        JSON.stringify(currentHousehold)
+      );
 
       setIsLoading(false);
 
@@ -156,6 +154,48 @@ function App() {
       console.error(error);
     } finally {
       setLoginSuccess(false);
+    }
+  };
+
+  const createHousehold = (householdName) => {
+    try {
+      const createHousehold = async () => {
+        const res = await fetch("http://localhost:8888/api/v1/userhousehold", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            userId: userId,
+            name: householdName,
+          }),
+        });
+
+        if (!res.ok) {
+          const response = await res.json();
+          toast.error(response.message);
+          return;
+        }
+
+        const data = await res.json();
+        console.log(data);
+        const householdData = data.household;
+        setHouseholds([...households, householdData]);
+        localStorage.setItem(
+          "households",
+          JSON.stringify([...households, householdData])
+        );
+        setCurrentHousehold(householdData);
+        localStorage.setItem(
+          "currentHousehold",
+          JSON.stringify(currentHousehold)
+        );
+        toast.success("Household created successfully!");
+      };
+      createHousehold();
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -249,11 +289,12 @@ function App() {
       setToken(null);
       setUserId(null);
       setHouseholds([]);
-      setHaveHousehold(false);
+      setCurrentHousehold(null);
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
       localStorage.removeItem("households");
+      localStorage.removeItem("currentHousehold");
       navigate("/login");
     }
   };
@@ -270,8 +311,11 @@ function App() {
                 setSidebarOpen={setSidebarOpen}
                 user={user}
                 logout={logout}
-                haveHousehold={haveHousehold}
+                currentHousehold={currentHousehold}
+                setCurrentHousehold={setCurrentHousehold}
                 username={user.username}
+                createHousehold={createHousehold}
+                households={households}
               />
             }
           >
@@ -280,7 +324,7 @@ function App() {
               element={
                 <Dashboard
                   sidebarOpen={sidebarOpen}
-                  haveHousehold={haveHousehold}
+                  currentHousehold={currentHousehold}
                 />
               }
             />
@@ -293,7 +337,7 @@ function App() {
               element={
                 <ChoreList
                   sidebarOpen={sidebarOpen}
-                  haveHousehold={haveHousehold}
+                  currentHousehold={currentHousehold}
                 />
               }
             />

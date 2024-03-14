@@ -1,14 +1,16 @@
 import "../styles/Sidebar.css";
 import HouseholdMember from "./HouseholdMember";
 import AddMember from "../components/AddMember";
-import CreateHousehold from "../components/CreateHousehold";
+import Select from "react-select";
 
 function Sidebar({
   user,
   sidebarOpen,
   setSidebarOpen,
   showOverlay,
-  haveHousehold,
+  currentHousehold,
+  households,
+  setCurrentHousehold,
 }) {
   const members = [
     { name: "Smith Jhon", username: "smith2849" },
@@ -18,6 +20,41 @@ function Sidebar({
     { name: "Jane Smith", username: "jane2784" },
     { name: "John Johnson", username: "johnson2784" },
   ];
+
+  const householdOptions = households.map((household) => ({
+    value: household.id,
+    label: household.name,
+  }));
+
+  const customStyles = {
+    control: (provided) => ({
+      ...provided,
+      width: "16rem", // Ensure the select takes the full width of its container
+      fontSize: "13px", // Adjust font size as needed
+    }),
+    option: (provided) => ({
+      ...provided,
+      fontSize: "13px", // Adjust option font size as needed
+    }),
+    menu: (provided) => ({
+      ...provided,
+      width: "100%", // Ensure the dropdown menu matches the width of the control
+    }),
+  };
+
+  const toggleHousehold = (selectedOption) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to change the household?"
+    );
+    if (isConfirmed) {
+      const newCurrentHousehold = {
+        name: selectedOption.label,
+        id: selectedOption.value,
+      };
+
+      setCurrentHousehold(newCurrentHousehold);
+    }
+  };
 
   const handleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -47,11 +84,15 @@ function Sidebar({
           <p className="user-phone">Phone: {user.phone}</p>
         </div>
       </div>
-      {haveHousehold ? (
+      {currentHousehold != null ? (
         <div className="household-container">
           <div className="household-container-header">
-            <h3>My Household</h3>
-            <p onClick={handleShowAddMember}>+Add Members</p>
+            <Select
+              options={householdOptions}
+              styles={customStyles}
+              defaultValue={householdOptions[0]}
+              onChange={toggleHousehold}
+            />
           </div>
           <div className="members-list">
             {members.map((member, index) => {

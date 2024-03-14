@@ -6,7 +6,7 @@ import CreateAnnouncement from "../components/CreateAnnouncement";
 import Announcement from "../components/Announcement";
 import UpcomingEvent from "../components/UpcomingEvent";
 
-function Dashboard({ sidebarOpen, haveHousehold }) {
+function Dashboard({ sidebarOpen, currentHousehold }) {
   const tasks = [
     { title: "Wash Dishes", status: "Not Started" },
     { title: "Clean Bathroom", status: "Complete" },
@@ -62,7 +62,7 @@ function Dashboard({ sidebarOpen, haveHousehold }) {
 
   return (
     <>
-      {haveHousehold ? (
+      {currentHousehold != null ? (
         <div
           className={
             sidebarOpen ? "dashboard-page" : "dashboard-page full-width"

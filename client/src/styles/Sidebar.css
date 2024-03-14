@@ -79,8 +79,9 @@
   height: fit-content;
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 1.5rem 1rem;
 }
 
@@ -97,8 +98,8 @@
 
 .members-list {
   width: 100%;
-  height: 85%;
-  overflow-y: visible;
+  height: 80%;
+  overflow-y: auto;
   padding: 0 1rem;
   display: flex;
   flex-direction: column;
