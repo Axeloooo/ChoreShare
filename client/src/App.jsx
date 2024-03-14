@@ -38,16 +38,18 @@ function App() {
       "allChores" ? JSON.parse(localStorage.getItem("allChores")) : []
     )
   );
+  const [myChores, setMyChores] = useState(
+    localStorage.getItem("myChores")
+      ? JSON.parse(localStorage.getItem("myChores"))
+      : []
+  );
   const navigate = useNavigate();
 
-  localStorage.removeItem("user");
-  localStorage.removeItem("token");
-  localStorage.removeItem("userId");
-  localStorage.removeItem("households");
   console.log(userId);
   console.log(households);
   console.log(currentHousehold);
   console.log(allChores);
+  console.log(myChores);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -150,7 +152,7 @@ function App() {
 
       console.log("householdsData", householdsData);
 
-      fetchChores(currentHousehold.id);
+      fetchChores(householdsData[0].id);
     } catch (error) {
       console.error(error);
     } finally {
@@ -219,6 +221,35 @@ function App() {
       setAllChores(data);
       localStorage.setItem("allChores", JSON.stringify(data));
 
+      fetchMyChores();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchMyChores = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:8888/api/v1/task/user/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const response = await res.json();
+        toast.error(response.message);
+        return;
+      }
+
+      const data = await res.json();
+      setMyChores(data);
+      localStorage.setItem("myChores", JSON.stringify(data));
+
       setIsLoading(false);
 
       if (loginSuccess) {
@@ -280,6 +311,180 @@ function App() {
       localStorage.setItem("allChores", JSON.stringify([...allChores, data]));
       toast.success("Chore created successfully!");
       closeOverlay();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const assignChore = async (choreId) => {
+    console.log("choreId", choreId);
+    console.log("UserID", userId);
+    try {
+      const res = await fetch(
+        `http://localhost:8888/api/v1/task/${choreId}/assignee/${userId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const response = await res.json();
+        toast.error(response.message);
+        return;
+      }
+
+      const updatedChore = await res.json();
+
+      setAllChores(
+        allChores.map((chore) => {
+          if (chore.id === choreId) {
+            return updatedChore;
+          }
+          return chore;
+        })
+      );
+
+      localStorage.setItem("allChores", JSON.stringify(allChores));
+
+      setMyChores([...myChores, updatedChore]);
+
+      localStorage.setItem("myChores", JSON.stringify(myChores));
+
+      toast.success("Chore assigned successfully!");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const unassignChore = async (choreId) => {
+    try {
+      const res = await fetch(
+        `http://localhost:8888/api/v1/task/${choreId}/unassign/${userId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const response = await res.json();
+        toast.error(response.message);
+        return;
+      }
+
+      const updatedChore = await res.json();
+
+      setAllChores(
+        allChores.map((chore) => {
+          if (chore.id === choreId) {
+            return updatedChore;
+          }
+          return chore;
+        })
+      );
+
+      localStorage.setItem("allChores", JSON.stringify(allChores));
+
+      setMyChores(
+        myChores.filter((chore) => {
+          return chore.id !== choreId;
+        })
+      );
+
+      localStorage.setItem("myChores", JSON.stringify(myChores));
+
+      toast.success("Chore unassigned successfully!");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const deleteChore = async (choreId) => {
+    try {
+      const res = await fetch(`http://localhost:8888/api/v1/task/${choreId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const response = await res.json();
+        toast.error(response.message);
+        return;
+      }
+
+      const updatedChores = allChores.filter((chore) => chore.id !== choreId);
+      setAllChores(updatedChores);
+      localStorage.setItem("allChores", JSON.stringify(updatedChores));
+
+      toast.success("Chore deleted successfully!");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const editChore = async (
+    choreId,
+    title,
+    description,
+    frequency,
+    tag,
+    closeOverlay
+  ) => {
+    try {
+      const res = await fetch(`http://localhost:8888/api/v1/task/${choreId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: title,
+          description: description,
+          frequency: frequency,
+          tag: tag,
+        }),
+      });
+
+      if (!res.ok) {
+        const response = await res.json();
+        toast.error(response.message);
+        return;
+      }
+
+      const updatedChore = await res.json();
+
+      const updatedChores = allChores.map((chore) => {
+        if (chore.id === choreId) {
+          return updatedChore;
+        }
+        return chore;
+      });
+
+      setAllChores(updatedChores);
+
+      localStorage.setItem("allChores", JSON.stringify(updatedChores));
+
+      const updatedMyChores = myChores.map((chore) => {
+        if (chore.id === choreId) {
+          return updatedChore;
+        }
+        return chore;
+      });
+
+      setMyChores(updatedMyChores);
+      closeOverlay();
+
+      toast.success("Chore updated successfully!");
     } catch (error) {
       console.error(error);
     }
@@ -374,12 +579,14 @@ function App() {
       setHouseholds([]);
       setCurrentHousehold(null);
       setAllChores([]);
+      setMyChores([]);
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
       localStorage.removeItem("households");
       localStorage.removeItem("currentHousehold");
       localStorage.removeItem("allChores");
+      localStorage.removeItem("myChores");
       navigate("/login");
     }
   };
@@ -410,6 +617,8 @@ function App() {
                 <Dashboard
                   sidebarOpen={sidebarOpen}
                   currentHousehold={currentHousehold}
+                  myChores={myChores}
+                  unassignChore={unassignChore}
                 />
               }
             />
@@ -425,6 +634,9 @@ function App() {
                   currentHousehold={currentHousehold}
                   allChores={allChores}
                   createChore={createChore}
+                  assignChore={assignChore}
+                  deleteChore={deleteChore}
+                  editChore={editChore}
                 />
               }
             />

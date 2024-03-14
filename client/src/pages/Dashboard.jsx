@@ -1,12 +1,12 @@
 import "../styles/Dashboard.css";
 import { Link } from "react-router-dom";
-import { FaPencil } from "react-icons/fa6";
 import { useOutletContext } from "react-router-dom";
 import CreateAnnouncement from "../components/CreateAnnouncement";
 import Announcement from "../components/Announcement";
 import UpcomingEvent from "../components/UpcomingEvent";
+import MyChore from "../components/MyChore";
 
-function Dashboard({ sidebarOpen, currentHousehold }) {
+function Dashboard({ sidebarOpen, currentHousehold, myChores, unassignChore }) {
   const tasks = [
     { title: "Wash Dishes", status: "Not Started" },
     { title: "Clean Bathroom", status: "Complete" },
@@ -76,31 +76,19 @@ function Dashboard({ sidebarOpen, currentHousehold }) {
                   <p>View All Chores</p>
                 </Link>
               </div>
-              {tasks.length === 0 ? (
+              {myChores.length === 0 ? (
                 <div className="container-contents empty">
                   No Chores Assigned
                 </div>
               ) : (
                 <div className="container-contents">
-                  {tasks.map((task, index) => {
+                  {myChores.map((task, index) => {
                     return (
-                      <div className="my-chore-container" key={index}>
-                        <p className="my-chore-title">{task.title}</p>
-                        <div className="progress-edit">
-                          <p
-                            className="progress"
-                            style={{
-                              backgroundColor:
-                                task.status === "Complete"
-                                  ? "rgba(111, 191, 131, 0.5)"
-                                  : "rgba(188, 204, 205, 0.5)",
-                            }}
-                          >
-                            {task.status}
-                          </p>
-                          <FaPencil className="edit" />
-                        </div>
-                      </div>
+                      <MyChore
+                        index={index}
+                        task={task}
+                        unassignChore={unassignChore}
+                      />
                     );
                   })}
                 </div>

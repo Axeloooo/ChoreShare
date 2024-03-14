@@ -38,8 +38,31 @@
   cursor: pointer;
 }
 
+.chore-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.chore-actions .icon {
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--blackgrey);
+}
+
+.chore-card-header .disabled {
+  background: rgb(217, 217, 217);
+  cursor: not-allowed;
+}
+
 .chore-card-header button:hover {
   background: rgba(217, 217, 217, 0.8);
+}
+
+.chore-card-header .disabled:hover {
+  background: rgb(217, 217, 217);
+  cursor: not-allowed;
 }
 
 .comment {

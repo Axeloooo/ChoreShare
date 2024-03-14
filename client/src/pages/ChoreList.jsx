@@ -4,79 +4,15 @@ import ChoreCard from "../components/ChoreCard";
 import CreateChore from "../components/CreateChore";
 import { useOutletContext } from "react-router-dom";
 
-function ChoreList({ sidebarOpen, currentHousehold, allChores, createChore }) {
-  const chores = [
-    {
-      title: "Clean Bathroom",
-      assignee: "none",
-      comment: "Wipe mirror, floor and counters. Wash the shower walls please!",
-      place: "Bathroom",
-      repeat: "Every Week",
-    },
-    {
-      title: "Take out trash",
-      assignee: "none",
-      comment: "Place bags in every bin!",
-      place: "General",
-      repeat: "Every 2 Weeks",
-    },
-    {
-      title: "Unload Dishwasher",
-      assignee: "none",
-      comment: "",
-      place: "Bathroom",
-      repeat: "Every Week",
-    },
-    {
-      title: "Clean Bathroom",
-      assignee: "none",
-      comment: "Wipe mirror, floor and counters. Wash the shower walls please!",
-      place: "Bathroom",
-      repeat: "Every Week",
-    },
-    {
-      title: "Clean Bathroom",
-      assignee: "none",
-      comment: "Wipe mirror, floor and counters. Wash the shower walls please!",
-      place: "Bathroom",
-      repeat: "Every Week",
-    },
-    {
-      title: "Clean Bathroom",
-      assignee: "none",
-      comment: "Wipe mirror, floor and counters. Wash the shower walls please!",
-      place: "Bathroom",
-      repeat: "Every Week",
-    },
-    {
-      title: "Clean Bathroom",
-      assignee: "none",
-      comment: "Wipe mirror, floor and counters. Wash the shower walls please!",
-      place: "Bathroom",
-      repeat: "Every Week",
-    },
-    {
-      title: "Clean Bathroom",
-      assignee: "none",
-      comment: "Wipe mirror, floor and counters. Wash the shower walls please!",
-      place: "Bathroom",
-      repeat: "Every Week",
-    },
-    {
-      title: "Clean Bathroom",
-      assignee: "none",
-      comment: "Wipe mirror, floor and counters. Wash the shower walls please!",
-      place: "Bathroom",
-      repeat: "Every Week",
-    },
-    {
-      title: "Clean Bathroom",
-      assignee: "none",
-      comment: "Wipe mirror, floor and counters. Wash the shower walls please!",
-      place: "Bathroom",
-      repeat: "Every Week",
-    },
-  ];
+function ChoreList({
+  sidebarOpen,
+  currentHousehold,
+  allChores,
+  createChore,
+  assignChore,
+  deleteChore,
+  editChore,
+}) {
   const [threeColumns, setthreeColumns] = useState([]);
   const { showOverlay, closeOverlay } = useOutletContext();
 
@@ -113,7 +49,14 @@ function ChoreList({ sidebarOpen, currentHousehold, allChores, createChore }) {
               {threeColumns.map((column) => (
                 <div className="column">
                   {column.map((chore) => (
-                    <ChoreCard chore={chore} />
+                    <ChoreCard
+                      chore={chore}
+                      assignChore={assignChore}
+                      deleteChore={deleteChore}
+                      editChore={editChore}
+                      showOverlay={showOverlay}
+                      closeOverlay={closeOverlay}
+                    />
                   ))}
                 </div>
               ))}
