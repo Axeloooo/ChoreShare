@@ -6,15 +6,13 @@ import Announcement from "../components/Announcement";
 import UpcomingEvent from "../components/UpcomingEvent";
 import MyChore from "../components/MyChore";
 
-function Dashboard({ sidebarOpen, currentHousehold, myChores, unassignChore }) {
-  const tasks = [
-    { title: "Wash Dishes", status: "Not Started" },
-    { title: "Clean Bathroom", status: "Complete" },
-    { title: "Vacuum", status: "Not Started" },
-    { title: "Wash Dishes", status: "Not Started" },
-    { title: "Wash Dishes", status: "Not Started" },
-    { title: "Wash Dishes", status: "Not Started" },
-  ];
+function Dashboard({
+  sidebarOpen,
+  currentHousehold,
+  myChores,
+  unassignChore,
+  editChoreStatus,
+}) {
   const announcements = [
     {
       message:
@@ -54,7 +52,7 @@ function Dashboard({ sidebarOpen, currentHousehold, myChores, unassignChore }) {
       author: "jhon2937",
     },
   ];
-  const { showOverlay } = useOutletContext();
+  const { showOverlay, closeOverlay } = useOutletContext();
 
   const handleShowCreateAnnouncement = () => {
     showOverlay(<CreateAnnouncement />);
@@ -82,12 +80,15 @@ function Dashboard({ sidebarOpen, currentHousehold, myChores, unassignChore }) {
                 </div>
               ) : (
                 <div className="container-contents">
-                  {myChores.map((task, index) => {
+                  {myChores.map((chore, index) => {
                     return (
                       <MyChore
                         index={index}
-                        task={task}
+                        chore={chore}
                         unassignChore={unassignChore}
+                        showOverlay={showOverlay}
+                        closeOverlay={closeOverlay}
+                        editChoreStatus={editChoreStatus}
                       />
                     );
                   })}
