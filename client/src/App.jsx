@@ -665,6 +665,7 @@ function App() {
                   sidebarOpen={sidebarOpen}
                   currentHousehold={currentHousehold}
                   myChores={myChores}
+                  allChores={allChores}
                   unassignChore={unassignChore}
                   editChoreStatus={editChoreStatus}
                 />

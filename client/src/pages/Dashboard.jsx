@@ -1,6 +1,7 @@
 import "../styles/Dashboard.css";
 import { Link } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
+import { useState, useEffect } from "react";
 import CreateAnnouncement from "../components/CreateAnnouncement";
 import Announcement from "../components/Announcement";
 import UpcomingEvent from "../components/UpcomingEvent";
@@ -10,9 +11,12 @@ function Dashboard({
   sidebarOpen,
   currentHousehold,
   myChores,
+  allChores,
   unassignChore,
   editChoreStatus,
 }) {
+  const [myChoresProgress, setMyChoresProgress] = useState("");
+  const [allChoresProgress, setAllChoresProgress] = useState("");
   const announcements = [
     {
       message:
@@ -57,6 +61,22 @@ function Dashboard({
   const handleShowCreateAnnouncement = () => {
     showOverlay(<CreateAnnouncement />);
   };
+
+  useEffect(() => {
+    const myChoresCompleted = myChores.reduce(
+      (acc, chore) => acc + (chore.status === "COMPLETED" ? 1 : 0),
+      0
+    );
+    const totalMyChores = myChores.length;
+    setMyChoresProgress(`${myChoresCompleted}/${totalMyChores}`);
+
+    const allChoresCompleted = allChores.reduce(
+      (acc, chore) => acc + (chore.status === "COMPLETED" ? 1 : 0),
+      0
+    );
+    const totalAllChores = allChores.length;
+    setAllChoresProgress(`${allChoresCompleted}/${totalAllChores}`);
+  }, [myChores, allChores]);
 
   return (
     <>
@@ -151,11 +171,11 @@ function Dashboard({
               </div>
               <div className="container-contents stats">
                 <div className="stat">
-                  <h3>0/3</h3>
+                  <h3>{myChoresProgress}</h3>
                   <p>My Chores Completed</p>
                 </div>
                 <div className="stat">
-                  <h3>0/11</h3>
+                  <h3>{allChoresProgress}</h3>
                   <p>Household Chores Completed</p>
                 </div>
               </div>
