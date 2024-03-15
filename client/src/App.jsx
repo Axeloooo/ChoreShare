@@ -34,9 +34,9 @@ function App() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [allChores, setAllChores] = useState(
-    localStorage.getItem(
-      "allChores" ? JSON.parse(localStorage.getItem("allChores")) : []
-    )
+    localStorage.getItem("allChores")
+      ? JSON.parse(localStorage.getItem("allChores"))
+      : []
   );
   const [myChores, setMyChores] = useState(
     localStorage.getItem("myChores")
@@ -46,18 +46,21 @@ function App() {
   const navigate = useNavigate();
 
   console.log(userId);
+  console.log(token);
   console.log(households);
   console.log(currentHousehold);
   console.log(allChores);
   console.log(myChores);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
     const storedUserId = localStorage.getItem("userId");
-
-    if (storedToken && storedUserId) {
-      setToken(storedToken);
+    if (storedUserId) {
       setUserId(JSON.parse(storedUserId));
+    }
+
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
     }
   }, []);
 
@@ -147,10 +150,8 @@ function App() {
 
       localStorage.setItem(
         "currentHousehold",
-        JSON.stringify(currentHousehold)
+        JSON.stringify(householdsData[0])
       );
-
-      console.log("householdsData", householdsData);
 
       fetchChores(householdsData[0].id);
     } catch (error) {
@@ -490,6 +491,52 @@ function App() {
     }
   };
 
+  const editChoreStatus = async (choreId, status, closeOverlay) => {
+    try {
+      const res = await fetch(
+        `http://localhost:8888/api/v1/task/${choreId}/status`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            status: status,
+            userId: userId,
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const response = await res.json();
+        toast.error(response.message);
+        return;
+      }
+
+      const updatedChore = await res.json();
+
+      const updatedAllChores = allChores.map((chore) =>
+        chore.id === updatedChore.id ? updatedChore : chore
+      );
+      setAllChores(updatedAllChores);
+
+      localStorage.setItem("allChores", JSON.stringify(updatedAllChores));
+
+      const updatedMyChores = myChores.map((chore) =>
+        chore.id === updatedChore.id ? updatedChore : chore
+      );
+      setMyChores(updatedMyChores);
+
+      localStorage.setItem("myChores", JSON.stringify(updatedMyChores));
+
+      toast.success("Chore status updated successfully!");
+      closeOverlay();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const login = async (username, password) => {
     setIsLoading(true);
     try {
@@ -619,6 +666,7 @@ function App() {
                   currentHousehold={currentHousehold}
                   myChores={myChores}
                   unassignChore={unassignChore}
+                  editChoreStatus={editChoreStatus}
                 />
               }
             />
