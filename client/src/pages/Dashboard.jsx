@@ -137,6 +137,8 @@ function Dashboard({
                         key={index}
                         message={announcement.message}
                         author={announcement.author}
+                        showOverlay={showOverlay}
+                        closeOverlay={closeOverlay}
                       />
                     );
                   })}

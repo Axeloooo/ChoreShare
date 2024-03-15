@@ -34,7 +34,7 @@
   border: none;
   padding: 0.3rem 0.4rem;
   border-radius: 0.2rem;
-  background: rgba(217, 217, 217, 0.6);
+  background: rgba(217, 217, 217, 0.5);
   cursor: pointer;
 }
 
@@ -57,7 +57,7 @@
 }
 
 .chore-card-header button:hover {
-  background: rgba(217, 217, 217, 0.8);
+  background: rgb(217, 217, 217);
 }
 
 .chore-card-header .disabled:hover {
