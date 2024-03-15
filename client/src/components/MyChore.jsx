@@ -14,13 +14,13 @@ function MyChore({
   function getStatusColor(status) {
     switch (status) {
       case "COMPLETED":
-        return "rgba(111, 191, 131, 0.3)"; // Greenish
+        return "rgba(111, 191, 131, 0.3)";
       case "PENDING":
-        return "rgba(188, 204, 205, 0.3)"; // Grayish
+        return "rgba(188, 204, 205, 0.3)";
       case "IN_PROGRESS":
-        return "rgba(255, 193, 7, 0.3)"; // Yellowish
+        return "rgba(255, 193, 7, 0.3)";
       default:
-        return "rgba(188, 204, 205, 0.3)"; // Default color (light redish) if none of the above
+        return "rgba(188, 204, 205, 0.3)";
     }
   }
 
