@@ -54,10 +54,23 @@ const formatGroupLabel = (data) => (
   </div>
 );
 
-function CreateChore({ createChore, closeOverlay }) {
-  const [selectedOptions, setSelectedOptions] = useState([]);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+function EditChore({ chore, editChore, closeOverlay }) {
+  const [selectedOptions, setSelectedOptions] = useState(() => {
+    const options = [];
+    if (chore.tag) {
+      const tagOption = tagOptions.find((option) => option.value === chore.tag);
+      if (tagOption) options.push(tagOption);
+    }
+    if (chore.frequency) {
+      const frequencyOption = frequencyOptions.find(
+        (option) => option.value === chore.frequency
+      );
+      if (frequencyOption) options.push(frequencyOption);
+    }
+    return options;
+  });
+  const [title, setTitle] = useState(chore.title || "");
+  const [description, setDescription] = useState(chore.description || "");
 
   const handleChange = (selected) => {
     const lastAddedOption = selected[selected.length - 1];
@@ -75,7 +88,7 @@ function CreateChore({ createChore, closeOverlay }) {
     }
   };
 
-  const handleCreateChore = (e) => {
+  const handleEditChore = (e) => {
     e.preventDefault();
 
     if (selectedOptions.length < 2) {
@@ -83,8 +96,8 @@ function CreateChore({ createChore, closeOverlay }) {
       return;
     }
 
-    let frequency = "";
-    let tag = "";
+    let frequency;
+    let tag;
     selectedOptions.forEach((option) => {
       if (option.category === "frequency") {
         frequency = option.value;
@@ -92,13 +105,13 @@ function CreateChore({ createChore, closeOverlay }) {
         tag = option.value;
       }
     });
-    console.log(title, description, frequency, tag);
-    createChore(title, description, frequency, tag, closeOverlay);
+
+    editChore(chore.id, title, description, frequency, tag, closeOverlay);
   };
 
   return (
     <div className="create-chore-window">
-      <h1>Add a chore</h1>
+      <h1>Edit chore</h1>
       <label htmlFor="chore-tags" className="label">
         Tags
       </label>
@@ -125,17 +138,14 @@ function CreateChore({ createChore, closeOverlay }) {
           }),
         }}
       />
-      <form
-        className="create-chore-form"
-        action=""
-        onSubmit={handleCreateChore}
-      >
+      <form className="create-chore-form" action="" onSubmit={handleEditChore}>
         <label htmlFor="chore-title">Title</label>
         <input
           type="text"
           id="chore-title"
           name="chore-title"
           placeholder="Chore Title"
+          value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
         />
@@ -143,13 +153,14 @@ function CreateChore({ createChore, closeOverlay }) {
         <textarea
           id="chore-description"
           name="chore-description"
+          value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Description of the chore..."
         />
-        <button type="submit">Create Chore</button>
+        <button type="submit">Update Chore</button>
       </form>
     </div>
   );
 }
 
-export default CreateChore;
+export default EditChore;
