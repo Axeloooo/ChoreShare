@@ -12,21 +12,47 @@ import SignupWindow from "./pages/SignupWindow";
 import { toast } from "react-toastify";
 
 function App() {
+  // Set to null if doesnt exist
+  // useEffect(() => {
+  //   if (!localStorage.getItem("user")) {
+  //     localStorage.setItem("user", JSON.stringify(null));
+  //     setUser("testUser");
+  //     console.log("here", localStorage.getItem("user"));
+  //   }
+  //   if (!localStorage.getItem("households")) {
+  //     localStorage.setItem("households", JSON.stringify([]));
+  //     setHouseholds([]);
+  //   }
+  //   if (!localStorage.getItem("currentHousehold")) {
+  //     localStorage.setItem("currentHousehold", JSON.stringify(null));
+  //     setCurrentHousehold(null);
+  //   }
+  //   if (!localStorage.getItem("allChores")) {
+  //     localStorage.setItem("allChores", JSON.stringify([]));
+  //     setAllChores([]);
+  //   }
+  //   if (!localStorage.getItem("myChores")) {
+  //     localStorage.setItem("myChores", JSON.stringify([]));
+  //     setMyChores([]);
+  //   }
+  // }, []);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(
-    localStorage.getItem("user")
+    localStorage.getItem("user") && localStorage.getItem("user") !== "undefined"
       ? JSON.parse(localStorage.getItem("user"))
       : null
   );
   const [token, setToken] = useState(null);
   const [userId, setUserId] = useState(null);
   const [households, setHouseholds] = useState(
-    localStorage.getItem("households")
+    localStorage.getItem("households") &&
+      localStorage.getItem("households") !== "undefined"
       ? JSON.parse(localStorage.getItem("households"))
       : []
   );
   const [currentHousehold, setCurrentHousehold] = useState(
-    localStorage.getItem("currentHousehold")
+    localStorage.getItem("currentHousehold") &&
+      localStorage.getItem("currentHousehold") !== "undefined"
       ? JSON.parse(localStorage.getItem("currentHousehold"))
       : null
   );
@@ -34,12 +60,14 @@ function App() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [allChores, setAllChores] = useState(
-    localStorage.getItem("allChores")
+    localStorage.getItem("allChores") &&
+      localStorage.getItem("allChores") !== "undefined"
       ? JSON.parse(localStorage.getItem("allChores"))
       : []
   );
   const [myChores, setMyChores] = useState(
-    localStorage.getItem("myChores")
+    localStorage.getItem("myChores") &&
+      localStorage.getItem("myChores") !== "undefined"
       ? JSON.parse(localStorage.getItem("myChores"))
       : []
   );
@@ -51,6 +79,11 @@ function App() {
   console.log(currentHousehold);
   console.log(allChores);
   console.log(myChores);
+  localStorage.removeItem("userId");
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  localStorage.removeItem("currentHousehold");
+  localStorage.removeItem("households");
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
@@ -84,6 +117,7 @@ function App() {
 
   useEffect(() => {
     if (userId && (loginSuccess || registerSuccess)) {
+      console.log("fetching user");
       try {
         const fetchUser = async () => {
           const res = await fetch(
@@ -121,6 +155,7 @@ function App() {
   }, [userId]);
 
   const fetchHousehold = async () => {
+    console.log("fetching household");
     try {
       const res = await fetch(
         `http://localhost:8888/api/v1/userhousehold/user/${userId}`,
@@ -146,12 +181,27 @@ function App() {
 
       if (householdsData.length > 0) {
         setCurrentHousehold(householdsData[0]);
-      }
 
-      localStorage.setItem(
-        "currentHousehold",
-        JSON.stringify(householdsData[0])
-      );
+        localStorage.setItem(
+          "currentHousehold",
+          JSON.stringify(householdsData[0])
+        );
+
+        fetchChores(householdsData[0].id);
+      } else {
+        console.log("performing else");
+        setCurrentHousehold(null);
+
+        localStorage.setItem("currentHousehold", null);
+
+        setAllChores([]);
+        setMyChores([]);
+
+        setIsLoading(false);
+
+        toast.success("Logged in successfully!");
+        navigate("/");
+      }
 
       fetchChores(householdsData[0].id);
     } catch (error) {
@@ -200,6 +250,7 @@ function App() {
   };
 
   const fetchChores = async (householdId) => {
+    console.log("fecthing chores");
     try {
       const res = await fetch(
         `http://localhost:8888/api/v1/task/household/${householdId}`,
@@ -229,6 +280,7 @@ function App() {
   };
 
   const fetchMyChores = async () => {
+    console.log("fecthing my chores");
     try {
       const res = await fetch(
         `http://localhost:8888/api/v1/task/user/${userId}`,
