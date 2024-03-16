@@ -23,20 +23,19 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
+  const [changingHousehold, setChangingHousehold] = useState(false);
   const [data, setData] = useState(
     localStorage.getItem("data") && localStorage.getItem("data") !== "undefined"
       ? JSON.parse(localStorage.getItem("data"))
-      : {
-          households: [],
-          currentHousehold: null,
-          allChores: [],
-          myChores: [],
-        }
+      : null
   );
-  const [fetchingData, setFetchingData] = useState(false);
   const navigate = useNavigate();
 
   console.log(data);
+  console.log(user);
+  console.log(userId);
+  console.log(token);
+  console.log(changingHousehold);
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
@@ -72,6 +71,7 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log("fetching data");
       if (userId && token && (loginSuccess || registerSuccess)) {
         try {
           await fetchUser(userId, token);
@@ -94,6 +94,23 @@ function App() {
     };
     fetchData();
   }, [userId, token]);
+
+  useEffect(() => {
+    const changeHousehold = async () => {
+      try {
+        if (changingHousehold) {
+          setIsLoading(true);
+          await fetchHouseholdById();
+          setChangingHousehold(false);
+          setIsLoading(false);
+          toast.success("Household changed successfully!");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    changeHousehold();
+  }, [changingHousehold]);
 
   const fetchUser = async (userId, token) => {
     if (!userId || !token || token === "null" || userId === "null") {
@@ -124,10 +141,87 @@ function App() {
     }
   };
 
+  const fetchHouseholdById = async () => {
+    try {
+      if (data.currentHousehold === null) return;
+      const householdRes = await fetch(
+        `http://localhost:8888/api/v1/household/${data.currentHousehold.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!householdRes.ok) {
+        const response = await householdRes.json();
+        console.log(response);
+        return;
+      }
+
+      const householdData = await householdRes.json();
+
+      const choresRes = await fetch(
+        `http://localhost:8888/api/v1/task/household/${householdData.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!choresRes.ok) {
+        const response = await choresRes.json();
+        console.log(response);
+        return;
+      }
+
+      const allChoresData = await choresRes.json();
+
+      const myChoresData = allChoresData.filter(
+        (task) => task.userId === userId
+      );
+
+      const membersRes = await fetch(
+        `http://localhost:8888/api/v1/userhousehold/household/${householdData.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!membersRes.ok) {
+        const response = await membersRes.json();
+        console.log(response);
+        return;
+      }
+
+      const membersData = await membersRes.json();
+
+      const fetchedData = {
+        households: data.households,
+        currentHousehold: householdData,
+        allChores: allChoresData,
+        myChores: myChoresData,
+        members: membersData,
+      };
+      setData(fetchedData);
+
+      localStorage.setItem("data", JSON.stringify(fetchedData));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const fetchHousehold = async () => {
     console.log("fetching household");
-    if (fetchingData) return;
-    setFetchingData(true);
     try {
       const householdRes = await fetch(
         `http://localhost:8888/api/v1/userhousehold/user/${userId}`,
@@ -151,6 +245,7 @@ function App() {
       );
 
       if (householdsData.length > 0) {
+        console.log("householdsData has length");
         const choresRes = await fetch(
           `http://localhost:8888/api/v1/task/household/${householdsData[0].id}`,
           {
@@ -170,8 +265,12 @@ function App() {
 
         const allChoresData = await choresRes.json();
 
-        const myChoresRes = await fetch(
-          `http://localhost:8888/api/v1/task/user/${userId}`,
+        const myChoresData = allChoresData.filter(
+          (task) => task.userId === userId
+        );
+
+        const membersRes = await fetch(
+          `http://localhost:8888/api/v1/userhousehold/household/${householdsData[0].id}`,
           {
             method: "GET",
             headers: {
@@ -181,29 +280,32 @@ function App() {
           }
         );
 
-        if (!myChoresRes.ok) {
-          const response = await myChoresRes.json();
+        if (!membersRes.ok) {
+          const response = await membersRes.json();
           console.log(response);
           return;
         }
 
-        const myChoresData = await myChoresRes.json();
+        const membersData = await membersRes.json();
 
         const fetchedData = {
           households: householdsData,
           currentHousehold: householdsData[0],
           allChores: allChoresData,
           myChores: myChoresData,
+          members: membersData,
         };
         setData(fetchedData);
 
         localStorage.setItem("data", JSON.stringify(fetchedData));
       } else {
+        console.log("householdsData has no length");
         const fetchedData = {
           households: [],
           currentHousehold: null,
           allChores: [],
           myChores: [],
+          members: [],
         };
         setData(fetchedData);
 
@@ -650,24 +752,44 @@ function App() {
   const logout = () => {
     const answer = window.confirm("Are you sure you want to log out?");
     if (answer) {
-      const loggedOutData = {
-        households: [],
-        currentHousehold: null,
-        allChores: [],
-        myChores: [],
-      };
-
       setUser(null);
       setUserId(null);
       setToken(null);
-      setData(loggedOutData);
+      setData(null);
 
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
-      localStorage.setItem("data", JSON.stringify(loggedOutData));
+      localStorage.removeItem("data", null);
 
       navigate("/login");
+    }
+  };
+
+  const inviteMember = async (email) => {
+    try {
+      const res = await fetch("http://localhost:8888/api/v1/email/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          to: email,
+          householdId: data.currentHousehold.id,
+        }),
+      });
+
+      if (!res.ok) {
+        if (res.status === 405) {
+          toast.success("Email sent successfully!");
+        } else {
+          toast.error("Oops! Something went wrong. Please try again.");
+        }
+        return;
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -687,6 +809,8 @@ function App() {
                 username={user.username}
                 createHousehold={createHousehold}
                 data={data}
+                inviteMember={inviteMember}
+                setChangingHousehold={setChangingHousehold}
               />
             }
           >

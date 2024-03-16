@@ -9,8 +9,11 @@ function Sidebar({
   sidebarOpen,
   setSidebarOpen,
   showOverlay,
+  closeOverlay,
   data,
   setData,
+  inviteMember,
+  setChangingHousehold,
 }) {
   const [selectedOption, setSelectedOption] = useState(() => {
     return data.currentHousehold
@@ -65,6 +68,7 @@ function Sidebar({
     );
 
     if (isConfirmed) {
+      setChangingHousehold(true);
       setSelectedOption(selectedOption);
       const newCurrentHousehold = {
         name: selectedOption.label,
@@ -79,7 +83,9 @@ function Sidebar({
   };
 
   const handleShowAddMember = () => {
-    showOverlay(<AddMember />);
+    showOverlay(
+      <AddMember inviteMember={inviteMember} closeOverlay={closeOverlay} />
+    );
   };
 
   return (
@@ -113,17 +119,22 @@ function Sidebar({
             />
           </div>
           <div className="members-list">
-            {members.map((member, index) => {
-              return (
-                <HouseholdMember
-                  key={index}
-                  index={index}
-                  name={member.name}
-                  username={member.username}
-                />
-              );
-            })}
+            {data.members.filter((member) => member.user.id !== user.id)
+              .length > 0 ? (
+              data.members
+                .filter((member) => member.user.id !== user.id)
+                .map((member, index) => (
+                  <HouseholdMember key={index} index={index} member={member} />
+                ))
+            ) : (
+              <div className="household-empty">
+                <p>No other members in the household</p>
+              </div>
+            )}
           </div>
+          <button className="add-member-btn" onClick={handleShowAddMember}>
+            +
+          </button>
         </div>
       ) : (
         <div className="no-household-container">
