@@ -9,24 +9,23 @@ function Sidebar({
   sidebarOpen,
   setSidebarOpen,
   showOverlay,
-  currentHousehold,
-  households,
-  setCurrentHousehold,
+  data,
+  setData,
 }) {
   const [selectedOption, setSelectedOption] = useState(() => {
-    return currentHousehold
-      ? { value: currentHousehold.id, label: currentHousehold.name }
+    return data.currentHousehold
+      ? { value: data.currentHousehold.id, label: data.currentHousehold.name }
       : null;
   });
 
   useEffect(() => {
-    if (currentHousehold) {
+    if (data.currentHousehold) {
       setSelectedOption({
-        value: currentHousehold.id,
-        label: currentHousehold.name,
+        value: data.currentHousehold.id,
+        label: data.currentHousehold.name,
       });
     }
-  }, [currentHousehold]);
+  }, [data.currentHousehold]);
 
   const members = [
     { name: "Smith Jhon", username: "smith2849" },
@@ -37,7 +36,7 @@ function Sidebar({
     { name: "John Johnson", username: "johnson2784" },
   ];
 
-  const householdOptions = households.map((household) => ({
+  const householdOptions = data.households.map((household) => ({
     value: household.id,
     label: household.name,
   }));
@@ -59,22 +58,19 @@ function Sidebar({
   };
 
   const toggleHousehold = (selectedOption) => {
-    console.log("selectedOption", selectedOption);
-    console.log("currentHousehold", currentHousehold);
-    console.log(selectedOption.value === currentHousehold.id);
-    if (selectedOption.value === currentHousehold?.id) return;
+    if (selectedOption.value === data.currentHousehold?.id) return;
 
     const isConfirmed = window.confirm(
       "Are you sure you want to change the household?"
     );
-    console.log("isConfirmed", isConfirmed);
+
     if (isConfirmed) {
       setSelectedOption(selectedOption);
       const newCurrentHousehold = {
         name: selectedOption.label,
         id: selectedOption.value,
       };
-      setCurrentHousehold(newCurrentHousehold);
+      setData((prev) => ({ ...prev, currentHousehold: newCurrentHousehold }));
     }
   };
 
@@ -106,7 +102,7 @@ function Sidebar({
           <p className="user-phone">Phone: {user.phone}</p>
         </div>
       </div>
-      {currentHousehold != null ? (
+      {data.currentHousehold != null ? (
         <div className="household-container">
           <div className="household-container-header">
             <Select

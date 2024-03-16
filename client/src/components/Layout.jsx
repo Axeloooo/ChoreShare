@@ -3,18 +3,16 @@ import Sidebar from "./Sidebar";
 import Overlay from "./Overlay";
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
-import CreateHousehold from "./CreateHousehold";
 
 function Layout({
   sidebarOpen,
   setSidebarOpen,
   user,
   logout,
-  setCurrentHousehold,
-  currentHousehold,
+  setData,
   username,
   createHousehold,
-  households,
+  data,
 }) {
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [overlayContent, setOverlayContent] = useState(null);
@@ -46,9 +44,8 @@ function Layout({
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
             showOverlay={showOverlay}
-            currentHousehold={currentHousehold}
-            households={households}
-            setCurrentHousehold={setCurrentHousehold}
+            data={data}
+            setData={setData}
           />
         </>
       ) : null}

@@ -7,14 +7,7 @@ import Announcement from "../components/Announcement";
 import UpcomingEvent from "../components/UpcomingEvent";
 import MyChore from "../components/MyChore";
 
-function Dashboard({
-  sidebarOpen,
-  currentHousehold,
-  myChores,
-  allChores,
-  unassignChore,
-  editChoreStatus,
-}) {
+function Dashboard({ sidebarOpen, data, unassignChore, editChoreStatus }) {
   const [myChoresProgress, setMyChoresProgress] = useState("");
   const [allChoresProgress, setAllChoresProgress] = useState("");
   const announcements = [
@@ -63,24 +56,24 @@ function Dashboard({
   };
 
   useEffect(() => {
-    const myChoresCompleted = myChores.reduce(
+    const myChoresCompleted = data.myChores.reduce(
       (acc, chore) => acc + (chore.status === "COMPLETED" ? 1 : 0),
       0
     );
-    const totalMyChores = myChores.length;
+    const totalMyChores = data.myChores.length;
     setMyChoresProgress(`${myChoresCompleted}/${totalMyChores}`);
 
-    const allChoresCompleted = allChores.reduce(
+    const allChoresCompleted = data.allChores.reduce(
       (acc, chore) => acc + (chore.status === "COMPLETED" ? 1 : 0),
       0
     );
-    const totalAllChores = allChores.length;
+    const totalAllChores = data.allChores.length;
     setAllChoresProgress(`${allChoresCompleted}/${totalAllChores}`);
-  }, [myChores, allChores]);
+  }, [data.myChores, data.allChores]);
 
   return (
     <>
-      {currentHousehold != null ? (
+      {data.currentHousehold != null ? (
         <div
           className={
             sidebarOpen ? "dashboard-page" : "dashboard-page full-width"
@@ -94,13 +87,13 @@ function Dashboard({
                   <p>View All Chores</p>
                 </Link>
               </div>
-              {myChores.length === 0 ? (
+              {data.myChores.length === 0 ? (
                 <div className="container-contents empty">
                   No Chores Assigned
                 </div>
               ) : (
                 <div className="container-contents">
-                  {myChores.map((chore, index) => {
+                  {data.myChores.map((chore, index) => {
                     return (
                       <MyChore
                         index={index}
