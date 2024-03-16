@@ -6,8 +6,7 @@ import { useOutletContext } from "react-router-dom";
 
 function ChoreList({
   sidebarOpen,
-  currentHousehold,
-  allChores,
+  data,
   createChore,
   assignChore,
   deleteChore,
@@ -17,7 +16,7 @@ function ChoreList({
   const { showOverlay, closeOverlay } = useOutletContext();
 
   useEffect(() => {
-    const threeColumns = allChores.reduce(function (columns, item, index) {
+    const threeColumns = data.allChores.reduce(function (columns, item, index) {
       const columnIndex = index % 3;
       const rowIndex = Math.floor(index / 3);
       if (!columns[columnIndex]) {
@@ -28,7 +27,7 @@ function ChoreList({
     }, []);
 
     setthreeColumns(threeColumns);
-  }, [allChores]);
+  }, [data.allChores]);
 
   const handleShowCreateChore = () => {
     showOverlay(
@@ -38,7 +37,7 @@ function ChoreList({
 
   return (
     <>
-      {currentHousehold != null ? (
+      {data.currentHousehold != null ? (
         <div className={sidebarOpen ? "chore-page" : "chore-page full-width"}>
           <div className="chore-container">
             <div className="title">
