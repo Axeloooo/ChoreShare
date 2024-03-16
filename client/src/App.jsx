@@ -35,7 +35,6 @@ function App() {
   console.log(user);
   console.log(userId);
   console.log(token);
-  console.log(changingHousehold);
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
