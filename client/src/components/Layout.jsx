@@ -13,6 +13,8 @@ function Layout({
   username,
   createHousehold,
   data,
+  inviteMember,
+  setChangingHousehold,
 }) {
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [overlayContent, setOverlayContent] = useState(null);
@@ -44,8 +46,11 @@ function Layout({
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
             showOverlay={showOverlay}
+            closeOverlay={closeOverlay}
             data={data}
             setData={setData}
+            inviteMember={inviteMember}
+            setChangingHousehold={setChangingHousehold}
           />
         </>
       ) : null}
