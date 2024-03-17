@@ -12,30 +12,6 @@ import SignupWindow from "./pages/SignupWindow";
 import { toast } from "react-toastify";
 
 function App() {
-  // Set to null if doesnt exist
-  // useEffect(() => {
-  //   if (!localStorage.getItem("user")) {
-  //     localStorage.setItem("user", JSON.stringify(null));
-  //     setUser("testUser");
-  //     console.log("here", localStorage.getItem("user"));
-  //   }
-  //   if (!localStorage.getItem("households")) {
-  //     localStorage.setItem("households", JSON.stringify([]));
-  //     setHouseholds([]);
-  //   }
-  //   if (!localStorage.getItem("currentHousehold")) {
-  //     localStorage.setItem("currentHousehold", JSON.stringify(null));
-  //     setCurrentHousehold(null);
-  //   }
-  //   if (!localStorage.getItem("allChores")) {
-  //     localStorage.setItem("allChores", JSON.stringify([]));
-  //     setAllChores([]);
-  //   }
-  //   if (!localStorage.getItem("myChores")) {
-  //     localStorage.setItem("myChores", JSON.stringify([]));
-  //     setMyChores([]);
-  //   }
-  // }, []);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(
     localStorage.getItem("user") && localStorage.getItem("user") !== "undefined"
@@ -44,55 +20,32 @@ function App() {
   );
   const [token, setToken] = useState(null);
   const [userId, setUserId] = useState(null);
-  const [households, setHouseholds] = useState(
-    localStorage.getItem("households") &&
-      localStorage.getItem("households") !== "undefined"
-      ? JSON.parse(localStorage.getItem("households"))
-      : []
-  );
-  const [currentHousehold, setCurrentHousehold] = useState(
-    localStorage.getItem("currentHousehold") &&
-      localStorage.getItem("currentHousehold") !== "undefined"
-      ? JSON.parse(localStorage.getItem("currentHousehold"))
-      : null
-  );
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
-  const [allChores, setAllChores] = useState(
-    localStorage.getItem("allChores") &&
-      localStorage.getItem("allChores") !== "undefined"
-      ? JSON.parse(localStorage.getItem("allChores"))
-      : []
-  );
-  const [myChores, setMyChores] = useState(
-    localStorage.getItem("myChores") &&
-      localStorage.getItem("myChores") !== "undefined"
-      ? JSON.parse(localStorage.getItem("myChores"))
-      : []
+  const [changingHousehold, setChangingHousehold] = useState(false);
+  const [data, setData] = useState(
+    localStorage.getItem("data") && localStorage.getItem("data") !== "undefined"
+      ? JSON.parse(localStorage.getItem("data"))
+      : null
   );
   const navigate = useNavigate();
 
+  console.log(data);
+  console.log(user);
   console.log(userId);
   console.log(token);
-  console.log(households);
-  console.log(currentHousehold);
-  console.log(allChores);
-  console.log(myChores);
-  localStorage.removeItem("userId");
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  localStorage.removeItem("currentHousehold");
-  localStorage.removeItem("households");
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
     if (storedUserId) {
+      console.log("storedUserId", storedUserId);
       setUserId(JSON.parse(storedUserId));
     }
 
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
+      console.log("storedToken", storedToken);
       setToken(storedToken);
     }
   }, []);
@@ -116,48 +69,160 @@ function App() {
   }, [isLoading]);
 
   useEffect(() => {
-    if (userId && (loginSuccess || registerSuccess)) {
-      console.log("fetching user");
-      try {
-        const fetchUser = async () => {
-          const res = await fetch(
-            `http://localhost:8888/api/v1/user/${userId}`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+    const fetchData = async () => {
+      console.log("fetching data");
+      if (userId && token && (loginSuccess || registerSuccess)) {
+        try {
+          await fetchUser(userId, token);
+          await fetchHousehold();
 
-          if (!res.ok) {
+          if (loginSuccess) {
             setIsLoading(false);
-            const response = await res.json();
-            toast.error(response.message);
-            return;
+            toast.success("Login Successful!");
+            setLoginSuccess(false);
+          } else if (registerSuccess) {
+            setIsLoading(false);
+            toast.success("Registration Successful!");
+            setRegisterSuccess(false);
           }
-
-          const data = await res.json();
-          setUser(data);
-          localStorage.setItem("user", JSON.stringify(data));
-          console.log(data);
-        };
-        fetchUser();
-      } catch (error) {
-        setIsLoading(false);
-        toast.error(error);
-        console.error(error);
-      } finally {
-        fetchHousehold();
+          navigate("/");
+        } catch (error) {
+          console.error(error);
+        }
       }
+    };
+    fetchData();
+  }, [userId, token]);
+
+  useEffect(() => {
+    const changeHousehold = async () => {
+      try {
+        if (changingHousehold) {
+          setIsLoading(true);
+          await fetchHouseholdById();
+          setChangingHousehold(false);
+          setIsLoading(false);
+          toast.success("Household changed successfully!");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    changeHousehold();
+  }, [changingHousehold]);
+
+  const fetchUser = async (userId, token) => {
+    if (!userId || !token || token === "null" || userId === "null") {
+      return;
     }
-  }, [userId]);
+    try {
+      const res = await fetch(`http://localhost:8888/api/v1/user/${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const response = await res.json();
+        console.log(response);
+        return;
+      }
+
+      const data = await res.json();
+      setUser(data);
+      localStorage.setItem("user", JSON.stringify(data));
+
+      fetchHousehold(userId);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchHouseholdById = async () => {
+    try {
+      if (data.currentHousehold === null) return;
+      const householdRes = await fetch(
+        `http://localhost:8888/api/v1/household/${data.currentHousehold.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!householdRes.ok) {
+        const response = await householdRes.json();
+        console.log(response);
+        return;
+      }
+
+      const householdData = await householdRes.json();
+
+      const choresRes = await fetch(
+        `http://localhost:8888/api/v1/task/household/${householdData.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!choresRes.ok) {
+        const response = await choresRes.json();
+        console.log(response);
+        return;
+      }
+
+      const allChoresData = await choresRes.json();
+
+      const myChoresData = allChoresData.filter(
+        (task) => task.userId === userId
+      );
+
+      const membersRes = await fetch(
+        `http://localhost:8888/api/v1/userhousehold/household/${householdData.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!membersRes.ok) {
+        const response = await membersRes.json();
+        console.log(response);
+        return;
+      }
+
+      const membersData = await membersRes.json();
+
+      const fetchedData = {
+        households: data.households,
+        currentHousehold: householdData,
+        allChores: allChoresData,
+        myChores: myChoresData,
+        members: membersData,
+      };
+      setData(fetchedData);
+
+      localStorage.setItem("data", JSON.stringify(fetchedData));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const fetchHousehold = async () => {
     console.log("fetching household");
     try {
-      const res = await fetch(
+      const householdRes = await fetch(
         `http://localhost:8888/api/v1/userhousehold/user/${userId}`,
         {
           method: "GET",
@@ -168,49 +233,90 @@ function App() {
         }
       );
 
-      if (!res.ok) {
-        const response = await res.json();
+      if (!householdRes.ok) {
+        const response = await householdRes.json();
         console.log(response);
         return;
       }
 
-      const data = await res.json();
-      const householdsData = data.map((item) => item.household);
-      setHouseholds(householdsData);
-      localStorage.setItem("households", JSON.stringify(householdsData));
+      const householdsData = (await householdRes.json()).map(
+        (item) => item.household
+      );
 
       if (householdsData.length > 0) {
-        setCurrentHousehold(householdsData[0]);
-
-        localStorage.setItem(
-          "currentHousehold",
-          JSON.stringify(householdsData[0])
+        console.log("householdsData has length");
+        const choresRes = await fetch(
+          `http://localhost:8888/api/v1/task/household/${householdsData[0].id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
-        fetchChores(householdsData[0].id);
+        if (!choresRes.ok) {
+          const response = await choresRes.json();
+          console.log(response);
+          return;
+        }
+
+        const allChoresData = await choresRes.json();
+
+        const myChoresData = allChoresData.filter(
+          (task) => task.userId === userId
+        );
+
+        const membersRes = await fetch(
+          `http://localhost:8888/api/v1/userhousehold/household/${householdsData[0].id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!membersRes.ok) {
+          const response = await membersRes.json();
+          console.log(response);
+          return;
+        }
+
+        const membersData = await membersRes.json();
+
+        const fetchedData = {
+          households: householdsData,
+          currentHousehold: householdsData[0],
+          allChores: allChoresData,
+          myChores: myChoresData,
+          members: membersData,
+        };
+        setData(fetchedData);
+
+        localStorage.setItem("data", JSON.stringify(fetchedData));
       } else {
-        console.log("performing else");
-        setCurrentHousehold(null);
+        console.log("householdsData has no length");
+        const fetchedData = {
+          households: [],
+          currentHousehold: null,
+          allChores: [],
+          myChores: [],
+          members: [],
+        };
+        setData(fetchedData);
 
-        localStorage.setItem("currentHousehold", null);
-
-        setAllChores([]);
-        setMyChores([]);
-
-        setIsLoading(false);
-
-        toast.success("Logged in successfully!");
-        navigate("/");
+        localStorage.setItem("data", JSON.stringify(fetchedData));
       }
-
-      fetchChores(householdsData[0].id);
     } catch (error) {
       console.error(error);
-    } finally {
     }
   };
 
   const createHousehold = async (householdName, closeOverlay) => {
+    setIsLoading(true);
     try {
       const res = await fetch("http://localhost:8888/api/v1/userhousehold", {
         method: "POST",
@@ -226,92 +332,28 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        toast.error(response.message);
+        console.log(response);
         return;
       }
 
-      const data = await res.json();
-      const householdData = data.household;
-      setHouseholds([...households, householdData]);
-      localStorage.setItem(
-        "households",
-        JSON.stringify([...households, householdData])
-      );
-      setCurrentHousehold(householdData);
-      localStorage.setItem(
-        "currentHousehold",
-        JSON.stringify(currentHousehold)
-      );
-      toast.success("Household created successfully!");
-      closeOverlay();
-    } catch (error) {
-      console.error(error);
-    }
-  };
+      const fetchData = await res.json();
+      const newHouseholdData = fetchData.household;
 
-  const fetchChores = async (householdId) => {
-    console.log("fecthing chores");
-    try {
-      const res = await fetch(
-        `http://localhost:8888/api/v1/task/household/${householdId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      setData((prevData) => {
+        const updatedData = {
+          ...prevData,
+          households: [...prevData.households, newHouseholdData],
+          currentHousehold: newHouseholdData,
+        };
 
-      if (!res.ok) {
-        const response = await res.json();
-        toast.error(response.message);
-        return;
-      }
+        localStorage.setItem("data", JSON.stringify(updatedData));
 
-      const data = await res.json();
-      setAllChores(data);
-      localStorage.setItem("allChores", JSON.stringify(data));
-
-      fetchMyChores();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchMyChores = async () => {
-    console.log("fecthing my chores");
-    try {
-      const res = await fetch(
-        `http://localhost:8888/api/v1/task/user/${userId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!res.ok) {
-        const response = await res.json();
-        toast.error(response.message);
-        return;
-      }
-
-      const data = await res.json();
-      setMyChores(data);
-      localStorage.setItem("myChores", JSON.stringify(data));
+        return updatedData;
+      });
 
       setIsLoading(false);
-
-      if (loginSuccess) {
-        toast.success("Login successful!");
-      } else if (registerSuccess) {
-        toast.success("Registration successful!");
-      }
-
-      navigate("/");
+      toast.success("Household created successfully!");
+      closeOverlay();
     } catch (error) {
       console.error(error);
     }
@@ -324,18 +366,8 @@ function App() {
     tag,
     closeOverlay
   ) => {
+    setIsLoading(true);
     try {
-      console.log(
-        JSON.stringify({
-          title: title,
-          householdId: currentHousehold.id,
-          description: description,
-          status: null,
-          frequency: frequence,
-          tag: tag,
-          userId: null,
-        })
-      );
       const res = await fetch("http://localhost:8888/api/v1/task", {
         method: "POST",
         headers: {
@@ -344,7 +376,7 @@ function App() {
         },
         body: JSON.stringify({
           title: title,
-          householdId: currentHousehold.id,
+          householdId: data.currentHousehold.id,
           description: description,
           status: null,
           frequency: frequence,
@@ -355,13 +387,24 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        toast.error(response.message);
+        console.log(response);
         return;
       }
 
-      const data = await res.json();
-      setAllChores([...allChores, data]);
-      localStorage.setItem("allChores", JSON.stringify([...allChores, data]));
+      const fetchData = await res.json();
+
+      setData((prevData) => {
+        const updatedData = {
+          ...prevData,
+          allChores: [...prevData.allChores, fetchData],
+        };
+
+        localStorage.setItem("data", JSON.stringify(updatedData));
+
+        return updatedData;
+      });
+
+      setIsLoading(false);
       toast.success("Chore created successfully!");
       closeOverlay();
     } catch (error) {
@@ -372,6 +415,7 @@ function App() {
   const assignChore = async (choreId) => {
     console.log("choreId", choreId);
     console.log("UserID", userId);
+    setIsLoading(true);
     try {
       const res = await fetch(
         `http://localhost:8888/api/v1/task/${choreId}/assignee/${userId}`,
@@ -386,27 +430,31 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        toast.error(response.message);
+        console.log(response);
         return;
       }
 
       const updatedChore = await res.json();
 
-      setAllChores(
-        allChores.map((chore) => {
-          if (chore.id === choreId) {
-            return updatedChore;
-          }
-          return chore;
-        })
-      );
+      setData((prevData) => {
+        const updatedAllChores = prevData.allChores.map((chore) =>
+          chore.id === choreId ? updatedChore : chore
+        );
 
-      localStorage.setItem("allChores", JSON.stringify(allChores));
+        const updatedMyChores = [...prevData.myChores, updatedChore];
 
-      setMyChores([...myChores, updatedChore]);
+        const updatedData = {
+          ...prevData,
+          allChores: updatedAllChores,
+          myChores: updatedMyChores,
+        };
 
-      localStorage.setItem("myChores", JSON.stringify(myChores));
+        localStorage.setItem("data", JSON.stringify(updatedData));
 
+        return updatedData;
+      });
+
+      setIsLoading(false);
       toast.success("Chore assigned successfully!");
     } catch (error) {
       console.error(error);
@@ -414,6 +462,7 @@ function App() {
   };
 
   const unassignChore = async (choreId) => {
+    setIsLoading(true);
     try {
       const res = await fetch(
         `http://localhost:8888/api/v1/task/${choreId}/unassign/${userId}`,
@@ -428,31 +477,33 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        toast.error(response.message);
+        console.log(response);
         return;
       }
 
       const updatedChore = await res.json();
 
-      setAllChores(
-        allChores.map((chore) => {
-          if (chore.id === choreId) {
-            return updatedChore;
-          }
-          return chore;
-        })
-      );
+      setData((prevData) => {
+        const updatedAllChores = prevData.allChores.map((chore) =>
+          chore.id === choreId ? updatedChore : chore
+        );
 
-      localStorage.setItem("allChores", JSON.stringify(allChores));
+        const updatedMyChores = prevData.myChores.filter(
+          (chore) => chore.id !== choreId
+        );
 
-      setMyChores(
-        myChores.filter((chore) => {
-          return chore.id !== choreId;
-        })
-      );
+        const updatedData = {
+          ...prevData,
+          allChores: updatedAllChores,
+          myChores: updatedMyChores,
+        };
 
-      localStorage.setItem("myChores", JSON.stringify(myChores));
+        localStorage.setItem("data", JSON.stringify(updatedData));
 
+        return updatedData;
+      });
+
+      setIsLoading(false);
       toast.success("Chore unassigned successfully!");
     } catch (error) {
       console.error(error);
@@ -460,6 +511,7 @@ function App() {
   };
 
   const deleteChore = async (choreId) => {
+    setIsLoading(true);
     try {
       const res = await fetch(`http://localhost:8888/api/v1/task/${choreId}`, {
         method: "DELETE",
@@ -471,14 +523,31 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        toast.error(response.message);
+        console.log(response);
         return;
       }
 
-      const updatedChores = allChores.filter((chore) => chore.id !== choreId);
-      setAllChores(updatedChores);
-      localStorage.setItem("allChores", JSON.stringify(updatedChores));
+      setData((prevData) => {
+        const updatedAllChores = prevData.allChores.filter(
+          (chore) => chore.id !== choreId
+        );
 
+        const updatedMyChores = prevData.myChores.filter(
+          (chore) => chore.id !== choreId
+        );
+
+        const updatedData = {
+          ...prevData,
+          allChores: updatedAllChores,
+          myChores: updatedMyChores,
+        };
+
+        localStorage.setItem("data", JSON.stringify(updatedData));
+
+        return updatedData;
+      });
+
+      setIsLoading(false);
       toast.success("Chore deleted successfully!");
     } catch (error) {
       console.error(error);
@@ -493,6 +562,7 @@ function App() {
     tag,
     closeOverlay
   ) => {
+    setIsLoading(true);
     try {
       const res = await fetch(`http://localhost:8888/api/v1/task/${choreId}`, {
         method: "PUT",
@@ -510,40 +580,42 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        toast.error(response.message);
+        console.log(response);
         return;
       }
 
       const updatedChore = await res.json();
 
-      const updatedChores = allChores.map((chore) => {
-        if (chore.id === choreId) {
-          return updatedChore;
-        }
-        return chore;
+      setData((prevData) => {
+        const updatedAllChores = prevData.allChores.map((chore) =>
+          chore.id === choreId ? updatedChore : chore
+        );
+
+        const updatedMyChores = prevData.myChores.map((chore) =>
+          chore.id === choreId ? updatedChore : chore
+        );
+
+        const updatedData = {
+          ...prevData,
+          allChores: updatedAllChores,
+          myChores: updatedMyChores,
+        };
+
+        localStorage.setItem("data", JSON.stringify(updatedData));
+
+        return updatedData;
       });
 
-      setAllChores(updatedChores);
-
-      localStorage.setItem("allChores", JSON.stringify(updatedChores));
-
-      const updatedMyChores = myChores.map((chore) => {
-        if (chore.id === choreId) {
-          return updatedChore;
-        }
-        return chore;
-      });
-
-      setMyChores(updatedMyChores);
-      closeOverlay();
-
+      setIsLoading(false);
       toast.success("Chore updated successfully!");
+      closeOverlay();
     } catch (error) {
       console.error(error);
     }
   };
 
   const editChoreStatus = async (choreId, status, closeOverlay) => {
+    setIsLoading(true);
     try {
       const res = await fetch(
         `http://localhost:8888/api/v1/task/${choreId}/status`,
@@ -562,26 +634,33 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        toast.error(response.message);
+        console.log(response);
         return;
       }
 
       const updatedChore = await res.json();
 
-      const updatedAllChores = allChores.map((chore) =>
-        chore.id === updatedChore.id ? updatedChore : chore
-      );
-      setAllChores(updatedAllChores);
+      setData((prevData) => {
+        const updatedAllChores = prevData.allChores.map((chore) =>
+          chore.id === choreId ? updatedChore : chore
+        );
 
-      localStorage.setItem("allChores", JSON.stringify(updatedAllChores));
+        const updatedMyChores = prevData.myChores.map((chore) =>
+          chore.id === choreId ? updatedChore : chore
+        );
 
-      const updatedMyChores = myChores.map((chore) =>
-        chore.id === updatedChore.id ? updatedChore : chore
-      );
-      setMyChores(updatedMyChores);
+        const updatedData = {
+          ...prevData,
+          allChores: updatedAllChores,
+          myChores: updatedMyChores,
+        };
 
-      localStorage.setItem("myChores", JSON.stringify(updatedMyChores));
+        localStorage.setItem("data", JSON.stringify(updatedData));
 
+        return updatedData;
+      });
+
+      setIsLoading(false);
       toast.success("Chore status updated successfully!");
       closeOverlay();
     } catch (error) {
@@ -604,7 +683,7 @@ function App() {
       if (!res.ok) {
         setIsLoading(false);
         const response = await res.json();
-        toast.error(response.message);
+        console.log(response);
         return;
       }
 
@@ -615,13 +694,13 @@ function App() {
       const decoded = jwtDecode(token);
       localStorage.setItem("userId", JSON.stringify(decoded.sub));
       setUserId(decoded.sub);
-      console.log(decoded.sub);
+
+      setLoginSuccess(true);
+      fetchUser(decoded.sub);
     } catch (error) {
       setIsLoading(false);
       toast.error(error);
       console.error(error);
-    } finally {
-      setLoginSuccess(true);
     }
   };
 
@@ -651,7 +730,7 @@ function App() {
       if (!res.ok) {
         setIsLoading(false);
         const response = await res.json();
-        toast.error(response.message);
+        console.log(response);
         return;
       }
 
@@ -673,20 +752,43 @@ function App() {
     const answer = window.confirm("Are you sure you want to log out?");
     if (answer) {
       setUser(null);
-      setToken(null);
       setUserId(null);
-      setHouseholds([]);
-      setCurrentHousehold(null);
-      setAllChores([]);
-      setMyChores([]);
+      setToken(null);
+      setData(null);
+
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
-      localStorage.removeItem("households");
-      localStorage.removeItem("currentHousehold");
-      localStorage.removeItem("allChores");
-      localStorage.removeItem("myChores");
+      localStorage.removeItem("data", null);
+
       navigate("/login");
+    }
+  };
+
+  const inviteMember = async (email) => {
+    try {
+      const res = await fetch("http://localhost:8888/api/v1/email/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          to: email,
+          householdId: data.currentHousehold.id,
+        }),
+      });
+
+      if (!res.ok) {
+        if (res.status === 405) {
+          toast.success("Email sent successfully!");
+        } else {
+          toast.error("Oops! Something went wrong. Please try again.");
+        }
+        return;
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -702,11 +804,12 @@ function App() {
                 setSidebarOpen={setSidebarOpen}
                 user={user}
                 logout={logout}
-                currentHousehold={currentHousehold}
-                setCurrentHousehold={setCurrentHousehold}
+                setData={setData}
                 username={user.username}
                 createHousehold={createHousehold}
-                households={households}
+                data={data}
+                inviteMember={inviteMember}
+                setChangingHousehold={setChangingHousehold}
               />
             }
           >
@@ -715,9 +818,7 @@ function App() {
               element={
                 <Dashboard
                   sidebarOpen={sidebarOpen}
-                  currentHousehold={currentHousehold}
-                  myChores={myChores}
-                  allChores={allChores}
+                  data={data}
                   unassignChore={unassignChore}
                   editChoreStatus={editChoreStatus}
                 />
@@ -732,8 +833,7 @@ function App() {
               element={
                 <ChoreList
                   sidebarOpen={sidebarOpen}
-                  currentHousehold={currentHousehold}
-                  allChores={allChores}
+                  data={data}
                   createChore={createChore}
                   assignChore={assignChore}
                   deleteChore={deleteChore}

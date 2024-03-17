@@ -13,6 +13,7 @@ import java.util.Date;
 import com.choresync.userhousehold.entity.Userhousehold;
 import com.choresync.userhousehold.exception.HouseholdCreationException;
 import com.choresync.userhousehold.exception.HouseholdNotFoundException;
+import com.choresync.userhousehold.exception.UserNotFoundException;
 import com.choresync.userhousehold.exception.UserhouseholdCreationException;
 import com.choresync.userhousehold.exception.UserhouseholdNotFoundException;
 import com.choresync.userhousehold.external.request.HouseholdRequest;
@@ -21,6 +22,8 @@ import com.choresync.userhousehold.external.response.UserResponse;
 import com.choresync.userhousehold.model.UserhouseholdRequest;
 import com.choresync.userhousehold.model.UserhouseholdResponse;
 import com.choresync.userhousehold.model.UserhouseholdResponse.Household;
+import com.choresync.userhousehold.model.GetMembersResponse;
+import com.choresync.userhousehold.model.GetMembersResponse.User;
 import com.choresync.userhousehold.repository.UserhouseholdRepository;
 
 @Service
@@ -160,10 +163,10 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
   }
 
   @Override
-  public List<UserhouseholdResponse> getUserhouseholdsByHouseholdId(String householdId) {
+  public List<GetMembersResponse> getUserhouseholdsByHouseholdId(String householdId) {
     List<Userhousehold> userhouseholds = userhouseholdRepository.findAllByHouseholdId(householdId);
 
-    List<UserhouseholdResponse> userhouseholdResponses = new ArrayList<>();
+    List<GetMembersResponse> userhouseholdResponses = new ArrayList<>();
 
     for (Userhousehold userhousehold : userhouseholds) {
       HouseholdResponse householdResponse;
@@ -177,7 +180,18 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
         throw new HouseholdNotFoundException("Household not found. " + e.getMessage());
       }
 
-      UserhouseholdResponse.Household household = UserhouseholdResponse.Household
+      UserResponse userResponse;
+
+      try {
+        userResponse = restTemplate
+            .getForObject(
+                "http://user-service/api/v1/user/" + userhousehold.getUserId(),
+                UserResponse.class);
+      } catch (RestClientException e) {
+        throw new UserNotFoundException("User not found. " + e.getMessage());
+      }
+
+      GetMembersResponse.Household household = GetMembersResponse.Household
           .builder()
           .id(householdResponse.getId())
           .name(householdResponse.getName())
@@ -185,10 +199,19 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
           .updatedAt(householdResponse.getUpdatedAt())
           .build();
 
-      UserhouseholdResponse userhouseholdResponse = UserhouseholdResponse
+      GetMembersResponse.User user = GetMembersResponse.User
           .builder()
-          .id(userhousehold.getId())
-          .userId(userhousehold.getUserId())
+          .id(userResponse.getId())
+          .firstName(userResponse.getFirstName())
+          .lastName(userResponse.getLastName())
+          .username(userResponse.getUsername())
+          .createdAt(userhousehold.getCreatedAt())
+          .updatedAt(userhousehold.getUpdatedAt())
+          .build();
+
+      GetMembersResponse userhouseholdResponse = GetMembersResponse
+          .builder()
+          .user(user)
           .household(household)
           .createdAt(userhousehold.getCreatedAt())
           .updatedAt(userhousehold.getUpdatedAt())

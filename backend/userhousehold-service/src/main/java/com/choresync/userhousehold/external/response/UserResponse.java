@@ -1,7 +1,5 @@
 package com.choresync.userhousehold.external.response;
 
-
-
 import java.util.Date;
 
 import lombok.AllArgsConstructor;

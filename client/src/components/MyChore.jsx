@@ -9,8 +9,6 @@ function MyChore({
   closeOverlay,
   editChoreStatus,
 }) {
-  console.log(chore);
-
   function getStatusColor(status) {
     switch (status) {
       case "COMPLETED":

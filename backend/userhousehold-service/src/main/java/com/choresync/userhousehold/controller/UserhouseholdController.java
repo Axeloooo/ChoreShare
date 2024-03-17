@@ -3,6 +3,7 @@ package com.choresync.userhousehold.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.choresync.userhousehold.external.response.UserResponse;
+import com.choresync.userhousehold.model.GetMembersResponse;
 import com.choresync.userhousehold.model.UserhouseholdRequest;
 import com.choresync.userhousehold.model.UserhouseholdResponse;
 import com.choresync.userhousehold.model.UserhouseholdResponse.Household;
@@ -47,9 +48,9 @@ public class UserhouseholdController {
   }
 
   @GetMapping("/household/{hid}")
-  public ResponseEntity<List<UserhouseholdResponse>> getUserhouseholdsByHouseholdId(
+  public ResponseEntity<List<GetMembersResponse>> getUserhouseholdsByHouseholdId(
       @PathVariable("hid") String householdId) {
-    List<UserhouseholdResponse> userhouseholdResponse = userhouseholdService
+    List<GetMembersResponse> userhouseholdResponse = userhouseholdService
         .getUserhouseholdsByHouseholdId(householdId);
     return new ResponseEntity<>(userhouseholdResponse, HttpStatus.OK);
   }
