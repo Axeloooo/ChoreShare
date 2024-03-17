@@ -2,8 +2,10 @@ package com.choresync.userhousehold.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.choresync.userhousehold.external.response.UserResponse;
 import com.choresync.userhousehold.model.UserhouseholdRequest;
 import com.choresync.userhousehold.model.UserhouseholdResponse;
+import com.choresync.userhousehold.model.UserhouseholdResponse.Household;
 import com.choresync.userhousehold.service.UserhouseholdService;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,4 +60,12 @@ public class UserhouseholdController {
 
     return new ResponseEntity<>("Userhousehold with id " + id + " has been deleted", HttpStatus.OK);
   }
+
+  @PostMapping("/join/{hid}/user/{uid}")
+  public ResponseEntity<Household> joinHouseHold(@PathVariable("uid") String userId, @PathVariable("hid") String houseId) {
+    
+    Household userhouseholdResponse = userhouseholdService.joinHouseHold(userId, houseId);
+    return new ResponseEntity<>(userhouseholdResponse, HttpStatus.OK);
+  }
+
 }

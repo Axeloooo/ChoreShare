@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Date;
 import com.choresync.userhousehold.entity.Userhousehold;
 import com.choresync.userhousehold.exception.HouseholdCreationException;
 import com.choresync.userhousehold.exception.HouseholdNotFoundException;
@@ -15,8 +17,10 @@ import com.choresync.userhousehold.exception.UserhouseholdCreationException;
 import com.choresync.userhousehold.exception.UserhouseholdNotFoundException;
 import com.choresync.userhousehold.external.request.HouseholdRequest;
 import com.choresync.userhousehold.external.response.HouseholdResponse;
+import com.choresync.userhousehold.external.response.UserResponse;
 import com.choresync.userhousehold.model.UserhouseholdRequest;
 import com.choresync.userhousehold.model.UserhouseholdResponse;
+import com.choresync.userhousehold.model.UserhouseholdResponse.Household;
 import com.choresync.userhousehold.repository.UserhouseholdRepository;
 
 @Service
@@ -203,4 +207,61 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
 
     userhouseholdRepository.delete(userhousehold);
   }
+
+  @Override
+  public Household joinHouseHold(String userId, String houseId) {
+
+    HouseholdResponse householdResponse;
+
+    // Throws of houseId does not exist
+    try {
+      householdResponse = restTemplate
+          .getForObject(
+              "http://household-service/api/v1/household/" + houseId,
+              HouseholdResponse.class);
+    } catch (RestClientException e) {
+      throw new HouseholdNotFoundException("Household not found. " + e.getMessage());
+    }
+
+    UserhouseholdResponse.Household household = UserhouseholdResponse.Household
+          .builder()
+          .id(householdResponse.getId())
+          .name(householdResponse.getName())
+          .createdAt(householdResponse.getCreatedAt())
+          .updatedAt(householdResponse.getUpdatedAt())
+          .build();
+
+    // Make Sure that the user exists
+    try {
+      restTemplate
+          .getForObject(
+              "http://user-service/api/v1/user/" + userId,
+              UserResponse.class);
+    } catch (Exception e) {
+      throw new HouseholdNotFoundException("User not found. " + e.getMessage());
+    }
+
+    // Check If the user already exists in the house
+    List<Userhousehold> userhouseholds = userhouseholdRepository.findAllByUserId(userId);
+
+    for (Userhousehold userhousehold : userhouseholds) {
+      if (userhousehold.getHouseholdId().equals(houseId)) {
+        throw new HouseholdNotFoundException("User Already In house! ");
+
+      }
+    }
+
+    Userhousehold userHousehold = new Userhousehold();
+        userHousehold.setUserId(userId);
+        userHousehold.setHouseholdId(houseId);
+        userHousehold.setCreatedAt(new Date()); // Set the current timestamp for createdAt
+        userHousehold.setUpdatedAt(new Date()); // Set the current timestamp for updatedAt
+
+        userhouseholdRepository.save(userHousehold);
+
+    return household;
+
+  }
+
+ 
 }
