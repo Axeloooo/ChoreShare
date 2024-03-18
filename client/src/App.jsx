@@ -204,12 +204,32 @@ function App() {
 
       const membersData = await membersRes.json();
 
+      const eventsRes = await fetch(
+        `http://localhost:8888/api/v1/event/household/${householdData.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!eventsRes.ok) {
+        const response = await eventsRes.json();
+        console.log(response);
+        return;
+      }
+
+      const eventsData = await eventsRes.json();
+
       const fetchedData = {
         households: data.households,
         currentHousehold: householdData,
         allChores: allChoresData,
         myChores: myChoresData,
         members: membersData,
+        events: eventsData,
       };
       setData(fetchedData);
 
@@ -287,12 +307,32 @@ function App() {
 
         const membersData = await membersRes.json();
 
+        const eventsRes = await fetch(
+          `http://localhost:8888/api/v1/event/household/${householdsData[0].id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!eventsRes.ok) {
+          const response = await eventsRes.json();
+          console.log(response);
+          return;
+        }
+
+        const eventsData = await eventsRes.json();
+
         const fetchedData = {
           households: householdsData,
           currentHousehold: householdsData[0],
           allChores: allChoresData,
           myChores: myChoresData,
           members: membersData,
+          events: eventsData,
         };
         setData(fetchedData);
 
@@ -305,6 +345,7 @@ function App() {
           allChores: [],
           myChores: [],
           members: [],
+          events: [],
         };
         setData(fetchedData);
 
@@ -668,6 +709,95 @@ function App() {
     }
   };
 
+  const createEvent = async (title, startTime, endTime, closeOverlay) => {
+    setIsLoading(true);
+    console.log("startTime", startTime);
+    console.log("endTime", endTime);
+    try {
+      const res = await fetch("http://localhost:8888/api/v1/event", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          householdId: data.currentHousehold.id,
+          title: title,
+          userId: userId,
+          username: user.username,
+          startTime: startTime,
+          endTime: endTime,
+        }),
+      });
+
+      if (!res.ok) {
+        const response = await res.json();
+        console.log(response);
+        return;
+      }
+
+      const newEvent = await res.json();
+
+      setData((prevData) => {
+        const updatedEvents = [...prevData.events, newEvent];
+
+        const updatedData = {
+          ...prevData,
+          events: updatedEvents,
+        };
+
+        localStorage.setItem("data", JSON.stringify(updatedData));
+
+        return updatedData;
+      });
+
+      setIsLoading(false);
+      toast.success("Event created successfully!");
+      closeOverlay();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const deleteEvent = async (eventId) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(`http://localhost:8888/api/v1/event/${eventId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const response = await res.json();
+        console.log(response);
+        return;
+      }
+
+      setData((prevData) => {
+        const updatedEvents = prevData.events.filter(
+          (event) => event.id !== eventId
+        );
+
+        const updatedData = {
+          ...prevData,
+          events: updatedEvents,
+        };
+
+        localStorage.setItem("data", JSON.stringify(updatedData));
+
+        return updatedData;
+      });
+
+      setIsLoading(false);
+      toast.success("Event deleted successfully!");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const login = async (username, password) => {
     setIsLoading(true);
     try {
@@ -821,12 +951,21 @@ function App() {
                   data={data}
                   unassignChore={unassignChore}
                   editChoreStatus={editChoreStatus}
+                  userId={userId}
+                  user={user}
+                  deleteEvent={deleteEvent}
                 />
               }
             />
             <Route
               path="calendar"
-              element={<Calendar sidebarOpen={sidebarOpen} />}
+              element={
+                <Calendar
+                  sidebarOpen={sidebarOpen}
+                  createEvent={createEvent}
+                  data={data}
+                />
+              }
             />
             <Route
               path="chore-list"

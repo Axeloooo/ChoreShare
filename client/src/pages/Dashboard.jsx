@@ -7,48 +7,17 @@ import Announcement from "../components/Announcement";
 import UpcomingEvent from "../components/UpcomingEvent";
 import MyChore from "../components/MyChore";
 
-function Dashboard({ sidebarOpen, data, unassignChore, editChoreStatus }) {
+function Dashboard({
+  sidebarOpen,
+  data,
+  unassignChore,
+  editChoreStatus,
+  user,
+  userId,
+  deleteEvent,
+}) {
   const [myChoresProgress, setMyChoresProgress] = useState("");
   const [allChoresProgress, setAllChoresProgress] = useState("");
-  const announcements = [
-    {
-      message:
-        "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Earum quidem nobis asperiores qui in voluptatem? Gvuwif hrbfiwojs xwifnoqmwkd. Earum quidem nobis asperiores qui in voluptatem? ",
-      author: "John Doe",
-    },
-    {
-      message: "Lorem ipsum dolor sit amet, consectetur.",
-      author: "Anonymous",
-    },
-    {
-      message: "Lorem ipsum dolor sit amet, consectetur.",
-      author: "Anonymous",
-    },
-    {
-      message: "Lorem ipsum dolor sit amet, consectetur.",
-      author: "Anonymous",
-    },
-  ];
-  const events = [
-    {
-      date: "5 Feb, 2024",
-      title: "Family Dinner",
-      time: "6:00 PM",
-      author: "jhon2937",
-    },
-    {
-      date: "5 Feb, 2024",
-      title: "Family Dinner",
-      time: "6:00 PM",
-      author: "jhon2937",
-    },
-    {
-      date: "5 Feb, 2024",
-      title: "Family Dinner",
-      time: "6:00 PM",
-      author: "jhon2937",
-    },
-  ];
   const { showOverlay, closeOverlay } = useOutletContext();
 
   const handleShowCreateAnnouncement = () => {
@@ -115,20 +84,19 @@ function Dashboard({ sidebarOpen, data, unassignChore, editChoreStatus }) {
                   <p>View Calendar</p>
                 </Link>
               </div>
-              {events.length === 0 ? (
+              {data.events.length === 0 ? (
                 <div className="container-contents empty">
                   No Upcoming Events
                 </div>
               ) : (
                 <div className="container-contents">
-                  {events.map((event, index) => {
+                  {data.events.map((event, index) => {
                     return (
                       <UpcomingEvent
                         key={index}
-                        date={event.date}
-                        title={event.title}
-                        time={event.time}
-                        author={event.author}
+                        event={event}
+                        userId={userId}
+                        deleteEvent={deleteEvent}
                       />
                     );
                   })}
@@ -140,18 +108,19 @@ function Dashboard({ sidebarOpen, data, unassignChore, editChoreStatus }) {
                 <h3>Announcements</h3>
                 <p onClick={handleShowCreateAnnouncement}>+ Create</p>
               </div>
-              {announcements.length === 0 ? (
+              {data.announcements.length === 0 ? (
                 <div className="container-contents empty">No Announcements</div>
               ) : (
                 <div className="container-contents">
-                  {announcements.map((announcement, index) => {
+                  {data.announcements.map((announcement, index) => {
                     return (
                       <Announcement
                         key={index}
-                        message={announcement.message}
-                        author={announcement.author}
+                        announcement={announcement}
                         showOverlay={showOverlay}
                         closeOverlay={closeOverlay}
+                        userId={userId}
+                        user={user}
                       />
                     );
                   })}
