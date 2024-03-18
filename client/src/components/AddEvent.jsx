@@ -1,6 +1,7 @@
 import "../styles/AddEvent.css";
 import { useState } from "react";
 
+// Add event
 function AddEvent({ createEvent, closeOverlay }) {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
@@ -10,8 +11,7 @@ function AddEvent({ createEvent, closeOverlay }) {
   const handleCreateEvent = (e) => {
     e.preventDefault();
 
-    const formattedStartTime =
-      date && startTime ? `${date}T${startTime}:00Z` : null;
+    const formattedStartTime = date && startTime ? `${date}T${startTime}:00Z` : null;
     const formattedEndTime = date && endTime ? `${date}T${endTime}:00Z` : null;
 
     createEvent(title, formattedStartTime, formattedEndTime, closeOverlay);
