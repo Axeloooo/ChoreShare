@@ -204,12 +204,32 @@ function App() {
 
       const membersData = await membersRes.json();
 
+      const announcementsRes = await fetch(
+        `http://localhost:8888/api/v1/announcement/household/${householdData.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!announcementsRes.ok) {
+        const response = await announcementsRes.json();
+        console.log(response);
+        return;
+      }
+
+      const announcementsData = await announcementsRes.json();
+
       const fetchedData = {
         households: data.households,
         currentHousehold: householdData,
         allChores: allChoresData,
         myChores: myChoresData,
         members: membersData,
+        announcements: announcementsData,
       };
       setData(fetchedData);
 
@@ -287,12 +307,32 @@ function App() {
 
         const membersData = await membersRes.json();
 
+        const announcementsRes = await fetch(
+          `http://localhost:8888/api/v1/announcement/household/${householdsData[0].id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!announcementsRes.ok) {
+          const response = await announcementsRes.json();
+          console.log(response);
+          return;
+        }
+
+        const announcementsData = await announcementsRes.json();
+
         const fetchedData = {
           households: householdsData,
           currentHousehold: householdsData[0],
           allChores: allChoresData,
           myChores: myChoresData,
           members: membersData,
+          announcements: announcementsData,
         };
         setData(fetchedData);
 
@@ -305,6 +345,7 @@ function App() {
           allChores: [],
           myChores: [],
           members: [],
+          announcements: [],
         };
         setData(fetchedData);
 
@@ -668,6 +709,157 @@ function App() {
     }
   };
 
+  const createAnnouncement = async (message, author, closeOverlay) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("http://localhost:8888/api/v1/announcement", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          message: message,
+          householdId: data.currentHousehold.id,
+          author: author,
+          userId: userId,
+        }),
+      });
+
+      if (!res.ok) {
+        const response = await res.json();
+        console.log(response);
+        return;
+      }
+
+      const newAnnouncement = await res.json();
+
+      setData((prevData) => {
+        const updatedAnnouncements = [
+          ...prevData.announcements,
+          newAnnouncement,
+        ];
+
+        const updatedData = {
+          ...prevData,
+          announcements: updatedAnnouncements,
+        };
+
+        localStorage.setItem("data", JSON.stringify(updatedData));
+
+        return updatedData;
+      });
+
+      setIsLoading(false);
+      toast.success("Announcement created successfully!");
+      closeOverlay();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const editAnnouncement = async (
+    announcementId,
+    message,
+    author,
+    closeOverlay
+  ) => {
+    console.log("author", author);
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `http://localhost:8888/api/v1/announcement/${announcementId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            message: message,
+            householdId: data.currentHousehold.id,
+            author: author,
+            userId: userId,
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const response = await res.json();
+        console.log(response);
+        return;
+      }
+
+      const updatedAnnouncement = await res.json();
+
+      setData((prevData) => {
+        const updatedAnnouncements = prevData.announcements.map(
+          (announcement) =>
+            announcement.id === announcementId
+              ? updatedAnnouncement
+              : announcement
+        );
+
+        const updatedData = {
+          ...prevData,
+          announcements: updatedAnnouncements,
+        };
+
+        localStorage.setItem("data", JSON.stringify(updatedData));
+
+        return updatedData;
+      });
+
+      setIsLoading(false);
+      toast.success("Chore status updated successfully!");
+      closeOverlay();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const deleteAnnouncement = async (announcementId) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `http://localhost:8888/api/v1/announcement/${announcementId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const response = await res.json();
+        console.log(response);
+        return;
+      }
+
+      setData((prevData) => {
+        const updatedAnnouncements = prevData.announcements.filter(
+          (announcement) => announcement.id !== announcementId
+        );
+
+        const updatedData = {
+          ...prevData,
+          announcements: updatedAnnouncements,
+        };
+
+        localStorage.setItem("data", JSON.stringify(updatedData));
+
+        return updatedData;
+      });
+
+      setIsLoading(false);
+      toast.success("Announcement deleted successfully!");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const login = async (username, password) => {
     setIsLoading(true);
     try {
@@ -821,6 +1013,11 @@ function App() {
                   data={data}
                   unassignChore={unassignChore}
                   editChoreStatus={editChoreStatus}
+                  userId={userId}
+                  user={user}
+                  createAnnouncement={createAnnouncement}
+                  deleteAnnouncement={deleteAnnouncement}
+                  editAnnouncement={editAnnouncement}
                 />
               }
             />
