@@ -23,7 +23,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
-  const [changingHousehold, setChangingHousehold] = useState(false);
   const [data, setData] = useState(
     localStorage.getItem("data") && localStorage.getItem("data") !== "undefined"
       ? JSON.parse(localStorage.getItem("data"))
@@ -94,23 +93,6 @@ function App() {
     fetchData();
   }, [userId, token]);
 
-  useEffect(() => {
-    const changeHousehold = async () => {
-      try {
-        if (changingHousehold) {
-          setIsLoading(true);
-          await fetchHouseholdById();
-          setChangingHousehold(false);
-          setIsLoading(false);
-          toast.success("Household changed successfully!");
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    changeHousehold();
-  }, [changingHousehold]);
-
   const fetchUser = async (userId, token) => {
     if (!userId || !token || token === "null" || userId === "null") {
       return;
@@ -140,11 +122,77 @@ function App() {
     }
   };
 
-  const fetchHouseholdById = async () => {
+  const joinHousehold = async (householdId, closeOverlay) => {
+    setIsLoading(true);
     try {
-      if (data.currentHousehold === null) return;
+      const res = await fetch(
+        `http://localhost:8888/api/v1/userhousehold/join/${householdId}/user/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const response = await res.json();
+        console.log(response);
+        return;
+      }
+
+      const newHousehold = await res.json();
+      const fetchSuccess = await fetchHouseholdById(newHousehold.id);
+
+      console.log("fetchSuccess", fetchSuccess);
+
+      if (fetchSuccess) {
+        setIsLoading(false);
+        toast.success("You've successfully joined a household!");
+        setData((prevData) => {
+          const updatedData = {
+            ...prevData,
+            households: [...prevData.households, newHousehold],
+            currentHousehold: newHousehold,
+          };
+
+          localStorage.setItem("data", JSON.stringify(updatedData));
+
+          return updatedData;
+        });
+
+        closeOverlay();
+      } else {
+        setIsLoading(false);
+        toast.error("Oops, something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const changeHousehold = async (household) => {
+    setIsLoading(true);
+    try {
+      const fetchSuccess = await fetchHouseholdById(household.id);
+      if (fetchSuccess) {
+        setIsLoading(false);
+        setData((prev) => ({ ...prev, currentHousehold: household }));
+        toast.success("Household changed successfully!");
+      } else {
+        setIsLoading(false);
+        toast.error("Oops, something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchHouseholdById = async (householdId) => {
+    try {
       const householdRes = await fetch(
-        `http://localhost:8888/api/v1/household/${data.currentHousehold.id}`,
+        `http://localhost:8888/api/v1/household/${householdId}`,
         {
           method: "GET",
           headers: {
@@ -225,7 +273,7 @@ function App() {
 
       const eventsRes = await fetch(
         `http://localhost:8888/api/v1/event/household/${householdData.id}`,
-      {
+        {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -233,13 +281,13 @@ function App() {
           },
         }
       );
-        
+
       if (!eventsRes.ok) {
         const response = await eventsRes.json();
         console.log(response);
         return;
       }
-      
+
       const eventsData = await eventsRes.json();
 
       const fetchedData = {
@@ -254,8 +302,10 @@ function App() {
       setData(fetchedData);
 
       localStorage.setItem("data", JSON.stringify(fetchedData));
+      return true;
     } catch (error) {
       console.error(error);
+      return false;
     }
   };
 
@@ -348,7 +398,7 @@ function App() {
 
         const eventsRes = await fetch(
           `http://localhost:8888/api/v1/event/household/${householdsData[0].id}`,
-           {
+          {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -356,13 +406,13 @@ function App() {
             },
           }
         );
-          
-         if (!eventsRes.ok) {
+
+        if (!eventsRes.ok) {
           const response = await eventsRes.json();
-           console.log(response);
+          console.log(response);
           return;
         }
-        
+
         const eventsData = await eventsRes.json();
 
         const fetchedData = {
@@ -750,7 +800,7 @@ function App() {
     }
   };
 
-const createAnnouncement = async (message, author, closeOverlay) => {
+  const createAnnouncement = async (message, author, closeOverlay) => {
     setIsLoading(true);
     try {
       const res = await fetch("http://localhost:8888/api/v1/announcement", {
@@ -799,7 +849,7 @@ const createAnnouncement = async (message, author, closeOverlay) => {
     }
   };
 
-const editAnnouncement = async (
+  const editAnnouncement = async (
     announcementId,
     message,
     author,
@@ -859,7 +909,7 @@ const editAnnouncement = async (
     }
   };
 
-const deleteAnnouncement = async (announcementId) => {
+  const deleteAnnouncement = async (announcementId) => {
     setIsLoading(true);
     try {
       const res = await fetch(
@@ -900,7 +950,7 @@ const deleteAnnouncement = async (announcementId) => {
       console.error(error);
     }
   };
-  
+
   const createEvent = async (title, startTime, endTime, closeOverlay) => {
     setIsLoading(true);
     console.log("startTime", startTime);
@@ -988,7 +1038,7 @@ const deleteAnnouncement = async (announcementId) => {
     } catch (error) {
       console.error(error);
     }
-  };   
+  };
 
   const login = async (username, password) => {
     setIsLoading(true);
@@ -1126,12 +1176,12 @@ const deleteAnnouncement = async (announcementId) => {
                 setSidebarOpen={setSidebarOpen}
                 user={user}
                 logout={logout}
-                setData={setData}
                 username={user.username}
                 createHousehold={createHousehold}
                 data={data}
                 inviteMember={inviteMember}
-                setChangingHousehold={setChangingHousehold}
+                joinHousehold={joinHousehold}
+                changeHousehold={changeHousehold}
               />
             }
           >

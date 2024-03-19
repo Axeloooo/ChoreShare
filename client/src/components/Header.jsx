@@ -10,6 +10,7 @@ function Header({
   username,
   createHousehold,
   closeOverlay,
+  joinHousehold,
 }) {
   const location = useLocation();
 
@@ -27,7 +28,12 @@ function Header({
   };
 
   const handleShowJoinHousehold = () => {
-    showOverlay(<JoinHousehold />);
+    showOverlay(
+      <JoinHousehold
+        joinHousehold={joinHousehold}
+        closeOverlay={closeOverlay}
+      />
+    );
   };
 
   return (

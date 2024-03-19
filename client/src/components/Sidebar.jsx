@@ -11,9 +11,8 @@ function Sidebar({
   showOverlay,
   closeOverlay,
   data,
-  setData,
   inviteMember,
-  setChangingHousehold,
+  changeHousehold,
 }) {
   const [selectedOption, setSelectedOption] = useState(() => {
     return data.currentHousehold
@@ -68,13 +67,12 @@ function Sidebar({
     );
 
     if (isConfirmed) {
-      setChangingHousehold(true);
       setSelectedOption(selectedOption);
       const newCurrentHousehold = {
         name: selectedOption.label,
         id: selectedOption.value,
       };
-      setData((prev) => ({ ...prev, currentHousehold: newCurrentHousehold }));
+      changeHousehold(newCurrentHousehold);
     }
   };
 
