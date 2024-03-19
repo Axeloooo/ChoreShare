@@ -22,6 +22,11 @@ function Dashboard({
   const [myChoresProgress, setMyChoresProgress] = useState("");
   const [allChoresProgress, setAllChoresProgress] = useState("");
   const { showOverlay, closeOverlay } = useOutletContext();
+  
+  // Function for showing the edit user overlay
+  const handleEditUser = () => {
+    showOverlay(<EditUser />);
+  }; 
 
   const handleShowCreateAnnouncement = () => {
     showOverlay(
