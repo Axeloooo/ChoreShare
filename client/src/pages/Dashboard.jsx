@@ -17,6 +17,7 @@ function Dashboard({
   createAnnouncement,
   deleteAnnouncement,
   editAnnouncement,
+  deleteEvent,
 }) {
   const [myChoresProgress, setMyChoresProgress] = useState("");
   const [allChoresProgress, setAllChoresProgress] = useState("");
