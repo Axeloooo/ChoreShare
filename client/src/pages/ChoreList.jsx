@@ -44,22 +44,28 @@ function ChoreList({
               <h3>11-17 Feb</h3>
               <p onClick={handleShowCreateChore}>+ Add Chore</p>
             </div>
-            <div className="chore-list">
-              {threeColumns.map((column) => (
-                <div className="column">
-                  {column.map((chore) => (
-                    <ChoreCard
-                      chore={chore}
-                      assignChore={assignChore}
-                      deleteChore={deleteChore}
-                      editChore={editChore}
-                      showOverlay={showOverlay}
-                      closeOverlay={closeOverlay}
-                    />
-                  ))}
-                </div>
-              ))}
-            </div>
+            {data.events.length > 0 ? (
+              <div className="chore-list">
+                {threeColumns.map((column) => (
+                  <div className="column">
+                    {column.map((chore) => (
+                      <ChoreCard
+                        chore={chore}
+                        assignChore={assignChore}
+                        deleteChore={deleteChore}
+                        editChore={editChore}
+                        showOverlay={showOverlay}
+                        closeOverlay={closeOverlay}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="chore-list-empty">
+                <p>Household does not have any chores yet</p>
+              </div>
+            )}
           </div>
         </div>
       ) : (
