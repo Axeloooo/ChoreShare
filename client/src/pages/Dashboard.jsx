@@ -14,6 +14,9 @@ function Dashboard({
   editChoreStatus,
   user,
   userId,
+  createAnnouncement,
+  deleteAnnouncement,
+  editAnnouncement,
   deleteEvent,
 }) {
   const [myChoresProgress, setMyChoresProgress] = useState("");
@@ -21,7 +24,13 @@ function Dashboard({
   const { showOverlay, closeOverlay } = useOutletContext();
 
   const handleShowCreateAnnouncement = () => {
-    showOverlay(<CreateAnnouncement />);
+    showOverlay(
+      <CreateAnnouncement
+        user={user}
+        createAnnouncement={createAnnouncement}
+        closeOverlay={closeOverlay}
+      />
+    );
   };
 
   useEffect(() => {
@@ -120,6 +129,8 @@ function Dashboard({
                         showOverlay={showOverlay}
                         closeOverlay={closeOverlay}
                         userId={userId}
+                        deleteAnnouncement={deleteAnnouncement}
+                        editAnnouncement={editAnnouncement}
                         user={user}
                       />
                     );
