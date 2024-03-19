@@ -99,16 +99,20 @@ function Dashboard({
                 </div>
               ) : (
                 <div className="container-contents">
-                  {data.events.map((event, index) => {
-                    return (
-                      <UpcomingEvent
-                        key={index}
-                        event={event}
-                        userId={userId}
-                        deleteEvent={deleteEvent}
-                      />
-                    );
-                  })}
+                  {data.events
+                    .sort(
+                      (a, b) => new Date(a.startTime) - new Date(b.startTime)
+                    )
+                    .map((event, index) => {
+                      return (
+                        <UpcomingEvent
+                          key={index}
+                          event={event}
+                          userId={userId}
+                          deleteEvent={deleteEvent}
+                        />
+                      );
+                    })}
                 </div>
               )}
             </div>

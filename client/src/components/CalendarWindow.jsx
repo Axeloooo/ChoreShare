@@ -26,6 +26,7 @@ function CalendarWindow({ data }) {
             hour: "2-digit",
             minute: "2-digit",
             hour12: false,
+            timeZone: "UTC",
           }).format(startTime);
 
           const formattedEndTime = endTime
@@ -33,6 +34,7 @@ function CalendarWindow({ data }) {
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: false,
+                timeZone: "UTC",
               }).format(endTime)
             : "";
 
