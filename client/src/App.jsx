@@ -122,6 +122,42 @@ function App() {
     }
   };
 
+  const editUser = async (firstName, lastName, email, phone, closeOverlay) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(`http://localhost:8888/api/v1/user/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          phone: phone,
+        }),
+      });
+
+      if (!res.ok) {
+        const response = await res.json();
+        setIsLoading(false);
+        toast.error(response.message);
+        return;
+      }
+
+      const updatedUser = await res.json();
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      setIsLoading(false);
+      closeOverlay();
+      toast.success("User updated successfully!");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const joinHousehold = async (householdId, closeOverlay) => {
     setIsLoading(true);
     try {
@@ -1182,6 +1218,7 @@ function App() {
                 inviteMember={inviteMember}
                 joinHousehold={joinHousehold}
                 changeHousehold={changeHousehold}
+                editUser={editUser}
               />
             }
           >
