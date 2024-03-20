@@ -125,7 +125,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         .orElseThrow(() -> new AnnouncementNotFoundException("Announcement not found"));
 
     announcement.setMessage(announcementRequest.getMessage());
-    announcement.setUserId(announcementRequest.getUserId());
+    announcement.setAuthor(announcementRequest.getAuthor());
     announcementRepository.save(announcement);
 
     AnnouncementResponse announcementResponse = AnnouncementResponse.builder()

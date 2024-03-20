@@ -938,7 +938,7 @@ function App() {
       });
 
       setIsLoading(false);
-      toast.success("Chore status updated successfully!");
+      toast.success("Announcement updated successfully!");
       closeOverlay();
     } catch (error) {
       console.error(error);
