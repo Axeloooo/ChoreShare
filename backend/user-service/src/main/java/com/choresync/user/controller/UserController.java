@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.choresync.user.model.UserAuthResponse;
+import com.choresync.user.model.UserEditMetadataRequest;
 import com.choresync.user.model.UserRequest;
 import com.choresync.user.model.UserResponse;
 import com.choresync.user.service.UserService;
@@ -59,7 +60,8 @@ public class UserController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<UserResponse> editUser(@PathVariable String id, @RequestBody UserRequest userRequest) {
+  public ResponseEntity<UserResponse> editUser(@PathVariable String id,
+      @RequestBody UserEditMetadataRequest userRequest) {
     UserResponse editedUser = userService.editUser(id, userRequest);
     return new ResponseEntity<>(editedUser, HttpStatus.OK);
   }
