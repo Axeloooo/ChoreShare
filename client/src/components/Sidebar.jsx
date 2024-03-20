@@ -1,8 +1,10 @@
 import "../styles/Sidebar.css";
 import HouseholdMember from "./HouseholdMember";
 import AddMember from "../components/AddMember";
+import EditUser from "../components/EditUser.jsx";
 import Select from "react-select";
 import { useState, useEffect } from "react";
+import { FaPencil } from "react-icons/fa6";
 
 function Sidebar({
   user,
@@ -13,6 +15,7 @@ function Sidebar({
   data,
   inviteMember,
   changeHousehold,
+  editUser,
 }) {
   const [selectedOption, setSelectedOption] = useState(() => {
     return data.currentHousehold
@@ -28,15 +31,6 @@ function Sidebar({
       });
     }
   }, [data.currentHousehold]);
-
-  const members = [
-    { name: "Smith Jhon", username: "smith2849" },
-    { name: "John Doe", username: "jhonny2784" },
-    { name: "Jane Doe", username: "janey2784" },
-    { name: "John Smith", username: "johnny2784" },
-    { name: "Jane Smith", username: "jane2784" },
-    { name: "John Johnson", username: "johnson2784" },
-  ];
 
   const householdOptions = data.households.map((household) => ({
     value: household.id,
@@ -86,6 +80,12 @@ function Sidebar({
     );
   };
 
+  const handleShowEditUser = () => {
+    showOverlay(
+      <EditUser closeOverlay={closeOverlay} user={user} editUser={editUser} />
+    );
+  };
+
   return (
     <div className={sidebarOpen ? "sidebar" : "sidebar closed"}>
       <div className="hamburger-menu" onClick={handleSidebar}>
@@ -100,6 +100,7 @@ function Sidebar({
             </p>
             <p className="username">{user.username}</p>
           </div>
+          <FaPencil className="edit-icon" onClick={handleShowEditUser} />
         </div>
         <div className="user-info">
           <p className="user-email">Email: {user.email}</p>

@@ -15,6 +15,7 @@ function Layout({
   inviteMember,
   joinHousehold,
   changeHousehold,
+  editUser,
 }) {
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [overlayContent, setOverlayContent] = useState(null);
@@ -51,6 +52,7 @@ function Layout({
             data={data}
             inviteMember={inviteMember}
             changeHousehold={changeHousehold}
+            editUser={editUser}
           />
         </>
       ) : null}
