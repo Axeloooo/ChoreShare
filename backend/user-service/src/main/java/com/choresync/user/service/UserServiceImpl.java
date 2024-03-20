@@ -13,6 +13,7 @@ import com.choresync.user.exception.UserAlreadyExistsException;
 import com.choresync.user.exception.UserCreationException;
 import com.choresync.user.exception.UserNotFoundException;
 import com.choresync.user.model.UserAuthResponse;
+import com.choresync.user.model.UserEditMetadataRequest;
 import com.choresync.user.model.UserRequest;
 import com.choresync.user.repository.UserRepository;
 
@@ -125,7 +126,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserResponse editUser(String id, UserRequest userRequest) {
+  public UserResponse editUser(String id, UserEditMetadataRequest userRequest) {
     User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
 
     if (!userRequest.getEmail().equals(user.getEmail())) {
@@ -146,11 +147,8 @@ public class UserServiceImpl implements UserService {
 
     user.setFirstName(userRequest.getFirstName());
     user.setLastName(userRequest.getLastName());
-    user.setUsername(userRequest.getUsername());
     user.setEmail(userRequest.getEmail());
     user.setPhone(userRequest.getPhone());
-    user.setStreak(user.getStreak());
-    user.setMissedChores(user.getMissedChores());
     userRepository.save(user);
 
     UserResponse userResponse = UserResponse.builder()

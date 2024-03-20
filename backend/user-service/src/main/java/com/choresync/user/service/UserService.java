@@ -5,6 +5,7 @@ import com.choresync.user.model.UserResponse;
 import java.util.List;
 
 import com.choresync.user.model.UserAuthResponse;
+import com.choresync.user.model.UserEditMetadataRequest;
 import com.choresync.user.model.UserRequest;
 
 public interface UserService {
@@ -16,7 +17,7 @@ public interface UserService {
 
   void deleteUserById(String id);
 
-  UserResponse editUser(String id, UserRequest userRequest);
+  UserResponse editUser(String id, UserEditMetadataRequest userRequest);
 
   UserAuthResponse getUserByUsername(String username);
 }
