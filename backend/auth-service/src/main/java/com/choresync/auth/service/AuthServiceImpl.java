@@ -12,6 +12,9 @@ import com.choresync.auth.external.request.UserRequest;
 import com.choresync.auth.external.response.UserAuthResponse;
 import com.choresync.auth.model.AuthLoginRequest;
 import com.choresync.auth.model.AuthRegisterRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -50,8 +53,7 @@ public class AuthServiceImpl implements AuthService {
           UserAuthResponse.class);
       return jwtService.generateToken(userResponse.getId());
     } catch (RestClientException e) {
-      throw new AuthInternalCommunicationException(
-          "Failed to create user. " + e.getMessage());
+      throw new AuthInternalCommunicationException(extractErrorMessage(e));
     }
   }
 
@@ -78,5 +80,25 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public void validateToken(String token) {
     jwtService.validateToken(token);
+  }
+
+  private String extractErrorMessage(RestClientException e) {
+    String rawMessage = e.getMessage();
+
+    try {
+      String jsonSubstring = rawMessage.substring(rawMessage.indexOf("{"), rawMessage.lastIndexOf("}") + 1);
+
+      ObjectMapper objectMapper = new ObjectMapper();
+      JsonNode rootNode = objectMapper.readTree(jsonSubstring);
+
+      if (rootNode.has("message")) {
+        return rootNode.get("message").asText();
+      }
+    } catch (JsonProcessingException ex) {
+      System.out.println("Error parsing JSON from exception message: " + ex.getMessage());
+    } catch (StringIndexOutOfBoundsException ex) {
+      System.out.println("Error extracting JSON substring from exception message: " + ex.getMessage());
+    }
+    return rawMessage;
   }
 }
