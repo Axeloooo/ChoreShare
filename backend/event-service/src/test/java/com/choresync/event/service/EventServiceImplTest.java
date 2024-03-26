@@ -21,7 +21,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.context.annotation.Description;
 
 import com.choresync.event.entity.Event;
-import com.choresync.event.exception.EventCreationException;
+import com.choresync.event.exception.EventInvalidBodyException;
 import com.choresync.event.exception.EventNotFoundException;
 import com.choresync.event.model.EventRequest;
 import com.choresync.event.model.EventResponse;
@@ -84,7 +84,7 @@ public class EventServiceImplTest {
   @Description("POST /api/v1/event - Test EventCreationException when creating event")
   @Test
   public void testCreateEventWithNullRequest() {
-    assertThrows(EventCreationException.class, () -> eventService.createEvent(null));
+    assertThrows(EventInvalidBodyException.class, () -> eventService.createEvent(null));
 
     verify(eventRepository, times(0)).save(any(Event.class));
   }

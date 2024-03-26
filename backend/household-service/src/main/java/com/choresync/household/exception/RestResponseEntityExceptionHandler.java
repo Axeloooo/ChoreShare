@@ -14,8 +14,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     super();
   }
 
-  @ExceptionHandler(HouseholdCreationException.class)
-  public ResponseEntity<ErrorResponse> handleHouseholdCreationException(HouseholdCreationException exception) {
+  @ExceptionHandler(HouseholdInvalidBodyException.class)
+  public ResponseEntity<ErrorResponse> handleHouseholdInvalidBodyException(HouseholdInvalidBodyException exception) {
     return new ResponseEntity<>(
         ErrorResponse
             .builder()
@@ -32,5 +32,15 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
             .message(exception.getMessage())
             .build(),
         HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(HouseholdInvalidParamException.class)
+  public ResponseEntity<ErrorResponse> handleHouseholdInvalidParamException(HouseholdInvalidParamException exception) {
+    return new ResponseEntity<>(
+        ErrorResponse
+            .builder()
+            .message(exception.getMessage())
+            .build(),
+        HttpStatus.BAD_REQUEST);
   }
 }

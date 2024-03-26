@@ -6,7 +6,9 @@ import com.choresync.household.model.HouseholdRequest;
 import com.choresync.household.model.HouseholdResponse;
 import com.choresync.household.service.HouseholdService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -41,4 +44,11 @@ public class HouseholdController {
     return new ResponseEntity<>(householdResponses, HttpStatus.OK);
   }
 
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Object> deleteHousehold(@PathVariable("id") String id) {
+    householdService.deleteHousehold(id);
+    Map<String, String> responseBody = new HashMap<>();
+    responseBody.put("message", "Household deleted successfully");
+    return new ResponseEntity<>(responseBody, HttpStatus.OK);
+  }
 }

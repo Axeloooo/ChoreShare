@@ -1,7 +1,6 @@
 package com.choresync.user.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,8 @@ import org.springframework.stereotype.Service;
 import com.choresync.user.model.UserResponse;
 import com.choresync.user.entity.User;
 import com.choresync.user.exception.UserAlreadyExistsException;
-import com.choresync.user.exception.UserCreationException;
+import com.choresync.user.exception.UserInvalidBodyException;
+import com.choresync.user.exception.UserInvalidParamException;
 import com.choresync.user.exception.UserNotFoundException;
 import com.choresync.user.model.UserAuthResponse;
 import com.choresync.user.model.UserEditMetadataRequest;
@@ -23,10 +23,26 @@ public class UserServiceImpl implements UserService {
   @Autowired
   private UserRepository userRepository;
 
+  /*
+   * Create a new user
+   * 
+   * @param userRequest
+   * 
+   * @return UserAuthResponse
+   * 
+   * @throws UserInvalidBodyException
+   * 
+   * @throws UserAlreadyExistsException
+   */
   @Override
   public UserAuthResponse createUser(UserRequest userRequest) {
-    if (userRequest == null) {
-      throw new UserCreationException("Invalid request body");
+    if (userRequest.getFirstName().isBlank() || userRequest.getFirstName() == null ||
+        userRequest.getLastName().isBlank() || userRequest.getLastName() == null ||
+        userRequest.getUsername().isBlank() || userRequest.getUsername() == null ||
+        userRequest.getPassword().isBlank() || userRequest.getPassword() == null ||
+        userRequest.getEmail().isBlank() || userRequest.getEmail() == null ||
+        userRequest.getPhone().isBlank() || userRequest.getPhone() == null) {
+      throw new UserInvalidBodyException("Invalid request body");
     }
 
     User existingUser = userRepository.findByEmail(userRequest.getEmail());
@@ -40,6 +56,14 @@ public class UserServiceImpl implements UserService {
     if (existingUser != null) {
       throw new UserAlreadyExistsException(
           "User with username " + userRequest.getUsername() + " already exists. Please choose a different username.");
+    }
+
+    existingUser = userRepository.findByPhone(userRequest.getPhone());
+
+    if (existingUser != null) {
+      throw new UserAlreadyExistsException(
+          "User with phone number " + userRequest.getPhone()
+              + " already exists. Please choose a different phone number.");
     }
 
     User user = User.builder()
@@ -66,13 +90,14 @@ public class UserServiceImpl implements UserService {
     return authResponse;
   }
 
+  /*
+   * Get all users
+   * 
+   * @return List<UserResponse>
+   */
   @Override
   public List<UserResponse> getAllUsers() {
     List<User> users = userRepository.findAll();
-
-    if (users.isEmpty()) {
-      return Collections.emptyList();
-    }
 
     List<UserResponse> userListResponse = new ArrayList<>();
 
@@ -96,9 +121,25 @@ public class UserServiceImpl implements UserService {
     return userListResponse;
   }
 
+  /*
+   * Get user by id
+   * 
+   * @param id
+   * 
+   * @return UserResponse
+   * 
+   * @throws UserInvalidParamException
+   * 
+   * @throws UserNotFoundException
+   */
   @Override
   public UserResponse getUserById(String id) {
-    User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+    if (id.isBlank() || id == null) {
+      throw new UserInvalidParamException("Invalid request parameter");
+    }
+
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
 
     UserResponse userResponse = UserResponse.builder()
         .id(user.getId())
@@ -116,8 +157,21 @@ public class UserServiceImpl implements UserService {
     return userResponse;
   }
 
+  /*
+   * Delete user by id
+   * 
+   * @param id
+   * 
+   * @throws UserInvalidParamException
+   * 
+   * @throws UserNotFoundException
+   */
   @Override
   public void deleteUserById(String id) {
+    if (id.isBlank() || id == null) {
+      throw new UserInvalidParamException("Invalid request parameter");
+    }
+
     if (!userRepository.existsById(id)) {
       throw new UserNotFoundException("User not found");
     }
@@ -125,15 +179,44 @@ public class UserServiceImpl implements UserService {
     userRepository.deleteById(id);
   }
 
+  /*
+   * Edit user by id
+   * 
+   * @param id
+   * 
+   * @param userRequest
+   * 
+   * @return UserResponse
+   * 
+   * @throws UserInvalidParamException
+   * 
+   * @throws UserInvalidBodyException
+   * 
+   * @throws UserNotFoundException
+   * 
+   * @throws UserAlreadyExistsException
+   */
   @Override
   public UserResponse editUser(String id, UserEditMetadataRequest userRequest) {
-    User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+    if (id.isBlank() || id == null) {
+      throw new UserInvalidParamException("Invalid request parameter");
+    }
+
+    if (userRequest.getFirstName().isBlank() || userRequest.getFirstName() == null ||
+        userRequest.getLastName().isBlank() || userRequest.getLastName() == null ||
+        userRequest.getEmail().isBlank() || userRequest.getEmail() == null ||
+        userRequest.getPhone().isBlank() || userRequest.getPhone() == null) {
+      throw new UserInvalidBodyException("Invalid request body");
+    }
+
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
 
     if (!userRequest.getEmail().equals(user.getEmail())) {
       User existingUser = userRepository.findByEmail(userRequest.getEmail());
 
       if (existingUser != null) {
-        throw new UserAlreadyExistsException("This email address is already in use! Please choose another email.");
+        throw new UserAlreadyExistsException("User with email " + userRequest.getEmail() + " already exists");
       }
     }
 
@@ -141,7 +224,9 @@ public class UserServiceImpl implements UserService {
       User existingUser = userRepository.findByPhone(userRequest.getPhone());
 
       if (existingUser != null) {
-        throw new UserAlreadyExistsException("This phone number is already in use! Please choose another number.");
+        throw new UserAlreadyExistsException(
+            "User with phone number " + userRequest.getPhone()
+                + " already exists. Please choose a different phone number.");
       }
     }
 
@@ -167,8 +252,23 @@ public class UserServiceImpl implements UserService {
     return userResponse;
   }
 
+  /*
+   * Get user by username
+   * 
+   * @param username
+   * 
+   * @return UserAuthResponse
+   * 
+   * @throws UserInvalidParamException
+   * 
+   * @throws UserNotFoundException
+   */
   @Override
   public UserAuthResponse getUserByUsername(String username) {
+    if (username.isBlank() || username == null) {
+      throw new UserInvalidParamException("Invalid request parameter");
+    }
+
     User user = userRepository.findByUsername(username);
 
     if (user == null) {

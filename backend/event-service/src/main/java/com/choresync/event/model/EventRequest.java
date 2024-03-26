@@ -12,16 +12,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventRequest {
-
-  private String householdId;
-
   private String title;
-
-  private String userId;
 
   private String username;
 
   private Date startTime;
 
   private Date endTime;
+
+  private String householdId;
+
+  private String userId;
 }

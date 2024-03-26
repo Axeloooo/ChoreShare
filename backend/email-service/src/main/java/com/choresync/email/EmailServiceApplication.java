@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class EmailServiceApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(EmailServiceApplication.class, args);
 	}
@@ -20,5 +19,4 @@ public class EmailServiceApplication {
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
-
 }

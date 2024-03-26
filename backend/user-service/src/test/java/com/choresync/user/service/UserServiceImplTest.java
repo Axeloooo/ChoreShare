@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Description;
 
 import com.choresync.user.entity.User;
 import com.choresync.user.exception.UserAlreadyExistsException;
-import com.choresync.user.exception.UserCreationException;
+import com.choresync.user.exception.UserInvalidBodyException;
 import com.choresync.user.exception.UserNotFoundException;
 import com.choresync.user.model.UserAuthResponse;
 import com.choresync.user.model.UserRequest;
@@ -105,7 +105,7 @@ class UserServiceImplTest {
   @Description("POST /api/v1/user - Test UserCreationException")
   @Test
   public void testUserCreationException() {
-    assertThrows(UserCreationException.class, () -> userService.createUser(null));
+    assertThrows(UserInvalidBodyException.class, () -> userService.createUser(null));
 
     verify(userRepository, times(0)).findByEmail(anyString());
     verify(userRepository, times(0)).save(any(User.class));

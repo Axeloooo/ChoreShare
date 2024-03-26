@@ -21,7 +21,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.context.annotation.Description;
 
 import com.choresync.household.entity.Household;
-import com.choresync.household.exception.HouseholdCreationException;
+import com.choresync.household.exception.HouseholdInvalidBodyException;
 import com.choresync.household.exception.HouseholdNotFoundException;
 import com.choresync.household.model.HouseholdRequest;
 import com.choresync.household.model.HouseholdResponse;
@@ -80,7 +80,7 @@ public class HouseholdServiceImplTest {
   @Description("POST /api/v1/household - Test HouseholdCreationException when household request is null")
   @Test
   public void testCreateHouseholdWithNullRequest() {
-    assertThrows(HouseholdCreationException.class, () -> householdService.createHousehold(null));
+    assertThrows(HouseholdInvalidBodyException.class, () -> householdService.createHousehold(null));
 
     verify(householdRepository, times(0)).save(any(Household.class));
   }

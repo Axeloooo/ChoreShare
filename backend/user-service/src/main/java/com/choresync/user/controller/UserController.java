@@ -38,17 +38,20 @@ public class UserController {
 
   @GetMapping
   public ResponseEntity<List<UserResponse>> getAllUsers() {
-    return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
+    List<UserResponse> users = userService.getAllUsers();
+    return new ResponseEntity<>(users, HttpStatus.OK);
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<UserResponse> getUserById(@PathVariable("id") String id) {
-    return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
+    UserResponse userResponse = userService.getUserById(id);
+    return new ResponseEntity<>(userResponse, HttpStatus.OK);
   }
 
   @GetMapping("/username/{username}")
   public ResponseEntity<UserAuthResponse> getUserByUsername(@PathVariable("username") String username) {
-    return new ResponseEntity<>(userService.getUserByUsername(username), HttpStatus.OK);
+    UserAuthResponse userAuthResponse = userService.getUserByUsername(username);
+    return new ResponseEntity<>(userAuthResponse, HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")

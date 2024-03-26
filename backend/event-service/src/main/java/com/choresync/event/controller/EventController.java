@@ -1,6 +1,8 @@
 package com.choresync.event.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,14 +27,14 @@ public class EventController {
 
   @PostMapping
   public ResponseEntity<EventResponse> createEvent(@RequestBody EventRequest eventRequest) {
-    EventResponse event = eventService.createEvent(eventRequest);
-    return new ResponseEntity<>(event, HttpStatus.CREATED);
+    EventResponse eventResponse = eventService.createEvent(eventRequest);
+    return new ResponseEntity<>(eventResponse, HttpStatus.CREATED);
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<EventResponse> getEventById(@PathVariable("id") String id) {
-    EventResponse event = eventService.getEventById(id);
-    return new ResponseEntity<>(event, HttpStatus.OK);
+    EventResponse eventResponse = eventService.getEventById(id);
+    return new ResponseEntity<>(eventResponse, HttpStatus.OK);
   }
 
   @GetMapping("/household/{hid}")
@@ -41,9 +43,17 @@ public class EventController {
     return new ResponseEntity<>(events, HttpStatus.OK);
   }
 
+  @GetMapping("/user/{uid}")
+  public ResponseEntity<List<EventResponse>> getAllEventsByUserId(@PathVariable("uid") String userId) {
+    List<EventResponse> events = eventService.getAllEventsByUserId(userId);
+    return new ResponseEntity<>(events, HttpStatus.OK);
+  }
+
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteEvent(@PathVariable("id") String id) {
+  public ResponseEntity<Object> deleteEvent(@PathVariable("id") String id) {
     eventService.deleteEvent(id);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    Map<String, String> responseBody = new HashMap<>();
+    responseBody.put("message", "Announcement deleted successfully");
+    return new ResponseEntity<>(responseBody, HttpStatus.OK);
   }
 }

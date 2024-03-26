@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.choresync.household.entity.Household;
-import com.choresync.household.exception.HouseholdCreationException;
+import com.choresync.household.exception.HouseholdInvalidBodyException;
+import com.choresync.household.exception.HouseholdInvalidParamException;
 import com.choresync.household.exception.HouseholdNotFoundException;
 import com.choresync.household.model.HouseholdRequest;
 import com.choresync.household.model.HouseholdResponse;
@@ -18,19 +19,30 @@ public class HouseholdServiceImpl implements HouseholdService {
   @Autowired
   private HouseholdRepository householdRepository;
 
+  /*
+   * This method creates a household
+   * 
+   * @param householdRequest
+   * 
+   * @return HouseholdResponse
+   * 
+   * @throws HouseholdInvalidBodyException
+   */
   @Override
   public HouseholdResponse createHousehold(HouseholdRequest householdRequest) {
-    if (householdRequest.getName() == null) {
-      throw new HouseholdCreationException("Invalid request body");
+    if (householdRequest.getName().isBlank() || householdRequest.getName() == null) {
+      throw new HouseholdInvalidBodyException("Invalid request body");
     }
 
-    Household household = Household.builder()
+    Household household = Household
+        .builder()
         .name(householdRequest.getName())
         .build();
 
     Household newHousehold = householdRepository.save(household);
 
-    HouseholdResponse householdResponse = HouseholdResponse.builder()
+    HouseholdResponse householdResponse = HouseholdResponse
+        .builder()
         .id(newHousehold.getId())
         .name(newHousehold.getName())
         .createdAt(newHousehold.getCreatedAt())
@@ -40,8 +52,23 @@ public class HouseholdServiceImpl implements HouseholdService {
     return householdResponse;
   }
 
+  /*
+   * This method returns a household by id
+   * 
+   * @param id
+   * 
+   * @return HouseholdResponse
+   * 
+   * @throws HouseholdInvalidParamException
+   * 
+   * @throws HouseholdNotFoundException
+   */
   @Override
   public HouseholdResponse getHouseholdById(String id) {
+    if (id.isBlank() || id == null) {
+      throw new HouseholdInvalidParamException("Invalid requets parameter");
+    }
+
     Household household = householdRepository.findById(id)
         .orElseThrow(() -> new HouseholdNotFoundException("Household not found"));
 
@@ -55,6 +82,11 @@ public class HouseholdServiceImpl implements HouseholdService {
     return householdResponse;
   }
 
+  /*
+   * This method returns a list of all households
+   * 
+   * @return List<HouseholdResponse>
+   */
   @Override
   public List<HouseholdResponse> getAllHouseholds() {
     List<Household> households = householdRepository.findAll();
@@ -73,5 +105,27 @@ public class HouseholdServiceImpl implements HouseholdService {
     }
 
     return householdResponses;
+  }
+
+  /*
+   * This method deletes a household by id
+   * 
+   * @param id
+   * 
+   * @throws HouseholdInvalidParamException
+   * 
+   * @throws HouseholdNotFoundException
+   */
+  @Override
+  public void deleteHousehold(String id) {
+    if (id.isBlank() || id == null) {
+      throw new HouseholdInvalidParamException("Invalid requets parameter");
+    }
+
+    if (!householdRepository.existsById(id)) {
+      throw new HouseholdNotFoundException("Household not found");
+    }
+
+    householdRepository.deleteById(id);
   }
 }

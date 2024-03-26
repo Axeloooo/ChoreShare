@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AnnouncementResponse {
-
   private String id;
 
   private String householdId;
@@ -26,5 +25,4 @@ public class AnnouncementResponse {
   private Date createdAt;
 
   private Date updatedAt;
-
 }

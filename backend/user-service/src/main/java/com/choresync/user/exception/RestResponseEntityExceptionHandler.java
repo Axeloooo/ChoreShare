@@ -14,8 +14,18 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     super();
   }
 
-  @ExceptionHandler(UserCreationException.class)
-  public ResponseEntity<ErrorResponse> handleUserCreationException(UserCreationException exception) {
+  @ExceptionHandler(UserInvalidParamException.class)
+  public ResponseEntity<ErrorResponse> handleUserInvalidParamException(UserInvalidParamException exception) {
+    return new ResponseEntity<>(
+        ErrorResponse
+            .builder()
+            .message(exception.getMessage())
+            .build(),
+        HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(UserInvalidBodyException.class)
+  public ResponseEntity<ErrorResponse> handleUserInvalidBodyException(UserInvalidBodyException exception) {
     return new ResponseEntity<>(
         ErrorResponse
             .builder()
