@@ -1,6 +1,5 @@
 package com.choresync.auth.exception;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -34,16 +33,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
             .message(exception.getMessage())
             .build(),
         HttpStatus.BAD_REQUEST);
-  }
-
-  @ExceptionHandler(AuthenticationException.class)
-  protected ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException exception) {
-    return new ResponseEntity<>(
-        ErrorResponse
-            .builder()
-            .message(exception.getMessage())
-            .build(),
-        HttpStatus.UNAUTHORIZED);
   }
 
   @ExceptionHandler(AuthInternalCommunicationException.class)
