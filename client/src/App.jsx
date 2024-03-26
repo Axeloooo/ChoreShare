@@ -30,15 +30,9 @@ function App() {
   );
   const navigate = useNavigate();
 
-  console.log(data);
-  console.log(user);
-  console.log(userId);
-  console.log(token);
-
   useEffect(() => {
     if (!token) return;
     const validateToken = async () => {
-      console.log("checking token");
       const res = await fetch(
         `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/auth/validate?token=${token}`,
         {
@@ -55,6 +49,7 @@ function App() {
       }
 
       logout();
+      toast.warn("Oops. You've been logged out.");
     };
 
     validateToken();
@@ -63,13 +58,11 @@ function App() {
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
     if (storedUserId) {
-      console.log("storedUserId", storedUserId);
       setUserId(JSON.parse(storedUserId));
     }
 
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
-      console.log("storedToken", storedToken);
       setToken(storedToken);
     }
   }, []);
@@ -94,11 +87,20 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log("fetching data");
       if (userId && token && (loginSuccess || registerSuccess)) {
         try {
-          await fetchUser(userId, token);
-          await fetchHousehold();
+          const fetchUserSuccess = await fetchUser(userId, token);
+          if (!fetchUserSuccess) {
+            setIsLoading(false);
+            toast.error("Oops, something went wrong. Please try again later.");
+            return;
+          }
+          const fetchHouseholdSuccess = await fetchHousehold();
+          if (!fetchHouseholdSuccess) {
+            setIsLoading(false);
+            toast.error("Oops, something went wrong. Please try again later.");
+            return;
+          }
 
           if (loginSuccess) {
             setIsLoading(false);
@@ -137,14 +139,14 @@ function App() {
       if (!res.ok) {
         const response = await res.json();
         console.log(response);
-        return;
+        return false;
       }
 
       const data = await res.json();
       setUser(data);
       localStorage.setItem("user", JSON.stringify(data));
 
-      fetchHousehold(userId);
+      return true;
     } catch (error) {
       console.error(error);
     }
@@ -212,8 +214,6 @@ function App() {
       const newHousehold = await res.json();
       const fetchSuccess = await fetchHouseholdById(newHousehold.id);
 
-      console.log("fetchSuccess", fetchSuccess);
-
       if (fetchSuccess) {
         setIsLoading(false);
         toast.success("You've successfully joined a household!");
@@ -272,7 +272,7 @@ function App() {
       if (!householdRes.ok) {
         const response = await householdRes.json();
         console.log(response);
-        return;
+        return false;
       }
 
       const householdData = await householdRes.json();
@@ -291,7 +291,7 @@ function App() {
       if (!choresRes.ok) {
         const response = await choresRes.json();
         console.log(response);
-        return;
+        return false;
       }
 
       const allChoresData = await choresRes.json();
@@ -314,7 +314,7 @@ function App() {
       if (!membersRes.ok) {
         const response = await membersRes.json();
         console.log(response);
-        return;
+        return false;
       }
 
       const membersData = await membersRes.json();
@@ -333,7 +333,7 @@ function App() {
       if (!announcementsRes.ok) {
         const response = await announcementsRes.json();
         console.log(response);
-        return;
+        return false;
       }
 
       const announcementsData = await announcementsRes.json();
@@ -352,7 +352,7 @@ function App() {
       if (!eventsRes.ok) {
         const response = await eventsRes.json();
         console.log(response);
-        return;
+        return false;
       }
 
       const eventsData = await eventsRes.json();
@@ -369,6 +369,7 @@ function App() {
       setData(fetchedData);
 
       localStorage.setItem("data", JSON.stringify(fetchedData));
+
       return true;
     } catch (error) {
       console.error(error);
@@ -377,7 +378,6 @@ function App() {
   };
 
   const fetchHousehold = async () => {
-    console.log("fetching household");
     try {
       const householdRes = await fetch(
         `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/userhousehold/user/${userId}`,
@@ -393,7 +393,7 @@ function App() {
       if (!householdRes.ok) {
         const response = await householdRes.json();
         console.log(response);
-        return;
+        return !householdRes.ok;
       }
 
       const householdsData = (await householdRes.json()).map(
@@ -401,7 +401,6 @@ function App() {
       );
 
       if (householdsData.length > 0) {
-        console.log("householdsData has length");
         const choresRes = await fetch(
           `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/household/${householdsData[0].id}`,
           {
@@ -416,7 +415,7 @@ function App() {
         if (!choresRes.ok) {
           const response = await choresRes.json();
           console.log(response);
-          return;
+          return false;
         }
 
         const allChoresData = await choresRes.json();
@@ -439,7 +438,7 @@ function App() {
         if (!membersRes.ok) {
           const response = await membersRes.json();
           console.log(response);
-          return;
+          return false;
         }
 
         const membersData = await membersRes.json();
@@ -458,7 +457,7 @@ function App() {
         if (!announcementsRes.ok) {
           const response = await announcementsRes.json();
           console.log(response);
-          return;
+          return false;
         }
 
         const announcementsData = await announcementsRes.json();
@@ -477,7 +476,7 @@ function App() {
         if (!eventsRes.ok) {
           const response = await eventsRes.json();
           console.log(response);
-          return;
+          return false;
         }
 
         const eventsData = await eventsRes.json();
@@ -494,6 +493,8 @@ function App() {
         setData(fetchedData);
 
         localStorage.setItem("data", JSON.stringify(fetchedData));
+
+        return true;
       } else {
         console.log("householdsData has no length");
         const fetchedData = {
@@ -508,6 +509,8 @@ function App() {
         setData(fetchedData);
 
         localStorage.setItem("data", JSON.stringify(fetchedData));
+
+        return true;
       }
     } catch (error) {
       console.error(error);
@@ -534,7 +537,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        console.log(response);
+        toast.error(response.message);
         return;
       }
 
@@ -592,7 +595,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        console.log(response);
+        toast.error(response.message);
         return;
       }
 
@@ -635,7 +638,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        console.log(response);
+        toast.error(response.message);
         return;
       }
 
@@ -682,7 +685,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        console.log(response);
+        toast.error(response.message);
         return;
       }
 
@@ -731,7 +734,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        console.log(response);
+        toast.error(response.message);
         return;
       }
 
@@ -791,7 +794,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        console.log(response);
+        toast.error(response.message);
         return;
       }
 
@@ -845,7 +848,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        console.log(response);
+        toast.error(response.message);
         return;
       }
 
@@ -901,7 +904,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        console.log(response);
+        toast.error(response.message);
         return;
       }
 
@@ -959,7 +962,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        console.log(response);
+        toast.error(response.message);
         return;
       }
 
@@ -1007,7 +1010,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        console.log(response);
+        toast.error(response.message);
         return;
       }
 
@@ -1059,7 +1062,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        console.log(response);
+        toast.error(response.message);
         return;
       }
 
@@ -1102,7 +1105,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
-        console.log(response);
+        toast.error(response.message);
         return;
       }
 
@@ -1145,27 +1148,23 @@ function App() {
 
       if (!res.ok) {
         setIsLoading(false);
-        const response = await res.json();
         if (res.status === 401) {
           toast.error("Invalid credentials. Please try again.");
         }
-        console.log(response);
         return;
       }
 
-      const token = await res.text();
-      localStorage.setItem("token", token);
-      setToken(token);
+      const token = await res.json();
+      localStorage.setItem("token", token.token);
+      setToken(token.token);
 
-      const decoded = jwtDecode(token);
+      const decoded = jwtDecode(token.token);
       localStorage.setItem("userId", JSON.stringify(decoded.sub));
       setUserId(decoded.sub);
 
       setLoginSuccess(true);
       fetchUser(decoded.sub);
     } catch (error) {
-      setIsLoading(false);
-      toast.error(error);
       console.error(error);
     }
   };
@@ -1200,15 +1199,14 @@ function App() {
         setIsLoading(false);
         const response = await res.json();
         toast.error(response.message);
-        console.log(response);
         return;
       }
 
-      const token = await res.text();
-      localStorage.setItem("token", token);
-      setToken(token);
+      const token = await res.json();
+      localStorage.setItem("token", token.token);
+      setToken(token.token);
 
-      const decoded = jwtDecode(token);
+      const decoded = jwtDecode(token.token);
       localStorage.setItem("userId", JSON.stringify(decoded.sub));
       setUserId(decoded.sub);
     } catch (error) {
