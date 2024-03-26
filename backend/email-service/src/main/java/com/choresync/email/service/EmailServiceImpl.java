@@ -95,7 +95,7 @@ public class EmailServiceImpl implements EmailService {
     String htmlMessage = String.format("<h1>Hi there!</h1>" +
         "<p>You have been invited to join a household on ChoreSync!</p>" +
         "<p>Click the link below to create an account:</p>" +
-        "<a href='http://localhost:3000/register' style='background-color:#3498FF; color: white; padding: 10px 18px; text-align: center; text-decoration: none; display: inline-block; margin: 10px 0 10px 0;'>Join ChoreSync</a>"
+        "<a href='https://choreshare.netlify.app/register' style='background-color:#3498FF; color: white; padding: 10px 18px; text-align: center; text-decoration: none; display: inline-block; margin: 10px 0 10px 0;'>Join ChoreSync</a>"
         +
         "<p>Use the following code to join the household:</p>" +
         "<strong>%s</strong>",
