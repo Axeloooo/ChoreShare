@@ -22,6 +22,7 @@ services:
       POSTGRES_PASSWORD: root
     volumes:
       - db:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   pgadmin4:
     container_name: pgadmin4
