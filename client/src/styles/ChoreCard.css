@@ -1,59 +1,82 @@
-
-.chore-card{
-    background: white;
-    border: 1px solid var(--lightgrey); 
-    padding: 1rem 0;
-    border-radius: 0.3rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: fit-content;
+.chore-card {
+  background: white;
+  border: 1px solid var(--lightgrey);
+  padding: 1rem 0;
+  border-radius: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: fit-content;
 }
 
-.chore-content{
-    width: 85%;
+.chore-content {
+  width: 85%;
 }
 
-.chore-card-header{
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: fit-content;
-    margin-bottom: 1.2rem;
+.chore-card-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: fit-content;
+  margin-bottom: 1.2rem;
 }
-.chore-card-header h3{
-    font-size: 0.9rem;
-    font-weight: 400;
-    color: var(--blackgrey);
-}
-
-.chore-card-header p{
-    font-size: 0.6rem;
-    color: var(--blackgrey);
-    padding: 0.3rem 0.4rem;
-    border-radius: 0.2rem;
-    background: rgba(217, 217, 217, 0.6);
-    cursor: pointer;
+.chore-card-header h3 {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--blackgrey);
 }
 
-.chore-card-header p:hover{
-    background: rgba(217, 217, 217, 0.8);
+.chore-card-header button {
+  font-size: 0.6rem;
+  color: var(--blackgrey);
+  border: none;
+  padding: 0.3rem 0.4rem;
+  border-radius: 0.2rem;
+  background: rgba(217, 217, 217, 0.5);
+  cursor: pointer;
 }
 
-.comment{
-    font-size: 0.7rem;
-    margin-bottom: 1.2rem;
+.chore-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8rem;
 }
 
-.chore-tags{
-    display: flex;
-    gap: 0.8rem;
+.chore-actions .icon {
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--blackgrey);
 }
 
-.chore-tags p{
-    font-size: 0.6rem;
-    padding: 0.3rem 0.4rem;
-    border-radius: 0.2rem;
+.chore-card-header .disabled {
+  background: rgb(217, 217, 217);
+  cursor: not-allowed;
+}
+
+.chore-card-header button:hover {
+  background: rgb(217, 217, 217);
+}
+
+.chore-card-header .disabled:hover {
+  background: rgb(217, 217, 217);
+  cursor: not-allowed;
+}
+
+.comment {
+  font-size: 0.7rem;
+  margin-bottom: 1.2rem;
+}
+
+.chore-tags {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.chore-tags p {
+  font-size: 0.6rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: 0.2rem;
 }

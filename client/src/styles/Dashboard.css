@@ -185,7 +185,7 @@
   gap: 1rem;
 }
 
-.edit {
+.icon {
   font-size: 0.8rem;
   cursor: pointer;
 }
@@ -226,15 +226,20 @@
   margin-top: 0.5rem;
 }
 
-.announcement-container .delete-btn {
+.announcement-container .buttons {
+  display: flex;
+  gap: 1rem;
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+}
+
+.announcement-container .buttons button {
   background: none;
   border: none;
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  font-size: 0.7rem;
-  color: var(--darkgrey);
+  font-size: 0.8rem;
   cursor: pointer;
+  color: var(--darkgrey);
 }
 
 /* Upcoming Events Container */
@@ -297,9 +302,25 @@
 
 .upcoming-event-container .right-container {
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+  color: black;
+}
+
+.upcoming-event-container .right-container .user {
+  display: flex;
   align-items: center;
   gap: 0.5rem;
   color: black;
+}
+
+.upcoming-event-container .right-container button {
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--darkgrey);
 }
 
 .upcoming-event-container .identifier {

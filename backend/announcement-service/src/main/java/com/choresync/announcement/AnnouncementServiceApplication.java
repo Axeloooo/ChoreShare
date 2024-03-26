@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class AnnouncementServiceApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(AnnouncementServiceApplication.class, args);
 	}
@@ -20,5 +19,4 @@ public class AnnouncementServiceApplication {
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
-
 }

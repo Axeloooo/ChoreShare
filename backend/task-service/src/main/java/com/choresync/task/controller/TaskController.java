@@ -1,6 +1,8 @@
 package com.choresync.task.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,8 +48,8 @@ public class TaskController {
   }
 
   @GetMapping("/household/{hid}")
-  public ResponseEntity<List<TaskResponse>> getAllTasksByHousehold(@PathVariable("hid") String householdId) {
-    List<TaskResponse> tasks = taskService.getAllTasksByHousehold(householdId);
+  public ResponseEntity<List<TaskResponse>> getAllTasksByHouseholdId(@PathVariable("hid") String householdId) {
+    List<TaskResponse> tasks = taskService.getAllTasksByHouseholdId(householdId);
     return new ResponseEntity<>(tasks, HttpStatus.OK);
   }
 
@@ -58,7 +60,7 @@ public class TaskController {
     return new ResponseEntity<>(task, HttpStatus.OK);
   }
 
-  @PutMapping("/{id}/assignee/{uid}")
+  @PutMapping("/{id}/assign/{uid}")
   public ResponseEntity<TaskResponse> assignTask(@PathVariable("id") String id,
       @PathVariable("uid") String userId) {
     TaskResponse task = taskService.assignTask(id, userId);
@@ -80,8 +82,10 @@ public class TaskController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<String> deleteTask(@PathVariable("id") String id) {
+  public ResponseEntity<Object> deleteTask(@PathVariable("id") String id) {
     taskService.deleteTask(id);
-    return new ResponseEntity<>("Task deleted successfully", HttpStatus.OK);
+    Map<String, String> responseBody = new HashMap<>();
+    responseBody.put("message", "Task deleted successfully");
+    return new ResponseEntity<>(responseBody, HttpStatus.OK);
   }
 }

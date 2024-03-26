@@ -2,13 +2,17 @@ package com.choresync.userhousehold.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.choresync.userhousehold.model.GetMembersResponse;
 import com.choresync.userhousehold.model.UserhouseholdRequest;
 import com.choresync.userhousehold.model.UserhouseholdResponse;
+import com.choresync.userhousehold.model.UserhouseholdResponse.Household;
 import com.choresync.userhousehold.service.UserhouseholdService;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,17 +49,25 @@ public class UserhouseholdController {
   }
 
   @GetMapping("/household/{hid}")
-  public ResponseEntity<List<UserhouseholdResponse>> getUserhouseholdsByHouseholdId(
+  public ResponseEntity<List<GetMembersResponse>> getUserhouseholdsByHouseholdId(
       @PathVariable("hid") String householdId) {
-    List<UserhouseholdResponse> userhouseholdResponse = userhouseholdService
+    List<GetMembersResponse> userhouseholdResponse = userhouseholdService
         .getUserhouseholdsByHouseholdId(householdId);
     return new ResponseEntity<>(userhouseholdResponse, HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<String> deleteUserhouseholdById(@PathVariable("id") String id) {
+  public ResponseEntity<Map<String, String>> deleteUserhouseholdById(@PathVariable("id") String id) {
     userhouseholdService.deleteUserhouseholdById(id);
+    Map<String, String> responseBody = new HashMap<>();
+    responseBody.put("message", "Userhousehold successfully deleted");
+    return new ResponseEntity<>(responseBody, HttpStatus.OK);
+  }
 
-    return new ResponseEntity<>("Userhousehold with id " + id + " has been deleted", HttpStatus.OK);
+  @PostMapping("/join/{hid}/user/{uid}")
+  public ResponseEntity<Household> joinHouseHold(@PathVariable("uid") String userId,
+      @PathVariable("hid") String houseId) {
+    Household userhouseholdResponse = userhouseholdService.joinHouseHold(userId, houseId);
+    return new ResponseEntity<>(userhouseholdResponse, HttpStatus.OK);
   }
 }

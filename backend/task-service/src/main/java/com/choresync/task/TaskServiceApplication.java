@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class TaskServiceApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(TaskServiceApplication.class, args);
 	}
@@ -20,5 +19,4 @@ public class TaskServiceApplication {
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
-
 }

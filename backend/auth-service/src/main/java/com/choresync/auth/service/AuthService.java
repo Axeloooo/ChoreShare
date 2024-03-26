@@ -1,12 +1,18 @@
 package com.choresync.auth.service;
 
+import org.springframework.web.client.RestClientException;
+
 import com.choresync.auth.model.AuthLoginRequest;
 import com.choresync.auth.model.AuthRegisterRequest;
+import com.choresync.auth.model.AuthTokenResponse;
+import com.choresync.auth.model.AuthValidateResponse;
 
 public interface AuthService {
-  String registerUser(AuthRegisterRequest authRequest);
+  String extractErrorMessage(RestClientException e);
 
-  String loginUser(AuthLoginRequest authRequest);
+  AuthTokenResponse registerUser(AuthRegisterRequest authRequest);
 
-  void validateToken(String token);
+  AuthTokenResponse loginUser(AuthLoginRequest authRequest);
+
+  AuthValidateResponse validateToken(String token);
 }

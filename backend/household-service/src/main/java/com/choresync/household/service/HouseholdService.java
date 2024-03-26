@@ -13,4 +13,5 @@ public interface HouseholdService {
 
   List<HouseholdResponse> getAllHouseholds();
 
+  void deleteHousehold(String id);
 }

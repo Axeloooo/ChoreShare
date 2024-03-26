@@ -10,12 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AnnouncementRequest {
-
   private String message;
 
-  private String householdId;
-
   private String author;
+
+  private String householdId;
 
   private String userId;
 }

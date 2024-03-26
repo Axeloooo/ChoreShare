@@ -9,7 +9,7 @@ import com.choresync.event.entity.Event;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, String> {
-
   List<Event> findByHouseholdId(String householdId);
 
+  List<Event> findByUserId(String userId);
 }

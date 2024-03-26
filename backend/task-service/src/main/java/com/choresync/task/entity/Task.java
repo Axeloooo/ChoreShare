@@ -31,6 +31,9 @@ public class Task {
 
   private String title;
 
+  @Column(name = "user_id")
+  private String userId;
+
   @Column(name = "household_id")
   private String householdId;
 
@@ -44,8 +47,6 @@ public class Task {
 
   @Enumerated(EnumType.STRING)
   private Tag tag;
-
-  private String userId;
 
   @CreationTimestamp
   @Column(name = "created_at")

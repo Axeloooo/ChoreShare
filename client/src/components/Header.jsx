@@ -4,19 +4,39 @@ import { FaArrowRightToBracket } from "react-icons/fa6";
 import CreateHousehold from "./CreateHousehold";
 import JoinHousehold from "./JoinHousehold";
 
-function Header({ logout, showOverlay }) {
+function Header({
+  logout,
+  showOverlay,
+  username,
+  createHousehold,
+  closeOverlay,
+  joinHousehold,
+}) {
   const location = useLocation();
 
   const handleLogout = () => {
-    logout();
+    const answer = window.confirm("Are you sure you want to log out?");
+    if (answer) {
+      logout();
+    }
   };
 
   const handleShowCreateHousehold = () => {
-    showOverlay(<CreateHousehold />);
+    showOverlay(
+      <CreateHousehold
+        createHousehold={createHousehold}
+        closeOverlay={closeOverlay}
+      />
+    );
   };
 
   const handleShowJoinHousehold = () => {
-    showOverlay(<JoinHousehold />);
+    showOverlay(
+      <JoinHousehold
+        joinHousehold={joinHousehold}
+        closeOverlay={closeOverlay}
+      />
+    );
   };
 
   return (
@@ -58,7 +78,7 @@ function Header({ logout, showOverlay }) {
           </button>
         </div>
         <div className="user-auth">
-          <p className="auth-username">podgaietska9038</p>
+          <p className="auth-username">{username}</p>
           <FaArrowRightToBracket className="exit-icon" onClick={handleLogout} />
         </div>
       </div>

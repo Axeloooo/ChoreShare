@@ -22,7 +22,7 @@ import com.choresync.task.entity.Frequency;
 import com.choresync.task.entity.Status;
 import com.choresync.task.entity.Tag;
 import com.choresync.task.entity.Task;
-import com.choresync.task.exception.TaskCreationException;
+import com.choresync.task.exception.TaskInvalidBodyException;
 import com.choresync.task.exception.TaskNotFoundException;
 import com.choresync.task.exception.TaskUnforbiddenActionException;
 import com.choresync.task.model.TaskEditMetadataRequest;
@@ -98,7 +98,7 @@ public class TaskServiceImplTest {
   @Description("POST /api/v1/task - Test TaskCreationException when creating task")
   @Test
   public void testCreateTaskWithNullRequest() {
-    assertThrows(TaskCreationException.class, () -> taskService.createTask(null));
+    assertThrows(TaskInvalidBodyException.class, () -> taskService.createTask(null));
 
     verify(taskRepository, times(0)).save(any(Task.class));
   }
@@ -305,7 +305,7 @@ public class TaskServiceImplTest {
   void updateTask_invalidRequest_throwsException() {
     TaskEditMetadataRequest taskRequest = new TaskEditMetadataRequest(null, null, null, null);
 
-    assertThrows(TaskCreationException.class, () -> {
+    assertThrows(TaskInvalidBodyException.class, () -> {
       taskService.updateTask("1", taskRequest);
     });
 
@@ -318,7 +318,7 @@ public class TaskServiceImplTest {
   void updateTaskStatus_invalidRequest_throwsException() {
     TaskEditStatusRequest taskRequest = new TaskEditStatusRequest(null, null);
 
-    assertThrows(TaskCreationException.class, () -> {
+    assertThrows(TaskInvalidBodyException.class, () -> {
       taskService.updateTaskStatus("1", taskRequest);
     });
 

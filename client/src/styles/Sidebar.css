@@ -38,6 +38,7 @@
   align-items: flex-start;
   width: fit-content;
   margin-bottom: 1.3rem;
+  gap: 0.7rem;
 }
 
 .user-identifier {
@@ -45,7 +46,6 @@
   height: 1rem;
   width: 1rem;
   border-radius: 50%;
-  margin-right: 0.7rem;
   margin-top: 0.3rem;
 }
 
@@ -70,17 +70,39 @@
   margin-top: 0.6rem;
 }
 
+.edit-icon {
+  font-size: 0.9rem;
+  color: var(--darkgrey);
+  cursor: pointer;
+  margin-top: 0.2rem;
+}
+
 .household-container {
   width: 100%;
   height: 75%;
+  position: relative;
+}
+
+.add-member-btn {
+  position: absolute;
+  bottom: 0.7rem;
+  right: 0.5rem;
+  border: none;
+  background: rgba(166, 166, 166, 0.2);
+  color: rgb(166, 166, 166);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  font-size: 1.5rem;
+  border-radius: 50%;
 }
 
 .household-container-header {
   height: fit-content;
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 1.5rem 1rem;
 }
 
@@ -97,8 +119,8 @@
 
 .members-list {
   width: 100%;
-  height: 85%;
-  overflow-y: visible;
+  height: 80%;
+  overflow-y: auto;
   padding: 0 1rem;
   display: flex;
   flex-direction: column;
@@ -169,4 +191,21 @@
   margin-bottom: 1rem;
   margin-top: 1rem;
   text-align: center;
+}
+
+/* No members container */
+
+.household-empty {
+  width: 100%;
+  height: 75%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1.5rem;
+}
+
+.household-empty p {
+  text-align: center;
+  color: var(--darkgrey);
 }

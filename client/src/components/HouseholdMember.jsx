@@ -1,4 +1,4 @@
-function HouseholdMember({ key, index, name, username }) {
+function HouseholdMember({ key, index, member }) {
   return (
     <div className="member-container">
       <div
@@ -6,8 +6,10 @@ function HouseholdMember({ key, index, name, username }) {
         style={{ backgroundColor: `var(--user-${index})` }}
       ></div>
       <div className="member-info">
-        <p className="fullname">{name}</p>
-        <p className="username">{username}</p>
+        <p className="fullname">
+          {member.user.firstName} {member.user.lastName}
+        </p>
+        <p className="username">{member.user.username}</p>
       </div>
     </div>
   );

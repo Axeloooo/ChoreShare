@@ -2,12 +2,15 @@ package com.choresync.task.service;
 
 import java.util.List;
 
+import org.springframework.web.client.RestClientException;
+
 import com.choresync.task.model.TaskEditMetadataRequest;
 import com.choresync.task.model.TaskEditStatusRequest;
 import com.choresync.task.model.TaskRequest;
 import com.choresync.task.model.TaskResponse;
 
 public interface TaskService {
+  String extractErrorMessage(RestClientException e);
 
   TaskResponse createTask(TaskRequest taskRequest);
 
@@ -15,7 +18,7 @@ public interface TaskService {
 
   List<TaskResponse> getAllTasksByUserId(String userId);
 
-  List<TaskResponse> getAllTasksByHousehold(String householdId);
+  List<TaskResponse> getAllTasksByHouseholdId(String householdId);
 
   TaskResponse updateTask(String id, TaskEditMetadataRequest taskRequest);
 

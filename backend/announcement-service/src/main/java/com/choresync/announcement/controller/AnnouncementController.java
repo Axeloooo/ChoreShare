@@ -50,12 +50,14 @@ public class AnnouncementController {
   @GetMapping("/household/{hid}")
   public ResponseEntity<List<AnnouncementResponse>> getAllAnnouncementsByHousehold(
       @PathVariable("hid") String householdId) {
-    return new ResponseEntity<>(announcementService.getAllAnnouncementsByHousehold(householdId), HttpStatus.OK);
+    List<AnnouncementResponse> announcements = announcementService.getAllAnnouncementsByHouseholdId(householdId);
+    return new ResponseEntity<>(announcements, HttpStatus.OK);
   }
 
   @GetMapping("/user/{uid}")
   public ResponseEntity<List<AnnouncementResponse>> getMethodName(@PathVariable("uid") String userId) {
-    return new ResponseEntity<>(announcementService.getAllAnnouncementsByUserId(userId), HttpStatus.OK);
+    List<AnnouncementResponse> announcements = announcementService.getAllAnnouncementsByUserId(userId);
+    return new ResponseEntity<>(announcements, HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")

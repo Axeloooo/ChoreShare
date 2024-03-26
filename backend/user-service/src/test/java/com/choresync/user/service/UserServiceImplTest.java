@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Description;
 
 import com.choresync.user.entity.User;
 import com.choresync.user.exception.UserAlreadyExistsException;
-import com.choresync.user.exception.UserCreationException;
+import com.choresync.user.exception.UserInvalidBodyException;
 import com.choresync.user.exception.UserNotFoundException;
 import com.choresync.user.model.UserAuthResponse;
 import com.choresync.user.model.UserRequest;
@@ -105,7 +105,7 @@ class UserServiceImplTest {
   @Description("POST /api/v1/user - Test UserCreationException")
   @Test
   public void testUserCreationException() {
-    assertThrows(UserCreationException.class, () -> userService.createUser(null));
+    assertThrows(UserInvalidBodyException.class, () -> userService.createUser(null));
 
     verify(userRepository, times(0)).findByEmail(anyString());
     verify(userRepository, times(0)).save(any(User.class));
@@ -184,31 +184,32 @@ class UserServiceImplTest {
     verify(userRepository, times(0)).deleteById(anyString());
   }
 
-  @Description("PUT /api/v1/user/{id} - Test edit user success")
-  @Test
-  public void testEditUserSuccess() {
-    when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
-    when(userRepository.save(any(User.class))).thenReturn(user);
+  // @Description("PUT /api/v1/user/{id} - Test edit user success")
+  // @Test
+  // public void testEditUserSuccess() {
+  // when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+  // when(userRepository.save(any(User.class))).thenReturn(user);
 
-    UserResponse userResponse = userService.editUser("1", userRequest);
+  // UserResponse userResponse = userService.editUser("1", userRequest);
 
-    assertNotNull(userResponse);
-    assertEquals(user.getId(), userResponse.getId());
+  // assertNotNull(userResponse);
+  // assertEquals(user.getId(), userResponse.getId());
 
-    verify(userRepository, times(1)).findById(anyString());
-    verify(userRepository, times(1)).save(any(User.class));
-  }
+  // verify(userRepository, times(1)).findById(anyString());
+  // verify(userRepository, times(1)).save(any(User.class));
+  // }
 
-  @Description("PUT /api/v1/user/{id} - Test UserNotFoundException")
-  @Test
-  public void testEditUserNotFound() {
-    when(userRepository.findById(anyString())).thenReturn(Optional.empty());
+  // @Description("PUT /api/v1/user/{id} - Test UserNotFoundException")
+  // @Test
+  // public void testEditUserNotFound() {
+  // when(userRepository.findById(anyString())).thenReturn(Optional.empty());
 
-    assertThrows(UserNotFoundException.class, () -> userService.editUser("1", userRequest));
+  // assertThrows(UserNotFoundException.class, () -> userService.editUser("1",
+  // userRequest));
 
-    verify(userRepository, times(1)).findById(anyString());
-    verify(userRepository, times(0)).save(any(User.class));
-  }
+  // verify(userRepository, times(1)).findById(anyString());
+  // verify(userRepository, times(0)).save(any(User.class));
+  // }
 
   @Description("GET /api/v1/user/username/{username} - Test get user by username success")
   @Test

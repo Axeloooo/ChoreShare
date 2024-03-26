@@ -1,0 +1,6 @@
+CREATE DATABASE announcementdb;
+CREATE DATABASE eventdb;
+CREATE DATABASE householddb;
+CREATE DATABASE taskdb;
+CREATE DATABASE userdb;
+CREATE DATABASE userhouseholddb;

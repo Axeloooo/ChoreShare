@@ -1,4 +1,4 @@
-package com.choresync.announcement.exception;
+package com.choresync.userhousehold.external.exception;
 
 public class HouseholdNotFoundException extends RuntimeException {
   public HouseholdNotFoundException(String message) {
