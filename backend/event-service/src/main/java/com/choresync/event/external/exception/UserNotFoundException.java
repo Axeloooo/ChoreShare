@@ -1,4 +1,4 @@
-package com.choresync.userhousehold.exception;
+package com.choresync.event.external.exception;
 
 public class UserNotFoundException extends RuntimeException {
   public UserNotFoundException(String message) {

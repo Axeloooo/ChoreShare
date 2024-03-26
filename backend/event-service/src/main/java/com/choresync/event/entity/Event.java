@@ -30,12 +30,11 @@ public class Event {
   @Column(name = "household_id")
   private String householdId;
 
-  private String title;
-
   @Column(name = "user_id")
   private String userId;
 
-  @Column(name = "username")
+  private String title;
+
   private String username;
 
   @Column(name = "start_time")

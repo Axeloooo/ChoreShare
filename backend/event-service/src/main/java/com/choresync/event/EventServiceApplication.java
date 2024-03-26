@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class EventServiceApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(EventServiceApplication.class, args);
 	}
@@ -20,5 +19,4 @@ public class EventServiceApplication {
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
-
 }

@@ -10,28 +10,28 @@ import com.choresync.gateway.Model.ErrorResponse;
 
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
-  public RestResponseEntityExceptionHandler() {
-    super();
-  }
+	public RestResponseEntityExceptionHandler() {
+		super();
+	}
 
-  @ExceptionHandler(AuthMissingTokenException.class)
-  public ResponseEntity<ErrorResponse> handleAuthMissingTokenException(AuthMissingTokenException exception) {
-    return new ResponseEntity<>(
-        ErrorResponse
-            .builder()
-            .message(exception.getMessage())
-            .build(),
-        HttpStatus.UNAUTHORIZED);
-  }
+	@ExceptionHandler(AuthMissingTokenException.class)
+	public ResponseEntity<ErrorResponse> handleAuthMissingTokenException(AuthMissingTokenException exception) {
+		return new ResponseEntity<>(
+				ErrorResponse
+						.builder()
+						.message(exception.getMessage())
+						.build(),
+				HttpStatus.UNAUTHORIZED);
+	}
 
-  @ExceptionHandler(AuthUnauthorizedAccessException.class)
-  public ResponseEntity<ErrorResponse> handleAuthUnauthorizedAccessException(
-      AuthUnauthorizedAccessException exception) {
-    return new ResponseEntity<>(
-        ErrorResponse
-            .builder()
-            .message(exception.getMessage())
-            .build(),
-        HttpStatus.FORBIDDEN);
-  }
+	@ExceptionHandler(AuthUnauthorizedAccessException.class)
+	public ResponseEntity<ErrorResponse> handleAuthUnauthorizedAccessException(
+			AuthUnauthorizedAccessException exception) {
+		return new ResponseEntity<>(
+				ErrorResponse
+						.builder()
+						.message(exception.getMessage())
+						.build(),
+				HttpStatus.FORBIDDEN);
+	}
 }

@@ -19,5 +19,4 @@ public class HouseholdResponse {
   private Date createdAt;
 
   private Date updatedAt;
-
 }

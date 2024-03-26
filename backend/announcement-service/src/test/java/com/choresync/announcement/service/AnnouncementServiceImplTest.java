@@ -20,7 +20,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.context.annotation.Description;
 
 import com.choresync.announcement.entity.Announcement;
-import com.choresync.announcement.exception.AnnouncementCreationException;
+import com.choresync.announcement.exception.AnnouncementInvalidBodyException;
 import com.choresync.announcement.exception.AnnouncementNotFoundException;
 import com.choresync.announcement.model.AnnouncementRequest;
 import com.choresync.announcement.model.AnnouncementResponse;
@@ -82,7 +82,7 @@ public class AnnouncementServiceImplTest {
   @Description("POST /api/v1/announcement - Test AnnouncementCreationException when request is null")
   @Test
   public void testCreateAnnouncementNullRequest() {
-    assertThrows(AnnouncementCreationException.class, () -> {
+    assertThrows(AnnouncementInvalidBodyException.class, () -> {
       announcementService.createAnnouncement(null);
     });
 
@@ -208,7 +208,7 @@ public class AnnouncementServiceImplTest {
   @Description("PUT /api/v1/announcement/{id} - Test AnnouncementCreationException when request is null")
   @Test
   public void testEditAnnouncementNullRequest() {
-    assertThrows(AnnouncementCreationException.class, () -> {
+    assertThrows(AnnouncementInvalidBodyException.class, () -> {
       announcementService.editAnnouncement("1", null);
     });
 

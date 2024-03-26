@@ -30,9 +30,10 @@ public class Announcement {
   @Column(name = "household_id")
   private String householdId;
 
-  private String message;
-
+  @Column(name = "user_id")
   private String userId;
+
+  private String message;
 
   private String author;
 

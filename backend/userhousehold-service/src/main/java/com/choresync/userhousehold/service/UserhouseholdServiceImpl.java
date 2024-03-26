@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Date;
 import com.choresync.userhousehold.entity.Userhousehold;
-import com.choresync.userhousehold.exception.HouseholdCreationException;
-import com.choresync.userhousehold.exception.HouseholdNotFoundException;
-import com.choresync.userhousehold.exception.UserNotFoundException;
-import com.choresync.userhousehold.exception.UserhouseholdCreationException;
+import com.choresync.userhousehold.exception.UserhouseholdInternalCommunicationException;
+import com.choresync.userhousehold.exception.UserhouseholdInvalidBodyException;
+import com.choresync.userhousehold.exception.UserhouseholdInvalidParamException;
 import com.choresync.userhousehold.exception.UserhouseholdNotFoundException;
+import com.choresync.userhousehold.exception.UserhouseholdUserInHouseholdException;
+import com.choresync.userhousehold.external.exception.HouseholdCreationException;
+import com.choresync.userhousehold.external.exception.HouseholdNotFoundException;
+import com.choresync.userhousehold.external.exception.UserNotFoundException;
 import com.choresync.userhousehold.external.request.HouseholdRequest;
 import com.choresync.userhousehold.external.response.HouseholdResponse;
 import com.choresync.userhousehold.external.response.UserResponse;
@@ -23,8 +24,10 @@ import com.choresync.userhousehold.model.UserhouseholdRequest;
 import com.choresync.userhousehold.model.UserhouseholdResponse;
 import com.choresync.userhousehold.model.UserhouseholdResponse.Household;
 import com.choresync.userhousehold.model.GetMembersResponse;
-import com.choresync.userhousehold.model.GetMembersResponse.User;
 import com.choresync.userhousehold.repository.UserhouseholdRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class UserhouseholdServiceImpl implements UserhouseholdService {
@@ -34,10 +37,66 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
   @Autowired
   private RestTemplate restTemplate;
 
+  /*
+   * Extracts the error message from a RestClientException
+   * 
+   * @param e
+   * 
+   * @return String
+   */
+  @Override
+  public String extractErrorMessage(RestClientException e) {
+    String rawMessage = e.getMessage();
+
+    try {
+      String jsonSubstring = rawMessage.substring(rawMessage.indexOf("{"), rawMessage.lastIndexOf("}") + 1);
+
+      ObjectMapper objectMapper = new ObjectMapper();
+      JsonNode rootNode = objectMapper.readTree(jsonSubstring);
+
+      if (rootNode.has("message")) {
+        return rootNode.get("message").asText();
+      }
+    } catch (JsonProcessingException ex) {
+      System.out.println("Error parsing JSON from exception message: " + ex.getMessage());
+    } catch (StringIndexOutOfBoundsException ex) {
+      System.out.println("Error extracting JSON substring from exception message: " + ex.getMessage());
+    }
+    return rawMessage;
+  }
+
+  /*
+   * Creates a new userhousehold
+   * 
+   * @param userhouseholdRequest
+   * 
+   * @return UserhouseholdResponse
+   * 
+   * @throws UserhouseholdInvalidBodyException
+   * 
+   * @throws UserNotFoundException
+   * 
+   * @throws UserhouseholdInternalCommunicationException
+   * 
+   * @throws HouseholdCreationException
+   */
   @Override
   public UserhouseholdResponse createUserhousehold(UserhouseholdRequest userhouseholdRequest) {
-    if (userhouseholdRequest.getName() == null || userhouseholdRequest.getUserId() == null) {
-      throw new UserhouseholdCreationException("Invalid request body");
+    if (userhouseholdRequest.getName().isBlank() || userhouseholdRequest.getName() == null
+        || userhouseholdRequest.getUserId().isBlank() || userhouseholdRequest.getUserId() == null) {
+      throw new UserhouseholdInvalidBodyException("Invalid request body");
+    }
+
+    try {
+      UserResponse userResponse = restTemplate.getForObject(
+          "http://user-service/api/v1/user/" + userhouseholdRequest.getUserId(),
+          UserResponse.class);
+
+      if (userResponse == null) {
+        throw new UserNotFoundException("User not found");
+      }
+    } catch (RestClientException e) {
+      throw new UserhouseholdInternalCommunicationException(extractErrorMessage(e));
     }
 
     HouseholdRequest householdResquest = HouseholdRequest
@@ -48,13 +107,16 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
     HouseholdResponse fetchedHousehold;
 
     try {
-      fetchedHousehold = restTemplate
-          .postForObject(
-              "http://household-service/api/v1/household",
-              householdResquest,
-              HouseholdResponse.class);
+      fetchedHousehold = restTemplate.postForObject(
+          "http://household-service/api/v1/household",
+          householdResquest,
+          HouseholdResponse.class);
+
+      if (fetchedHousehold == null) {
+        throw new HouseholdCreationException("Household not created");
+      }
     } catch (RestClientException e) {
-      throw new HouseholdCreationException("Failed to create household. " + e.getMessage());
+      throw new UserhouseholdInternalCommunicationException(extractErrorMessage(e));
     }
 
     Userhousehold userhousehold = Userhousehold
@@ -85,8 +147,27 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
     return userhouseholdResponse;
   }
 
+  /*
+   * Gets a userhousehold by id
+   * 
+   * @param id
+   * 
+   * @return UserhouseholdResponse
+   * 
+   * @throws UserhouseholdInvalidParamException
+   * 
+   * @throws UserhouseholdNotFoundException
+   * 
+   * @throws UserhouseholdInternalCommunicationException
+   * 
+   * @throws HouseholdNotFoundException
+   */
   @Override
   public UserhouseholdResponse getUserhouseholdById(String id) {
+    if (id.isBlank() || id == null) {
+      throw new UserhouseholdInvalidParamException("Invalid request param");
+    }
+
     Userhousehold userhousehold = userhouseholdRepository.findById(id).orElseThrow(
         () -> new UserhouseholdNotFoundException("Userhousehold not found"));
 
@@ -97,8 +178,12 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
           .getForObject(
               "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
               HouseholdResponse.class);
+
+      if (householdResponse == null) {
+        throw new HouseholdNotFoundException("Household not found");
+      }
     } catch (RestClientException e) {
-      throw new HouseholdNotFoundException("Household not found. " + e.getMessage());
+      throw new UserhouseholdInternalCommunicationException(extractErrorMessage(e));
     }
 
     UserhouseholdResponse.Household household = UserhouseholdResponse.Household
@@ -121,8 +206,39 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
     return userhouseholdResponse;
   }
 
+  /*
+   * Gets userhouseholds by user id
+   * 
+   * @param userId
+   * 
+   * @return List<UserhouseholdResponse>
+   * 
+   * @throws UserhouseholdInvalidParamException
+   * 
+   * @throws UserNotFoundException
+   * 
+   * @throws UserhouseholdInternalCommunicationException
+   * 
+   * @throws HouseholdNotFoundException
+   */
   @Override
   public List<UserhouseholdResponse> getUserhouseholdsByUserId(String userId) {
+    if (userId.isBlank() || userId == null) {
+      throw new UserhouseholdInvalidParamException("Invalid request param");
+    }
+
+    try {
+      UserResponse userResponse = restTemplate.getForObject(
+          "http://user-service/api/v1/user/" + userId,
+          UserResponse.class);
+
+      if (userResponse == null) {
+        throw new UserNotFoundException("User not found");
+      }
+    } catch (RestClientException e) {
+      throw new UserhouseholdInternalCommunicationException(extractErrorMessage(e));
+    }
+
     List<Userhousehold> userhouseholds = userhouseholdRepository.findAllByUserId(userId);
 
     List<UserhouseholdResponse> userhouseholdResponses = new ArrayList<>();
@@ -135,8 +251,12 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
             .getForObject(
                 "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
                 HouseholdResponse.class);
+
+        if (householdResponse == null) {
+          throw new HouseholdNotFoundException("Household not found");
+        }
       } catch (RestClientException e) {
-        throw new HouseholdNotFoundException("Household not found. " + e.getMessage());
+        throw new UserhouseholdInternalCommunicationException(extractErrorMessage(e));
       }
 
       UserhouseholdResponse.Household household = UserhouseholdResponse.Household
@@ -162,8 +282,38 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
     return userhouseholdResponses;
   }
 
+  /*
+   * Gets userhouseholds by household id
+   * 
+   * @param householdId
+   * 
+   * @return List<GetMembersResponse>
+   * 
+   * @throws UserhouseholdInvalidParamException
+   * 
+   * @throws HouseholdNotFoundException
+   * 
+   * @throws UserhouseholdInternalCommunicationException
+   */
   @Override
   public List<GetMembersResponse> getUserhouseholdsByHouseholdId(String householdId) {
+    if (householdId.isBlank() || householdId == null) {
+      throw new UserhouseholdInvalidParamException("Invalid request param");
+    }
+
+    try {
+      HouseholdResponse householdResponse = restTemplate
+          .getForObject(
+              "http://household-service/api/v1/household/" + householdId,
+              HouseholdResponse.class);
+
+      if (householdResponse == null) {
+        throw new HouseholdNotFoundException("Household not found");
+      }
+    } catch (RestClientException e) {
+      throw new UserhouseholdInternalCommunicationException(extractErrorMessage(e));
+    }
+
     List<Userhousehold> userhouseholds = userhouseholdRepository.findAllByHouseholdId(householdId);
 
     List<GetMembersResponse> userhouseholdResponses = new ArrayList<>();
@@ -172,23 +322,29 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
       HouseholdResponse householdResponse;
 
       try {
-        householdResponse = restTemplate
-            .getForObject(
-                "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
-                HouseholdResponse.class);
+        householdResponse = restTemplate.getForObject(
+            "http://household-service/api/v1/household/" + userhousehold.getHouseholdId(),
+            HouseholdResponse.class);
+
+        if (householdResponse == null) {
+          throw new HouseholdNotFoundException("Household not found");
+        }
       } catch (RestClientException e) {
-        throw new HouseholdNotFoundException("Household not found. " + e.getMessage());
+        throw new UserhouseholdInternalCommunicationException(extractErrorMessage(e));
       }
 
       UserResponse userResponse;
 
       try {
-        userResponse = restTemplate
-            .getForObject(
-                "http://user-service/api/v1/user/" + userhousehold.getUserId(),
-                UserResponse.class);
+        userResponse = restTemplate.getForObject(
+            "http://user-service/api/v1/user/" + userhousehold.getUserId(),
+            UserResponse.class);
+
+        if (userResponse == null) {
+          throw new UserNotFoundException("User not found");
+        }
       } catch (RestClientException e) {
-        throw new UserNotFoundException("User not found. " + e.getMessage());
+        throw new UserhouseholdInternalCommunicationException(extractErrorMessage(e));
       }
 
       GetMembersResponse.Household household = GetMembersResponse.Household
@@ -223,68 +379,103 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
     return userhouseholdResponses;
   }
 
+  /*
+   * Deletes a userhousehold by id
+   * 
+   * @param id
+   * 
+   * @throws UserhouseholdInvalidParamException
+   * 
+   * @throws UserhouseholdNotFoundException
+   */
   @Override
   public void deleteUserhouseholdById(String id) {
-    Userhousehold userhousehold = userhouseholdRepository.findById(id).orElseThrow(
-        () -> new UserhouseholdNotFoundException("Userhousehold not found"));
+    if (id.isBlank() || id == null) {
+      throw new UserhouseholdInvalidParamException("Invalid request param");
+    }
 
-    userhouseholdRepository.delete(userhousehold);
+    if (!userhouseholdRepository.existsById(id)) {
+      throw new UserhouseholdNotFoundException("Userhousehold not found");
+    }
+
+    userhouseholdRepository.deleteById(id);
   }
 
+  /*
+   * Joins a user to a household
+   * 
+   * @param userId
+   * 
+   * @param houseId
+   * 
+   * @return Household
+   * 
+   * @throws UserhouseholdInvalidParamException
+   * 
+   * @throws UserNotFoundException
+   * 
+   * @throws UserhouseholdInternalCommunicationException
+   * 
+   * @throws UserhouseholdUserInHouseholdException
+   * 
+   * @throws HouseholdNotFoundException
+   */
   @Override
   public Household joinHouseHold(String userId, String houseId) {
+    if (userId.isBlank() || userId == null || houseId.isBlank() || houseId == null) {
+      throw new UserhouseholdInvalidParamException("Invalid request param");
+    }
+
+    try {
+      UserResponse userResponse = restTemplate.getForObject(
+          "http://user-service/api/v1/user/" + userId,
+          UserResponse.class);
+
+      if (userResponse == null) {
+        throw new UserNotFoundException("User not found");
+      }
+    } catch (RestClientException e) {
+      throw new UserhouseholdInternalCommunicationException(extractErrorMessage(e));
+    }
 
     HouseholdResponse householdResponse;
 
-    // Throws of houseId does not exist
     try {
-      householdResponse = restTemplate
-          .getForObject(
-              "http://household-service/api/v1/household/" + houseId,
-              HouseholdResponse.class);
+      householdResponse = restTemplate.getForObject(
+          "http://household-service/api/v1/household/" + houseId,
+          HouseholdResponse.class);
+
+      if (householdResponse == null) {
+        throw new HouseholdNotFoundException("Household not found");
+      }
     } catch (RestClientException e) {
-      throw new HouseholdNotFoundException("Household not found. " + e.getMessage());
+      throw new UserhouseholdInternalCommunicationException(extractErrorMessage(e));
     }
 
     UserhouseholdResponse.Household household = UserhouseholdResponse.Household
-          .builder()
-          .id(householdResponse.getId())
-          .name(householdResponse.getName())
-          .createdAt(householdResponse.getCreatedAt())
-          .updatedAt(householdResponse.getUpdatedAt())
-          .build();
+        .builder()
+        .id(householdResponse.getId())
+        .name(householdResponse.getName())
+        .createdAt(householdResponse.getCreatedAt())
+        .updatedAt(householdResponse.getUpdatedAt())
+        .build();
 
-    // Make Sure that the user exists
-    try {
-      restTemplate
-          .getForObject(
-              "http://user-service/api/v1/user/" + userId,
-              UserResponse.class);
-    } catch (Exception e) {
-      throw new HouseholdNotFoundException("User not found. " + e.getMessage());
-    }
-
-    // Check If the user already exists in the house
     List<Userhousehold> userhouseholds = userhouseholdRepository.findAllByUserId(userId);
 
     for (Userhousehold userhousehold : userhouseholds) {
       if (userhousehold.getHouseholdId().equals(houseId)) {
-        throw new HouseholdNotFoundException("User Already In house! ");
-
+        throw new UserhouseholdUserInHouseholdException("User already in household");
       }
     }
 
-    Userhousehold userHousehold = new Userhousehold();
-        userHousehold.setUserId(userId);
-        userHousehold.setHouseholdId(houseId);
-        userHousehold.setCreatedAt(new Date()); // Set the current timestamp for createdAt
-        userHousehold.setUpdatedAt(new Date()); // Set the current timestamp for updatedAt
+    Userhousehold userHousehold = Userhousehold
+        .builder()
+        .userId(userId)
+        .householdId(houseId)
+        .build();
 
-        userhouseholdRepository.save(userHousehold);
+    userhouseholdRepository.save(userHousehold);
 
     return household;
-
   }
-
- 
 }

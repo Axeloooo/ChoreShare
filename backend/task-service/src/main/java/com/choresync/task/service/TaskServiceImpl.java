@@ -12,16 +12,23 @@ import com.choresync.task.entity.Frequency;
 import com.choresync.task.entity.Status;
 import com.choresync.task.entity.Tag;
 import com.choresync.task.entity.Task;
-import com.choresync.task.exception.HouseholdNotFoundException;
-import com.choresync.task.exception.TaskCreationException;
+import com.choresync.task.exception.TaskInternalCommunicationException;
+import com.choresync.task.exception.TaskInvalidBodyException;
+import com.choresync.task.exception.TaskInvalidParamException;
 import com.choresync.task.exception.TaskNotFoundException;
 import com.choresync.task.exception.TaskUnforbiddenActionException;
+import com.choresync.task.external.exception.HouseholdNotFoundException;
+import com.choresync.task.external.exception.UserNotFoundException;
 import com.choresync.task.external.response.HouseholdResponse;
+import com.choresync.task.external.response.UserResponse;
 import com.choresync.task.model.TaskEditMetadataRequest;
 import com.choresync.task.model.TaskEditStatusRequest;
 import com.choresync.task.model.TaskRequest;
 import com.choresync.task.model.TaskResponse;
 import com.choresync.task.repository.TaskRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -31,26 +38,80 @@ public class TaskServiceImpl implements TaskService {
   @Autowired
   private RestTemplate restTemplate;
 
+  /*
+   * Extracts the error message from a RestClientException
+   * 
+   * @param e
+   * 
+   * @return String
+   */
   @Override
-  public TaskResponse createTask(TaskRequest taskRequest) {
-    if (taskRequest == null) {
-      throw new TaskCreationException("Missing fields in request body");
-    }
-
-    HouseholdResponse householdResponse;
+  public String extractErrorMessage(RestClientException e) {
+    String rawMessage = e.getMessage();
 
     try {
-      householdResponse = restTemplate.getForObject(
+      String jsonSubstring = rawMessage.substring(rawMessage.indexOf("{"), rawMessage.lastIndexOf("}") + 1);
+
+      ObjectMapper objectMapper = new ObjectMapper();
+      JsonNode rootNode = objectMapper.readTree(jsonSubstring);
+
+      if (rootNode.has("message")) {
+        return rootNode.get("message").asText();
+      }
+    } catch (JsonProcessingException ex) {
+      System.out.println("Error parsing JSON from exception message: " + ex.getMessage());
+    } catch (StringIndexOutOfBoundsException ex) {
+      System.out.println("Error extracting JSON substring from exception message: " + ex.getMessage());
+    }
+    return rawMessage;
+  }
+
+  /*
+   * Creates a new task.
+   * 
+   * @param taskRequest
+   * 
+   * @return TaskResponse
+   * 
+   * @throws TaskInvalidBodyException
+   * 
+   * @throws TaskInternalCommunicationException
+   * 
+   * @throws HouseholdNotFoundException
+   * 
+   * @throws UserNotFoundException
+   */
+  @Override
+  public TaskResponse createTask(TaskRequest taskRequest) {
+    if (taskRequest.getTitle().isBlank() || taskRequest.getTitle() == null || taskRequest.getHouseholdId().isBlank()
+        || taskRequest.getHouseholdId() == null || taskRequest.getDescription().isBlank()
+        || taskRequest.getDescription() == null || taskRequest.getFrequency().isBlank()
+        || taskRequest.getFrequency() == null || taskRequest.getTag().isBlank() || taskRequest.getTag() == null
+        || taskRequest.getUserId().isBlank() || taskRequest.getUserId() == null) {
+      throw new TaskInvalidBodyException("Invalid request body");
+    }
+
+    try {
+      HouseholdResponse householdResponse = restTemplate.getForObject(
           "http://household-service/api/v1/household/" + taskRequest.getHouseholdId(),
           HouseholdResponse.class);
 
+      if (householdResponse == null) {
+        throw new HouseholdNotFoundException("Could not find a household");
+      }
     } catch (RestClientException e) {
-      throw new HouseholdNotFoundException(
-          "Could not find a household. " + e.getMessage());
+      throw new TaskInternalCommunicationException(extractErrorMessage(e));
     }
 
-    if (householdResponse == null) {
-      throw new HouseholdNotFoundException("Could not find a household");
+    try {
+      UserResponse userResponse = restTemplate.getForObject(
+          "http://user-service/api/v1/user/" + taskRequest.getUserId(), UserResponse.class);
+
+      if (userResponse == null) {
+        throw new UserNotFoundException("Could not find a user");
+      }
+    } catch (RestClientException e) {
+      throw new TaskInternalCommunicationException(extractErrorMessage(e));
     }
 
     Task task = Task.builder()
@@ -81,8 +142,22 @@ public class TaskServiceImpl implements TaskService {
     return taskResponse;
   }
 
+  /*
+   * Retrieves a task by its ID.
+   * 
+   * @param id
+   * 
+   * @return TaskResponse
+   * 
+   * @throws TaskInvalidParamException
+   * 
+   * @throws TaskNotFoundException
+   */
   @Override
   public TaskResponse getTaskById(String id) {
+    if (id.isBlank() || id == null) {
+      throw new TaskInvalidParamException("Invalid request parameter");
+    }
     Task task = taskRepository.findById(id).orElseThrow(() -> {
       throw new TaskNotFoundException("Task not found");
     });
@@ -103,10 +178,35 @@ public class TaskServiceImpl implements TaskService {
     return taskResponse;
   }
 
+  /*
+   * Retrieves all tasks by a user ID.
+   * 
+   * @param userId
+   * 
+   * @return List<TaskResponse>
+   * 
+   * @throws TaskInvalidParamException
+   * 
+   * @throws TaskInternalCommunicationException
+   * 
+   * @throws UserNotFoundException
+   */
   @Override
   public List<TaskResponse> getAllTasksByUserId(String userId) {
-    if (userId == null) {
-      throw new TaskNotFoundException("Task not found");
+    if (userId.isBlank() || userId == null) {
+      throw new TaskInvalidParamException("Invalid request parameter");
+    }
+
+    try {
+      UserResponse userResponse = restTemplate.getForObject(
+          "http://user-service/api/v1/user/" + userId,
+          UserResponse.class);
+
+      if (userResponse == null) {
+        throw new UserNotFoundException("Could not find a user");
+      }
+    } catch (RestClientException e) {
+      throw new TaskInternalCommunicationException(extractErrorMessage(e));
     }
 
     List<Task> tasks = taskRepository.findByUserId(userId);
@@ -133,8 +233,36 @@ public class TaskServiceImpl implements TaskService {
     return taskResponses;
   }
 
+  /*
+   * Retrieves all tasks by a household ID.
+   * 
+   * @param householdId
+   * 
+   * @return List<TaskResponse>
+   * 
+   * @throws TaskInvalidParamException
+   * 
+   * @throws TaskInternalCommunicationException
+   * 
+   * @throws HouseholdNotFoundException
+   */
   @Override
-  public List<TaskResponse> getAllTasksByHousehold(String householdId) {
+  public List<TaskResponse> getAllTasksByHouseholdId(String householdId) {
+    if (householdId.isBlank() || householdId == null) {
+      throw new TaskInvalidParamException("Invalid request parameter");
+    }
+
+    try {
+      HouseholdResponse householdResponse = restTemplate.getForObject(
+          "http://household-service/api/v1/household/" + householdId,
+          HouseholdResponse.class);
+
+      if (householdResponse == null) {
+        throw new HouseholdNotFoundException("Could not find a household");
+      }
+    } catch (RestClientException e) {
+      throw new TaskInternalCommunicationException(extractErrorMessage(e));
+    }
 
     List<Task> tasks = taskRepository.findByHouseholdId(householdId);
 
@@ -160,11 +288,31 @@ public class TaskServiceImpl implements TaskService {
     return taskResponses;
   }
 
+  /*
+   * Updates a task by its ID.
+   * 
+   * @param id
+   * 
+   * @param taskRequest
+   * 
+   * @return TaskResponse
+   * 
+   * @throws TaskInvalidParamException
+   * 
+   * @throws TaskInvalidBodyException
+   * 
+   * @throws TaskNotFoundException
+   */
   @Override
   public TaskResponse updateTask(String id, TaskEditMetadataRequest taskRequest) {
-    if (taskRequest.getTitle() == null && taskRequest.getDescription() == null
-        && taskRequest.getFrequency() == null && taskRequest.getTag() == null) {
-      throw new TaskCreationException("Invalid request body");
+    if (id.isBlank() || id == null) {
+      throw new TaskInvalidParamException("Invalid request parameter");
+    }
+
+    if (taskRequest.getTitle() == null || taskRequest.getTitle().isBlank() || taskRequest.getDescription() == null
+        || taskRequest.getDescription().isBlank() || taskRequest.getFrequency() == null
+        || taskRequest.getFrequency().isBlank() || taskRequest.getTag() == null || taskRequest.getTag().isBlank()) {
+      throw new TaskInvalidBodyException("Invalid request body");
     }
 
     Task task = taskRepository.findById(id).orElseThrow(() -> {
@@ -194,10 +342,32 @@ public class TaskServiceImpl implements TaskService {
     return taskResponse;
   }
 
+  /*
+   * Updates a task status by its ID.
+   * 
+   * @param id
+   * 
+   * @param taskRequest
+   * 
+   * @return TaskResponse
+   * 
+   * @throws TaskInvalidParamException
+   * 
+   * @throws TaskInvalidBodyException
+   * 
+   * @throws TaskNotFoundException
+   * 
+   * @throws TaskUnforbiddenActionException
+   */
   @Override
   public TaskResponse updateTaskStatus(String id, TaskEditStatusRequest taskRequest) {
-    if (taskRequest.getStatus() == null && taskRequest.getUserId() == null) {
-      throw new TaskCreationException("Invalid request body");
+    if (id.isBlank() || id == null) {
+      throw new TaskInvalidParamException("Invalid request parameter");
+    }
+
+    if (taskRequest.getStatus().isBlank() || taskRequest.getStatus() == null || taskRequest.getUserId().isBlank()
+        || taskRequest.getUserId() == null) {
+      throw new TaskInvalidBodyException("Invalid request body");
     }
 
     Task task = taskRepository.findById(id).orElseThrow(() -> {
@@ -228,17 +398,49 @@ public class TaskServiceImpl implements TaskService {
     return taskResponse;
   }
 
+  /*
+   * Deletes a task by its ID.
+   * 
+   * @param id
+   * 
+   * @throws TaskInvalidParamException
+   * 
+   * @throws TaskNotFoundException
+   */
   @Override
   public void deleteTask(String id) {
-    if (taskRepository.existsById(id)) {
-      taskRepository.deleteById(id);
-    } else {
+    if (id.isBlank() || id == null) {
+      throw new TaskInvalidParamException("Invalid request parameter");
+    }
+
+    if (!taskRepository.existsById(id)) {
       throw new TaskNotFoundException("Task not found");
     }
+
+    taskRepository.deleteById(id);
   }
 
+  /*
+   * Unassigns a task from a user.
+   * 
+   * @param id
+   * 
+   * @param userId
+   * 
+   * @return TaskResponse
+   * 
+   * @throws TaskInvalidParamException
+   * 
+   * @throws TaskNotFoundException
+   * 
+   * @throws TaskUnforbiddenActionException
+   */
   @Override
   public TaskResponse unassignTask(String id, String userId) {
+    if (id.isBlank() || id == null || userId.isBlank() || userId == null) {
+      throw new TaskInvalidParamException("Invalid request parameter");
+    }
+
     Task task = taskRepository.findById(id).orElseThrow(() -> {
       throw new TaskNotFoundException("Task not found");
     });
@@ -267,10 +469,25 @@ public class TaskServiceImpl implements TaskService {
     return taskResponse;
   }
 
+  /*
+   * Assigns a task to a user.
+   * 
+   * @param id
+   * 
+   * @param userId
+   * 
+   * @return TaskResponse
+   * 
+   * @throws TaskInvalidParamException
+   * 
+   * @throws TaskNotFoundException
+   * 
+   * @throws TaskUnforbiddenActionException
+   */
   @Override
   public TaskResponse assignTask(String id, String userId) {
-    if (userId == null) {
-      throw new TaskCreationException("Invalid request body");
+    if (userId.isBlank() || userId == null || id.isBlank() || id == null) {
+      throw new TaskInvalidParamException("Invalid request parameter");
     }
 
     Task task = taskRepository.findById(id).orElseThrow(() -> {
