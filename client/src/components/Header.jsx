@@ -15,7 +15,10 @@ function Header({
   const location = useLocation();
 
   const handleLogout = () => {
-    logout();
+    const answer = window.confirm("Are you sure you want to log out?");
+    if (answer) {
+      logout();
+    }
   };
 
   const handleShowCreateHousehold = () => {

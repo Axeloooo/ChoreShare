@@ -2,6 +2,7 @@ package com.choresync.auth.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.choresync.auth.exception.AuthInternalCommunicationException;
 import com.choresync.auth.model.AuthLoginRequest;
 import com.choresync.auth.model.AuthRegisterRequest;
 import com.choresync.auth.model.AuthTokenResponse;
@@ -44,7 +45,7 @@ public class AuthController {
       AuthTokenResponse authTokenResponse = authService.loginUser(authLoginRequest);
       return new ResponseEntity<>(authTokenResponse, HttpStatus.OK);
     } else {
-      throw new RuntimeException("Invalid credentials");
+      throw new AuthInternalCommunicationException("Invalid credentials");
     }
   }
 
