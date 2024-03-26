@@ -98,13 +98,16 @@ function App() {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:8888/api/v1/user/${userId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/user/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) {
         const response = await res.json();
@@ -125,19 +128,22 @@ function App() {
   const editUser = async (firstName, lastName, email, phone, closeOverlay) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`http://localhost:8888/api/v1/user/${userId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          phone: phone,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/user/${userId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            phone: phone,
+          }),
+        }
+      );
 
       if (!res.ok) {
         const response = await res.json();
@@ -162,7 +168,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:8888/api/v1/userhousehold/join/${householdId}/user/${userId}`,
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/userhousehold/join/${householdId}/user/${userId}`,
         {
           method: "POST",
           headers: {
@@ -228,7 +234,7 @@ function App() {
   const fetchHouseholdById = async (householdId) => {
     try {
       const householdRes = await fetch(
-        `http://localhost:8888/api/v1/household/${householdId}`,
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/household/${householdId}`,
         {
           method: "GET",
           headers: {
@@ -247,7 +253,7 @@ function App() {
       const householdData = await householdRes.json();
 
       const choresRes = await fetch(
-        `http://localhost:8888/api/v1/task/household/${householdData.id}`,
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/household/${householdData.id}`,
         {
           method: "GET",
           headers: {
@@ -270,7 +276,7 @@ function App() {
       );
 
       const membersRes = await fetch(
-        `http://localhost:8888/api/v1/userhousehold/household/${householdData.id}`,
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/userhousehold/household/${householdData.id}`,
         {
           method: "GET",
           headers: {
@@ -289,7 +295,7 @@ function App() {
       const membersData = await membersRes.json();
 
       const announcementsRes = await fetch(
-        `http://localhost:8888/api/v1/announcement/household/${householdData.id}`,
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/announcement/household/${householdData.id}`,
         {
           method: "GET",
           headers: {
@@ -308,7 +314,7 @@ function App() {
       const announcementsData = await announcementsRes.json();
 
       const eventsRes = await fetch(
-        `http://localhost:8888/api/v1/event/household/${householdData.id}`,
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/event/household/${householdData.id}`,
         {
           method: "GET",
           headers: {
@@ -349,7 +355,7 @@ function App() {
     console.log("fetching household");
     try {
       const householdRes = await fetch(
-        `http://localhost:8888/api/v1/userhousehold/user/${userId}`,
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/userhousehold/user/${userId}`,
         {
           method: "GET",
           headers: {
@@ -372,7 +378,7 @@ function App() {
       if (householdsData.length > 0) {
         console.log("householdsData has length");
         const choresRes = await fetch(
-          `http://localhost:8888/api/v1/task/household/${householdsData[0].id}`,
+          `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/household/${householdsData[0].id}`,
           {
             method: "GET",
             headers: {
@@ -395,7 +401,7 @@ function App() {
         );
 
         const membersRes = await fetch(
-          `http://localhost:8888/api/v1/userhousehold/household/${householdsData[0].id}`,
+          `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/userhousehold/household/${householdsData[0].id}`,
           {
             method: "GET",
             headers: {
@@ -414,7 +420,7 @@ function App() {
         const membersData = await membersRes.json();
 
         const announcementsRes = await fetch(
-          `http://localhost:8888/api/v1/announcement/household/${householdsData[0].id}`,
+          `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/announcement/household/${householdsData[0].id}`,
           {
             method: "GET",
             headers: {
@@ -433,7 +439,7 @@ function App() {
         const announcementsData = await announcementsRes.json();
 
         const eventsRes = await fetch(
-          `http://localhost:8888/api/v1/event/household/${householdsData[0].id}`,
+          `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/event/household/${householdsData[0].id}`,
           {
             method: "GET",
             headers: {
@@ -486,17 +492,20 @@ function App() {
   const createHousehold = async (householdName, closeOverlay) => {
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:8888/api/v1/userhousehold", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          userId: userId,
-          name: householdName,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/userhousehold`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            userId: userId,
+            name: householdName,
+          }),
+        }
+      );
 
       if (!res.ok) {
         const response = await res.json();
@@ -536,22 +545,25 @@ function App() {
   ) => {
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:8888/api/v1/task", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          title: title,
-          householdId: data.currentHousehold.id,
-          description: description,
-          status: null,
-          frequency: frequence,
-          tag: tag,
-          userId: null,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title: title,
+            householdId: data.currentHousehold.id,
+            description: description,
+            status: null,
+            frequency: frequence,
+            tag: tag,
+            userId: null,
+          }),
+        }
+      );
 
       if (!res.ok) {
         const response = await res.json();
@@ -586,7 +598,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:8888/api/v1/task/${choreId}/assignee/${userId}`,
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/${choreId}/assignee/${userId}`,
         {
           method: "PUT",
           headers: {
@@ -633,7 +645,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:8888/api/v1/task/${choreId}/unassign/${userId}`,
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/${choreId}/unassign/${userId}`,
         {
           method: "PUT",
           headers: {
@@ -681,13 +693,16 @@ function App() {
   const deleteChore = async (choreId) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`http://localhost:8888/api/v1/task/${choreId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/${choreId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) {
         const response = await res.json();
@@ -732,19 +747,22 @@ function App() {
   ) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`http://localhost:8888/api/v1/task/${choreId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          title: title,
-          description: description,
-          frequency: frequency,
-          tag: tag,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/${choreId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title: title,
+            description: description,
+            frequency: frequency,
+            tag: tag,
+          }),
+        }
+      );
 
       if (!res.ok) {
         const response = await res.json();
@@ -786,7 +804,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:8888/api/v1/task/${choreId}/status`,
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/${choreId}/status`,
         {
           method: "PUT",
           headers: {
@@ -839,19 +857,22 @@ function App() {
   const createAnnouncement = async (message, author, closeOverlay) => {
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:8888/api/v1/announcement", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          message: message,
-          householdId: data.currentHousehold.id,
-          author: author,
-          userId: userId,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/announcement`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            message: message,
+            householdId: data.currentHousehold.id,
+            author: author,
+            userId: userId,
+          }),
+        }
+      );
 
       if (!res.ok) {
         const response = await res.json();
@@ -895,7 +916,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:8888/api/v1/announcement/${announcementId}`,
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/announcement/${announcementId}`,
         {
           method: "PUT",
           headers: {
@@ -949,7 +970,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:8888/api/v1/announcement/${announcementId}`,
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/announcement/${announcementId}`,
         {
           method: "DELETE",
           headers: {
@@ -992,21 +1013,24 @@ function App() {
     console.log("startTime", startTime);
     console.log("endTime", endTime);
     try {
-      const res = await fetch("http://localhost:8888/api/v1/event", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          householdId: data.currentHousehold.id,
-          title: title,
-          userId: userId,
-          username: user.username,
-          startTime: startTime,
-          endTime: endTime,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/event`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            householdId: data.currentHousehold.id,
+            title: title,
+            userId: userId,
+            username: user.username,
+            startTime: startTime,
+            endTime: endTime,
+          }),
+        }
+      );
 
       if (!res.ok) {
         const response = await res.json();
@@ -1040,13 +1064,16 @@ function App() {
   const deleteEvent = async (eventId) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`http://localhost:8888/api/v1/event/${eventId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/event/${eventId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) {
         const response = await res.json();
@@ -1079,18 +1106,24 @@ function App() {
   const login = async (username, password) => {
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:8888/api/v1/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: username,
+            password: password,
+          }),
+        }
+      );
 
       if (!res.ok) {
         setIsLoading(false);
         const response = await res.json();
+        if (res.status === 401) {
+          toast.error("Invalid credentials. Please try again.");
+        }
         console.log(response);
         return;
       }
@@ -1122,22 +1155,26 @@ function App() {
   ) => {
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:8888/api/v1/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName: firstName,
-          lastName: lastName,
-          username: username,
-          password: password,
-          email: email,
-          phone: phone,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/auth/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            firstName: firstName,
+            lastName: lastName,
+            username: username,
+            password: password,
+            email: email,
+            phone: phone,
+          }),
+        }
+      );
 
       if (!res.ok) {
         setIsLoading(false);
         const response = await res.json();
+        toast.error(response.message);
         console.log(response);
         return;
       }
@@ -1175,17 +1212,20 @@ function App() {
 
   const inviteMember = async (email) => {
     try {
-      const res = await fetch("http://localhost:8888/api/v1/email/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          to: email,
-          householdId: data.currentHousehold.id,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/email/send`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            to: email,
+            householdId: data.currentHousehold.id,
+          }),
+        }
+      );
 
       if (!res.ok) {
         if (res.status === 405) {
