@@ -36,6 +36,31 @@ function App() {
   console.log(token);
 
   useEffect(() => {
+    if (!token) return;
+    const validateToken = async () => {
+      console.log("checking token");
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/auth/validate?token=${token}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.ok) {
+        return;
+      }
+
+      logout();
+    };
+
+    validateToken();
+  }, [token]);
+
+  useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
     if (storedUserId) {
       console.log("storedUserId", storedUserId);
@@ -1194,20 +1219,17 @@ function App() {
   };
 
   const logout = () => {
-    const answer = window.confirm("Are you sure you want to log out?");
-    if (answer) {
-      setUser(null);
-      setUserId(null);
-      setToken(null);
-      setData(null);
+    setUser(null);
+    setUserId(null);
+    setToken(null);
+    setData(null);
 
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
-      localStorage.removeItem("userId");
-      localStorage.removeItem("data", null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("data", null);
 
-      navigate("/login");
-    }
+    navigate("/login");
   };
 
   const inviteMember = async (email) => {
