@@ -28,6 +28,27 @@ public class AuthServiceImpl implements AuthService {
   private JwtService jwtService;
 
   @Override
+  public String extractErrorMessage(RestClientException e) {
+    String rawMessage = e.getMessage();
+
+    try {
+      String jsonSubstring = rawMessage.substring(rawMessage.indexOf("{"), rawMessage.lastIndexOf("}") + 1);
+
+      ObjectMapper objectMapper = new ObjectMapper();
+      JsonNode rootNode = objectMapper.readTree(jsonSubstring);
+
+      if (rootNode.has("message")) {
+        return rootNode.get("message").asText();
+      }
+    } catch (JsonProcessingException ex) {
+      System.out.println("Error parsing JSON from exception message: " + ex.getMessage());
+    } catch (StringIndexOutOfBoundsException ex) {
+      System.out.println("Error extracting JSON substring from exception message: " + ex.getMessage());
+    }
+    return rawMessage;
+  }
+
+  @Override
   public String registerUser(AuthRegisterRequest authRequest) {
     if (authRequest.getFirstName() == null || authRequest.getLastName() == null || authRequest.getUsername() == null
         || authRequest.getEmail() == null || authRequest.getPassword() == null) {
