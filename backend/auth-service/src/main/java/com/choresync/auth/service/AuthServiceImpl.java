@@ -103,23 +103,4 @@ public class AuthServiceImpl implements AuthService {
     jwtService.validateToken(token);
   }
 
-  private String extractErrorMessage(RestClientException e) {
-    String rawMessage = e.getMessage();
-
-    try {
-      String jsonSubstring = rawMessage.substring(rawMessage.indexOf("{"), rawMessage.lastIndexOf("}") + 1);
-
-      ObjectMapper objectMapper = new ObjectMapper();
-      JsonNode rootNode = objectMapper.readTree(jsonSubstring);
-
-      if (rootNode.has("message")) {
-        return rootNode.get("message").asText();
-      }
-    } catch (JsonProcessingException ex) {
-      System.out.println("Error parsing JSON from exception message: " + ex.getMessage());
-    } catch (StringIndexOutOfBoundsException ex) {
-      System.out.println("Error extracting JSON substring from exception message: " + ex.getMessage());
-    }
-    return rawMessage;
-  }
 }
