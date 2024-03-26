@@ -17,8 +17,20 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     super();
   }
 
-  @ExceptionHandler(HouseholdCreationException.class)
-  public ResponseEntity<ErrorResponse> handleHouseholdCreationException(HouseholdCreationException exception) {
+  @ExceptionHandler(UserhouseholdInternalCommunicationException.class)
+  public ResponseEntity<ErrorResponse> handleUserhouseholdInternalCommunicationException(
+      UserhouseholdInternalCommunicationException exception) {
+    return new ResponseEntity<>(
+        ErrorResponse
+            .builder()
+            .message(exception.getMessage())
+            .build(),
+        HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  @ExceptionHandler(UserhouseholdUserInHouseholdException.class)
+  public ResponseEntity<ErrorResponse> handleUserhouseholdUserInHouseholdException(
+      UserhouseholdUserInHouseholdException exception) {
     return new ResponseEntity<>(
         ErrorResponse
             .builder()
@@ -36,16 +48,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
             .message(exception.getMessage())
             .build(),
         HttpStatus.INTERNAL_SERVER_ERROR);
-  }
-
-  @ExceptionHandler(HouseholdNotFoundException.class)
-  public ResponseEntity<ErrorResponse> handleHouseholdNotFoundException(HouseholdNotFoundException exception) {
-    return new ResponseEntity<>(
-        ErrorResponse
-            .builder()
-            .message(exception.getMessage())
-            .build(),
-        HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(UserhouseholdNotFoundException.class)
@@ -67,6 +69,26 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
             .message(exception.getMessage())
             .build(),
         HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(HouseholdCreationException.class)
+  public ResponseEntity<ErrorResponse> handleHouseholdCreationException(HouseholdCreationException exception) {
+    return new ResponseEntity<>(
+        ErrorResponse
+            .builder()
+            .message(exception.getMessage())
+            .build(),
+        HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  @ExceptionHandler(HouseholdNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleHouseholdNotFoundException(HouseholdNotFoundException exception) {
+    return new ResponseEntity<>(
+        ErrorResponse
+            .builder()
+            .message(exception.getMessage())
+            .build(),
+        HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(UserNotFoundException.class)
