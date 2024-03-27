@@ -78,10 +78,10 @@ public class EventServiceImpl implements EventService {
    */
   @Override
   public EventResponse createEvent(EventRequest eventRequest) {
-    if (eventRequest.getTitle().isBlank() || eventRequest.getTitle() == null || eventRequest.getUserId().isBlank()
+    if (eventRequest.getTitle().isBlank() || eventRequest.getUserId().isBlank()
         || eventRequest.getUserId() == null || eventRequest.getUsername().isBlank()
         || eventRequest.getUsername() == null
-        || eventRequest.getStartTime() == null || eventRequest.getEndTime() == null
+        || eventRequest.getStartTime() == null
         || eventRequest.getHouseholdId().isBlank()
         || eventRequest.getHouseholdId() == null) {
       throw new EventInvalidBodyException("Invalid request body");
