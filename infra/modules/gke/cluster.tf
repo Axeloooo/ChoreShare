@@ -1,4 +1,4 @@
-resource "google_container_cluster" "choresync" {
+resource "google_container_cluster" "choreshare" {
   name     = var.CLUSTER_NAME
   location = var.REGION
 
