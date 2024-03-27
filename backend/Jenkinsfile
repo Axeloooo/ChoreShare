@@ -39,11 +39,8 @@ pipeline {
                         ]
 
                         services.each { service ->
-                            echo "Building image for ${service}"
-                            def image = docker.build("${REPO_URI}/${service}:${IMAGE_TAG}", "./${service}")
-                            echo "Pushing image for ${service}"
+                            def image = docker.build("${REPO_URI}/${service}:${IMAGE_TAG}", "backend/${service}")
                             image.push()
-                            echo "Image for ${service} pushed successfully"
                         }
                     }
                 }
@@ -54,8 +51,9 @@ pipeline {
         stage("Deploy to GKE") {
             steps {
                 script {
-                    sh "sed -i 's|axeloooo|${REPO_URI}|g' k8s/*.yml"
-                    sh "sed -i 's|latest|${IMAGE_TAG}|g' k8s/*.yml"
+                    sh "sed -i 's|axeloooo|${REPO_URI}|g' backend/k8s/*.yml"
+                    sh "sed -i 's|latest|${IMAGE_TAG}|g' backend/k8s/*.yml"
+                    sh "cat backend/k8s/*.yml > backend/k8s/combined.yml"
                     step([
                         $class: 'KubernetesEngineBuilder', 
                         projectId: "${env.PROJECT_ID}", 
@@ -63,7 +61,7 @@ pipeline {
                         location: "${env.CLUSTER_LOCATION}", 
                         credentialsId: "${env.PROJECT_ID}", 
                         verifyDeployments: true,
-                        manifestPattern: "k8s/*.yml",
+                        manifestPattern: "backend/k8s/combined.yml",
                     ])
                 }
             }
