@@ -84,8 +84,8 @@ public class TaskServiceImpl implements TaskService {
   @Override
   public TaskResponse createTask(TaskRequest taskRequest) {
     if (taskRequest.getTitle().isBlank() || taskRequest.getTitle() == null || taskRequest.getHouseholdId().isBlank()
-        || taskRequest.getHouseholdId() == null || taskRequest.getDescription().isBlank()
-        || taskRequest.getDescription() == null || taskRequest.getFrequency().isBlank()
+        || taskRequest.getHouseholdId() == null
+        || taskRequest.getFrequency().isBlank()
         || taskRequest.getFrequency() == null || taskRequest.getTag().isBlank() || taskRequest.getTag() == null
         || taskRequest.getUserId().isBlank() || taskRequest.getUserId() == null) {
       throw new TaskInvalidBodyException("Invalid request body");
@@ -121,7 +121,7 @@ public class TaskServiceImpl implements TaskService {
         .status(Status.PENDING)
         .frequency(Frequency.valueOf(taskRequest.getFrequency()))
         .tag(Tag.valueOf(taskRequest.getTag()))
-        .userId(taskRequest.getUserId())
+        .userId(null)
         .build();
 
     Task newTask = taskRepository.save(task);
@@ -134,7 +134,7 @@ public class TaskServiceImpl implements TaskService {
         .status(newTask.getStatus().name())
         .frequency(newTask.getFrequency().name())
         .tag(newTask.getTag().name())
-        .userId(newTask.getUserId())
+        .userId(null)
         .createdAt(newTask.getCreatedAt())
         .updatedAt(newTask.getUpdatedAt())
         .build();
@@ -309,8 +309,8 @@ public class TaskServiceImpl implements TaskService {
       throw new TaskInvalidParamException("Invalid request parameter");
     }
 
-    if (taskRequest.getTitle() == null || taskRequest.getTitle().isBlank() || taskRequest.getDescription() == null
-        || taskRequest.getDescription().isBlank() || taskRequest.getFrequency() == null
+    if (taskRequest.getTitle() == null || taskRequest.getTitle().isBlank()
+        || taskRequest.getFrequency() == null
         || taskRequest.getFrequency().isBlank() || taskRequest.getTag() == null || taskRequest.getTag().isBlank()) {
       throw new TaskInvalidBodyException("Invalid request body");
     }
@@ -450,6 +450,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     task.setUserId(null);
+    task.setStatus(Status.PENDING);
 
     Task updatedTask = taskRepository.save(task);
 

@@ -17,7 +17,7 @@ function CalendarWindow({ data }) {
     });
 
     return (
-      <div>
+      <div style={{ maxHeight: "60px", overflowY: "auto" }}>
         {dayEvents.map((event, index) => {
           const startTime = new Date(event.startTime);
           const endTime = event.endTime ? new Date(event.endTime) : null;
