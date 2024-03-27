@@ -450,6 +450,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     task.setUserId(null);
+    task.setStatus(Status.PENDING);
 
     Task updatedTask = taskRepository.save(task);
 
