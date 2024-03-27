@@ -83,11 +83,8 @@ public class TaskServiceImpl implements TaskService {
    */
   @Override
   public TaskResponse createTask(TaskRequest taskRequest) {
-    if (taskRequest.getTitle().isBlank() || taskRequest.getTitle() == null || taskRequest.getHouseholdId().isBlank()
-        || taskRequest.getHouseholdId() == null
-        || taskRequest.getFrequency().isBlank()
-        || taskRequest.getFrequency() == null || taskRequest.getTag().isBlank() || taskRequest.getTag() == null
-        || taskRequest.getUserId().isBlank() || taskRequest.getUserId() == null) {
+    if (taskRequest.getTitle() == null || taskRequest.getHouseholdId() == null || taskRequest.getFrequency() == null
+        || taskRequest.getTag() == null || taskRequest.getUserId() == null || taskRequest.getStatus() == null) {
       throw new TaskInvalidBodyException("Invalid request body");
     }
 
@@ -134,7 +131,7 @@ public class TaskServiceImpl implements TaskService {
         .status(newTask.getStatus().name())
         .frequency(newTask.getFrequency().name())
         .tag(newTask.getTag().name())
-        .userId(null)
+        .userId(newTask.getUserId())
         .createdAt(newTask.getCreatedAt())
         .updatedAt(newTask.getUpdatedAt())
         .build();
@@ -155,7 +152,7 @@ public class TaskServiceImpl implements TaskService {
    */
   @Override
   public TaskResponse getTaskById(String id) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new TaskInvalidParamException("Invalid request parameter");
     }
     Task task = taskRepository.findById(id).orElseThrow(() -> {
@@ -193,7 +190,7 @@ public class TaskServiceImpl implements TaskService {
    */
   @Override
   public List<TaskResponse> getAllTasksByUserId(String userId) {
-    if (userId.isBlank() || userId == null) {
+    if (userId == null) {
       throw new TaskInvalidParamException("Invalid request parameter");
     }
 
@@ -248,7 +245,7 @@ public class TaskServiceImpl implements TaskService {
    */
   @Override
   public List<TaskResponse> getAllTasksByHouseholdId(String householdId) {
-    if (householdId.isBlank() || householdId == null) {
+    if (householdId == null) {
       throw new TaskInvalidParamException("Invalid request parameter");
     }
 
@@ -305,13 +302,12 @@ public class TaskServiceImpl implements TaskService {
    */
   @Override
   public TaskResponse updateTask(String id, TaskEditMetadataRequest taskRequest) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new TaskInvalidParamException("Invalid request parameter");
     }
 
-    if (taskRequest.getTitle() == null || taskRequest.getTitle().isBlank()
-        || taskRequest.getFrequency() == null
-        || taskRequest.getFrequency().isBlank() || taskRequest.getTag() == null || taskRequest.getTag().isBlank()) {
+    if (taskRequest.getTitle() == null || taskRequest.getFrequency() == null || taskRequest.getTag() == null
+        || taskRequest.getTag() == null) {
       throw new TaskInvalidBodyException("Invalid request body");
     }
 
@@ -361,12 +357,11 @@ public class TaskServiceImpl implements TaskService {
    */
   @Override
   public TaskResponse updateTaskStatus(String id, TaskEditStatusRequest taskRequest) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new TaskInvalidParamException("Invalid request parameter");
     }
 
-    if (taskRequest.getStatus().isBlank() || taskRequest.getStatus() == null || taskRequest.getUserId().isBlank()
-        || taskRequest.getUserId() == null) {
+    if (taskRequest.getStatus() == null || taskRequest.getUserId() == null) {
       throw new TaskInvalidBodyException("Invalid request body");
     }
 
@@ -409,7 +404,7 @@ public class TaskServiceImpl implements TaskService {
    */
   @Override
   public void deleteTask(String id) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new TaskInvalidParamException("Invalid request parameter");
     }
 
@@ -437,7 +432,7 @@ public class TaskServiceImpl implements TaskService {
    */
   @Override
   public TaskResponse unassignTask(String id, String userId) {
-    if (id.isBlank() || id == null || userId.isBlank() || userId == null) {
+    if (id == null || userId == null) {
       throw new TaskInvalidParamException("Invalid request parameter");
     }
 
@@ -487,7 +482,7 @@ public class TaskServiceImpl implements TaskService {
    */
   @Override
   public TaskResponse assignTask(String id, String userId) {
-    if (userId.isBlank() || userId == null || id.isBlank() || id == null) {
+    if (userId == null || id == null) {
       throw new TaskInvalidParamException("Invalid request parameter");
     }
 
