@@ -628,7 +628,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/${choreId}/assignee/${userId}`,
+        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/${choreId}/assign/${userId}`,
         {
           method: "PUT",
           headers: {
