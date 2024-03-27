@@ -23,7 +23,7 @@ pipeline {
                 withCredentials([file(credentialsId: "GCP_CREDENTIALS", variable: "GCP_KEY")]) {
                     sh "gcloud auth activate-service-account --key-file=${GCP_KEY}"
                     sh "gcloud auth configure-docker ${env.REGISTRY_URI} --quiet"
-                    sh "sudo docker --version"
+                    sh "docker --version"
                     script {
                         def services = [
                             "registry-service",
