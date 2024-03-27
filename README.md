@@ -96,6 +96,46 @@ cd backend
 docker compose up -d
 ```
 
-5. Open the browser and navigate to `http://localhost:8761/` to view the Eureka dashboard.
+5. Open the browser and navigate to `http://localhost:8761` to view the Eureka dashboard.
 
-6. Open the browser and navigate to `http://localhost:5050/` to view the PGAAdmin dashboard.
+6. Open the browser and navigate to `http://localhost:5050` to view the PG4Admin dashboard.
+
+## Setup PG4Admin
+
+1. Make sure you followed the steps on [Running the Backend](#running-the-backend) before proceeding.
+
+2. Open the browser and navigate to `http://localhost:5050` to view the PG4Admin dashboard.
+
+3. Login with the following credentials:
+
+- **Username:** `pgadmin4@pgadmin.com`
+
+- **Password:** `admin`
+
+![PG4Admin Login](./images/image1.png)
+
+4. Click on `Add New Server`.
+
+![Add New Server](./images/image2.png)
+
+5. In the `General` tab, enter the following information:
+
+- **Name:** `ChoreShare`
+
+![General Tab](./images/image3.png)
+
+6. In the `Connection` tab, enter the following information:
+
+- **Host name/address:** `postgres`
+
+- **Port:** `5432`
+
+- **Maintenance database:** `postgres`
+
+- **Username:** `postgres`
+
+- **Password:** `root`
+
+- **Save password?:** `Yes`
+
+![Connection Tab](./images/image4.png)

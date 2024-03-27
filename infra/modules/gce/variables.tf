@@ -1,3 +1,8 @@
+variable "REGION" {
+  description = "The GCP region"
+  type        = string
+}
+
 variable "INSTANCE_NAME" {
   description = "The GCE instance name"
   type        = string
@@ -8,8 +13,8 @@ variable "MACHINE_TYPE" {
   type        = string
 }
 
-variable "REGION" {
-  description = "The GCP region"
+variable "IMAGE_FAMILY" {
+  description = "The GCE image family"
   type        = string
 }
 

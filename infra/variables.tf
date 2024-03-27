@@ -24,6 +24,11 @@ variable "MACHINE_TYPE" {
   type        = string
 }
 
+variable "IMAGE_FAMILY" {
+  description = "The GCE image family"
+  type        = string
+}
+
 variable "NETWORK_NAME" {
   description = "The GCE network name"
   type        = string
