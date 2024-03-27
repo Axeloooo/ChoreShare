@@ -79,9 +79,9 @@ public class AnnouncementServiceImpl implements AnnouncementService {
   @Override
   public AnnouncementResponse createAnnouncement(AnnouncementRequest announcementRequest) {
     if (announcementRequest.getMessage().isBlank() || announcementRequest.getHouseholdId().isBlank()
-        || announcementRequest.getUserId().isBlank() || announcementRequest.getAuthor().isBlank()
+        || announcementRequest.getUserId().isBlank()
         || announcementRequest.getMessage() == null || announcementRequest.getHouseholdId() == null
-        || announcementRequest.getUserId() == null || announcementRequest.getAuthor() == null) {
+        || announcementRequest.getUserId() == null) {
       throw new AnnouncementInvalidBodyException("Invalid request body");
     }
 
@@ -236,8 +236,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
       throw new AnnouncementInvalidParamException("Invalid request parameter");
     }
 
-    if (announcementRequest.getMessage() == null || announcementRequest.getMessage().isBlank()
-        || announcementRequest.getAuthor() == null || announcementRequest.getAuthor().isBlank()) {
+    if (announcementRequest.getMessage() == null || announcementRequest.getMessage().isBlank()) {
       throw new AnnouncementInvalidBodyException("Invalid request body");
     }
 
