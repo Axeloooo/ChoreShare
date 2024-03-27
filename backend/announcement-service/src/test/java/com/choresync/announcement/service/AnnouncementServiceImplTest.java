@@ -150,7 +150,7 @@ public class AnnouncementServiceImplTest {
 
   @Description("GET /api/v1/announcement - Test get all announcements")
   @Test
-  public void testGetAllAnnouncements() {
+  public void testGetAllAnnouncementsByHousehold() {
     when(announcementRepository.findByHouseholdId("house1")).thenReturn(Arrays.asList(announcement));
 
     List<AnnouncementResponse> responses = announcementService.getAllAnnouncementsByHouseholdId("house1");
@@ -165,7 +165,7 @@ public class AnnouncementServiceImplTest {
 
   @Description("GET /api/v1/announcement - Test get all empty announcements")
   @Test
-  public void testGetAllAnnouncementsEmpty() {
+  public void testGetAllAnnouncementsByHouseholdEmpty() {
     when(announcementRepository.findByHouseholdId("house1")).thenReturn(Collections.emptyList());
 
     List<AnnouncementResponse> responses = announcementService.getAllAnnouncementsByHouseholdId("house1");
