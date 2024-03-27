@@ -23,6 +23,7 @@ import com.choresync.user.exception.UserAlreadyExistsException;
 import com.choresync.user.exception.UserInvalidBodyException;
 import com.choresync.user.exception.UserNotFoundException;
 import com.choresync.user.model.UserAuthResponse;
+import com.choresync.user.model.UserEditMetadataRequest;
 import com.choresync.user.model.UserRequest;
 import com.choresync.user.model.UserResponse;
 import com.choresync.user.repository.UserRepository;
@@ -36,6 +37,8 @@ class UserServiceImplTest {
   private UserServiceImpl userService;
 
   private UserRequest userRequest;
+  private UserRequest invalidUserRequest;
+  private UserEditMetadataRequest userMetadata;
   private User user;
 
   @BeforeEach
@@ -45,6 +48,22 @@ class UserServiceImplTest {
     userRequest = UserRequest.builder()
         .firstName("John")
         .lastName("Doe")
+        .username("johndoe")
+        .email("john.doe@example.com")
+        .password("password")
+        .phone("1234567890")
+        .build();
+
+    userMetadata = UserEditMetadataRequest.builder()
+        .firstName("John")
+        .lastName("Doe")
+        .email("john.doe@example.com")
+        .phone("1234567890")
+        .build();
+
+    invalidUserRequest = UserRequest.builder()
+        .firstName("Jhon")
+        .lastName(null)
         .username("johndoe")
         .email("john.doe@example.com")
         .password("password")
@@ -105,7 +124,7 @@ class UserServiceImplTest {
   @Description("POST /api/v1/user - Test UserCreationException")
   @Test
   public void testUserCreationException() {
-    assertThrows(UserInvalidBodyException.class, () -> userService.createUser(null));
+    assertThrows(UserInvalidBodyException.class, () -> userService.createUser(invalidUserRequest));
 
     verify(userRepository, times(0)).findByEmail(anyString());
     verify(userRepository, times(0)).save(any(User.class));
@@ -184,32 +203,32 @@ class UserServiceImplTest {
     verify(userRepository, times(0)).deleteById(anyString());
   }
 
-  // @Description("PUT /api/v1/user/{id} - Test edit user success")
-  // @Test
-  // public void testEditUserSuccess() {
-  // when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
-  // when(userRepository.save(any(User.class))).thenReturn(user);
+  @Description("PUT /api/v1/user/{id} - Test edit user success")
+  @Test
+  public void testEditUserSuccess() {
+    when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+    when(userRepository.save(any(User.class))).thenReturn(user);
 
-  // UserResponse userResponse = userService.editUser("1", userRequest);
+    UserResponse userResponse = userService.editUser("1", userMetadata);
 
-  // assertNotNull(userResponse);
-  // assertEquals(user.getId(), userResponse.getId());
+    assertNotNull(userResponse);
+    assertEquals(user.getId(), userResponse.getId());
 
-  // verify(userRepository, times(1)).findById(anyString());
-  // verify(userRepository, times(1)).save(any(User.class));
-  // }
+    verify(userRepository, times(1)).findById(anyString());
+    verify(userRepository, times(1)).save(any(User.class));
+  }
 
-  // @Description("PUT /api/v1/user/{id} - Test UserNotFoundException")
-  // @Test
-  // public void testEditUserNotFound() {
-  // when(userRepository.findById(anyString())).thenReturn(Optional.empty());
+  @Description("PUT /api/v1/user/{id} - Test UserNotFoundException")
+  @Test
+  public void testEditUserNotFound() {
+    when(userRepository.findById(anyString())).thenReturn(Optional.empty());
 
-  // assertThrows(UserNotFoundException.class, () -> userService.editUser("1",
-  // userRequest));
+    assertThrows(UserNotFoundException.class, () -> userService.editUser("1",
+        userMetadata));
 
-  // verify(userRepository, times(1)).findById(anyString());
-  // verify(userRepository, times(0)).save(any(User.class));
-  // }
+    verify(userRepository, times(1)).findById(anyString());
+    verify(userRepository, times(0)).save(any(User.class));
+  }
 
   @Description("GET /api/v1/user/username/{username} - Test get user by username success")
   @Test
