@@ -537,6 +537,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
+        setIsLoading(false);
         toast.error(response.message);
         return;
       }
@@ -595,6 +596,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
+        setIsLoading(false);
         toast.error(response.message);
         return;
       }
@@ -638,6 +640,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
+        setIsLoading(false);
         toast.error(response.message);
         return;
       }
@@ -685,6 +688,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
+        setIsLoading(false);
         toast.error(response.message);
         return;
       }
@@ -734,6 +738,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
+        setIsLoading(false);
         toast.error(response.message);
         return;
       }
@@ -794,6 +799,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
+        setIsLoading(false);
         toast.error(response.message);
         return;
       }
@@ -848,6 +854,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
+        setIsLoading(false);
         toast.error(response.message);
         return;
       }
@@ -904,6 +911,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
+        setIsLoading(false);
         toast.error(response.message);
         return;
       }
@@ -962,6 +970,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
+        setIsLoading(false);
         toast.error(response.message);
         return;
       }
@@ -1010,6 +1019,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
+        setIsLoading(false);
         toast.error(response.message);
         return;
       }
@@ -1062,6 +1072,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
+        setIsLoading(false);
         toast.error(response.message);
         return;
       }
@@ -1105,6 +1116,7 @@ function App() {
 
       if (!res.ok) {
         const response = await res.json();
+        setIsLoading(false);
         toast.error(response.message);
         return;
       }
