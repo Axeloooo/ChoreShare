@@ -78,9 +78,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
    */
   @Override
   public AnnouncementResponse createAnnouncement(AnnouncementRequest announcementRequest) {
-    if (announcementRequest.getMessage().isBlank() || announcementRequest.getHouseholdId().isBlank()
-        || announcementRequest.getUserId().isBlank()
-        || announcementRequest.getMessage() == null || announcementRequest.getHouseholdId() == null
+    if (announcementRequest.getMessage() == null || announcementRequest.getHouseholdId() == null
         || announcementRequest.getUserId() == null) {
       throw new AnnouncementInvalidBodyException("Invalid request body");
     }
@@ -144,7 +142,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
    */
   @Override
   public AnnouncementResponse getAnnouncementById(String id) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new AnnouncementInvalidParamException("Invalid request parameter");
     }
 
@@ -179,7 +177,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
    */
   @Override
   public List<AnnouncementResponse> getAllAnnouncementsByHouseholdId(String householdId) {
-    if (householdId.isBlank() || householdId == null) {
+    if (householdId == null) {
       throw new AnnouncementInvalidParamException("Invalid request parameter");
     }
 
@@ -232,11 +230,11 @@ public class AnnouncementServiceImpl implements AnnouncementService {
    */
   @Override
   public AnnouncementResponse editAnnouncement(String id, AnnouncementRequest announcementRequest) {
-    if (id == null || id.isBlank()) {
+    if (id == null) {
       throw new AnnouncementInvalidParamException("Invalid request parameter");
     }
 
-    if (announcementRequest.getMessage() == null || announcementRequest.getMessage().isBlank()) {
+    if (announcementRequest.getMessage() == null) {
       throw new AnnouncementInvalidBodyException("Invalid request body");
     }
 
@@ -271,7 +269,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
    */
   @Override
   public void deleteAnnouncement(String id) {
-    if (id == null || id.isBlank()) {
+    if (id == null) {
       throw new AnnouncementInvalidParamException("Invalid request parameter");
     }
 
@@ -297,7 +295,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
    */
   @Override
   public List<AnnouncementResponse> getAllAnnouncementsByUserId(String userId) {
-    if (userId.isBlank() || userId == null) {
+    if (userId == null) {
       throw new AnnouncementInvalidParamException("Invalid request parameter");
     }
 
