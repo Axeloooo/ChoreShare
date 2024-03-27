@@ -589,7 +589,7 @@ function App() {
             status: null,
             frequency: frequence,
             tag: tag,
-            userId: null,
+            userId: userId,
           }),
         }
       );
