@@ -78,11 +78,9 @@ public class EventServiceImpl implements EventService {
    */
   @Override
   public EventResponse createEvent(EventRequest eventRequest) {
-    if (eventRequest.getTitle().isBlank() || eventRequest.getUserId().isBlank()
-        || eventRequest.getUserId() == null || eventRequest.getUsername().isBlank()
+    if (eventRequest.getTitle() == null || eventRequest.getUserId() == null
         || eventRequest.getUsername() == null
         || eventRequest.getStartTime() == null
-        || eventRequest.getHouseholdId().isBlank()
         || eventRequest.getHouseholdId() == null) {
       throw new EventInvalidBodyException("Invalid request body");
     }
@@ -152,7 +150,7 @@ public class EventServiceImpl implements EventService {
    */
   @Override
   public EventResponse getEventById(String id) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new EventInvalidParamException("Invalid request parameter");
     }
 
@@ -189,7 +187,7 @@ public class EventServiceImpl implements EventService {
    */
   @Override
   public List<EventResponse> getAllEventsByHouseholdId(String householdId) {
-    if (householdId.isBlank() || householdId == null) {
+    if (householdId == null) {
       throw new EventInvalidParamException("Invalid request parameter");
     }
 
@@ -241,7 +239,7 @@ public class EventServiceImpl implements EventService {
    */
   @Override
   public void deleteEvent(String id) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new EventInvalidParamException("Invalid request parameter");
     }
 
@@ -267,7 +265,7 @@ public class EventServiceImpl implements EventService {
    */
   @Override
   public List<EventResponse> getAllEventsByUserId(String userId) {
-    if (userId.isBlank() || userId == null) {
+    if (userId == null) {
       throw new EventInvalidParamException("Invalid request parameter");
     }
 
