@@ -20,10 +20,9 @@ pipeline {
 
         stage("Build and Push Images") {
             steps {
-                withCredentials([file(credentialsId: "GCP_CREDENTIALS", variable: "GCP_KEY")]) {
+                withCredentials([file(credentialsId: "gcp", variable: "GCP_KEY")]) {
                     sh "gcloud auth activate-service-account --key-file=${GCP_KEY}"
                     sh "gcloud auth configure-docker ${env.REGISTRY_URI} --quiet"
-                    sh "docker --version"
                     script {
                         def services = [
                             "registry-service",
@@ -40,13 +39,17 @@ pipeline {
                         ]
 
                         services.each { service ->
+                            echo "Building image for ${service}"
                             def image = docker.build("${REPO_URI}/${service}:${IMAGE_TAG}", "./${service}")
+                            echo "Pushing image for ${service}"
                             image.push()
+                            echo "Image for ${service} pushed successfully"
                         }
                     }
                 }
             }
         }
+
 
         stage("Deploy to GKE") {
             steps {
