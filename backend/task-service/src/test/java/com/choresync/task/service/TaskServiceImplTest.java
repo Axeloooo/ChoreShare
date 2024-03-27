@@ -2,6 +2,8 @@ package com.choresync.task.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,14 +19,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.annotation.Description;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import com.choresync.task.entity.Frequency;
 import com.choresync.task.entity.Status;
 import com.choresync.task.entity.Tag;
 import com.choresync.task.entity.Task;
+import com.choresync.task.exception.TaskInternalCommunicationException;
 import com.choresync.task.exception.TaskInvalidBodyException;
+import com.choresync.task.exception.TaskInvalidParamException;
 import com.choresync.task.exception.TaskNotFoundException;
 import com.choresync.task.exception.TaskUnforbiddenActionException;
+import com.choresync.task.external.exception.HouseholdNotFoundException;
+import com.choresync.task.external.exception.UserNotFoundException;
+import com.choresync.task.external.response.HouseholdResponse;
+import com.choresync.task.external.response.UserResponse;
 import com.choresync.task.model.TaskEditMetadataRequest;
 import com.choresync.task.model.TaskEditStatusRequest;
 import com.choresync.task.model.TaskRequest;
@@ -32,6 +42,9 @@ import com.choresync.task.model.TaskResponse;
 import com.choresync.task.repository.TaskRepository;
 
 public class TaskServiceImplTest {
+
+  @Mock
+  private RestTemplate restTemplate;
 
   @Mock
   private TaskRepository taskRepository;
@@ -42,18 +55,27 @@ public class TaskServiceImplTest {
   private Task task;
   private TaskRequest taskRequest;
   private TaskResponse taskResponse;
+  private TaskRequest taskInvalidRequest;
+  private UserResponse userResponse;
+  private HouseholdResponse householdResponse;
 
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
 
-    taskRequest = TaskRequest.builder()
+    taskInvalidRequest = TaskRequest
+        .builder()
+        .build();
+
+    taskRequest = TaskRequest
+        .builder()
         .title("Test Task")
         .description("This is a test task")
         .status("PENDING")
         .frequency("EVERYDAY")
         .tag("GENERAL")
         .userId("user1")
+        .householdId("household1")
         .build();
 
     task = Task.builder()
@@ -63,7 +85,8 @@ public class TaskServiceImplTest {
         .status(Status.valueOf(taskRequest.getStatus()))
         .frequency(Frequency.valueOf(taskRequest.getFrequency()))
         .tag(Tag.valueOf(taskRequest.getTag()))
-        .userId("user1")
+        .userId(null)
+        .householdId("household1")
         .createdAt(new Date())
         .updatedAt(new Date())
         .build();
@@ -76,14 +99,98 @@ public class TaskServiceImplTest {
         .frequency(task.getFrequency().name())
         .tag(task.getTag().name())
         .userId(task.getUserId())
+        .householdId(task.getHouseholdId())
         .createdAt(task.getCreatedAt())
         .updatedAt(task.getUpdatedAt())
         .build();
+
+    userResponse = UserResponse
+        .builder()
+        .id("user1")
+        .firstName("John")
+        .lastName("Doe")
+        .username("johndoe")
+        .email("axel@gmail.com")
+        .phone("1234567890")
+        .missedChores(0)
+        .streak(0)
+        .createdAt(new Date())
+        .updatedAt(new Date())
+        .build();
+
+    householdResponse = HouseholdResponse
+        .builder()
+        .id("household1")
+        .name("Household 1")
+        .createdAt(new Date())
+        .updatedAt(new Date())
+        .build();
+  }
+
+  @Description("POST /api/v1/task - Test create task with invalid body")
+  @Test
+  public void testCreateTaskWithInvalidBody() {
+    assertThrows(TaskInvalidBodyException.class, () -> taskService.createTask(taskInvalidRequest));
+  }
+
+  @Description("POST /api/v1/task - Test create task with household not found")
+  @Test
+  public void testCreateTaskWithHouseholdNotFound() {
+    when(restTemplate.getForObject("http://user-service/api/v1/user/" + taskRequest.getUserId(), UserResponse.class))
+        .thenReturn(userResponse);
+    when(restTemplate.getForObject("http://household-service/api/v1/household/" + taskRequest.getHouseholdId(),
+        HouseholdResponse.class))
+        .thenReturn(null);
+
+    assertThrows(HouseholdNotFoundException.class, () -> taskService.createTask(taskRequest));
+  }
+
+  @Description("POST /api/v1/task - Test create task with user not found")
+  @Test
+  public void testCreateTaskWithUserNotFound() {
+    when(restTemplate.getForObject("http://household-service/api/v1/household/" + taskRequest.getHouseholdId(),
+        HouseholdResponse.class))
+        .thenReturn(householdResponse);
+    when(restTemplate.getForObject("http://user-service/api/v1/user/" + taskRequest.getUserId(), UserResponse.class))
+        .thenReturn(null);
+
+    assertThrows(UserNotFoundException.class, () -> taskService.createTask(taskRequest));
+  }
+
+  @Description("POST /api/v1/task - Test create task with internal communication exception in household service")
+  @Test
+  public void testCreateTaskWithInternalCommunicationException() {
+    when(restTemplate.getForObject("http://household-service/api/v1/household/" + taskRequest.getHouseholdId(),
+        HouseholdResponse.class))
+        .thenThrow(new RestClientException("Internal error"));
+    when(restTemplate.getForObject("http://user-service/api/v1/user/" + taskRequest.getUserId(), UserResponse.class))
+        .thenReturn(userResponse);
+
+    assertThrows(TaskInternalCommunicationException.class, () -> taskService.createTask(taskRequest));
+  }
+
+  @Description("POST /api/v1/task - Test create task with internal communication exception in user service")
+  @Test
+  public void testCreateTaskWithInternalCommunicationExceptionInUserService() {
+    when(restTemplate.getForObject("http://household-service/api/v1/household/" + taskRequest.getHouseholdId(),
+        HouseholdResponse.class))
+        .thenReturn(householdResponse);
+    when(restTemplate.getForObject("http://user-service/api/v1/user/" + taskRequest.getUserId(), UserResponse.class))
+        .thenThrow(new RestClientException("Internal error"));
+
+    assertThrows(TaskInternalCommunicationException.class, () -> taskService.createTask(taskRequest));
   }
 
   @Description("POST /api/v1/task - Test create task")
   @Test
   public void testCreateTask() {
+    when(restTemplate.getForObject("http://user-service/api/v1/user/" + taskRequest.getUserId(), UserResponse.class))
+        .thenReturn(userResponse);
+
+    when(restTemplate.getForObject("http://household-service/api/v1/household/" + taskRequest.getHouseholdId(),
+        HouseholdResponse.class))
+        .thenReturn(householdResponse);
+
     when(taskRepository.save(any(Task.class)))
         .thenReturn(task);
 
@@ -92,23 +199,32 @@ public class TaskServiceImplTest {
     assertNotNull(response);
     assertEquals(taskResponse, response);
 
+    verify(restTemplate, times(1)).getForObject("http://user-service/api/v1/user/" + taskRequest.getUserId(),
+        UserResponse.class);
+    verify(restTemplate, times(1)).getForObject(
+        "http://household-service/api/v1/household/" + taskRequest.getHouseholdId(),
+        HouseholdResponse.class);
     verify(taskRepository, times(1)).save(any(Task.class));
   }
 
-  @Description("POST /api/v1/task - Test TaskCreationException when creating task")
+  @Description("GET /api/v1/task/{id} - Test get task by id with invalid parameter")
   @Test
-  public void testCreateTaskWithNullRequest() {
-    assertThrows(TaskInvalidBodyException.class, () -> taskService.createTask(null));
-
-    verify(taskRepository, times(0)).save(any(Task.class));
+  public void testGetTaskByIdWithInvalidParam() {
+    assertThrows(TaskInvalidParamException.class, () -> taskService.getTaskById(null));
   }
 
-  @Description("GET /api/v1/task/{id} - Test get task by id")
+  @Description("GET /api/v1/task/{id} - Test get task by id with task not found")
   @Test
-  public void testGetTaskById() {
-    when(taskRepository.findById("1"))
-        .thenReturn(Optional.of(task));
+  public void testGetTaskByIdWithTaskNotFound() {
+    when(taskRepository.findById("invalidId")).thenReturn(Optional.empty());
 
+    assertThrows(TaskNotFoundException.class, () -> taskService.getTaskById("invalidId"));
+  }
+
+  @Description("GET /api/v1/task/{id} - Test get task by id success")
+  @Test
+  public void testGetTaskByIdSuccess() {
+    when(taskRepository.findById("1")).thenReturn(Optional.of(task));
     TaskResponse response = taskService.getTaskById("1");
 
     assertNotNull(response);
@@ -117,265 +233,335 @@ public class TaskServiceImplTest {
     verify(taskRepository, times(1)).findById("1");
   }
 
-  @Description("GET /api/v1/task/{id} - Test TaskNotFoundException when getting task by id")
+  @Description("GET /api/v1/task/user/{userId} - Test get all tasks by user id with invalid param")
   @Test
-  public void testGetTaskByIdNotFound() {
-    assertThrows(TaskNotFoundException.class, () -> taskService.getTaskById("1"));
-
-    verify(taskRepository, times(1)).findById("1");
+  public void testGetAllTasksByUserIdWithInvalidParam() {
+    assertThrows(TaskInvalidParamException.class, () -> taskService.getAllTasksByUserId(null));
   }
 
-  @Description("Get /api/v1/task/user/{userId} - Test get all tasks by user id")
+  @Description("GET /api/v1/task/user/{userId} - Test get all tasks by user id with user not found")
   @Test
-  public void testGetAllTasksByUserId() {
-    when(taskRepository.findByUserId("user1"))
-        .thenReturn(Arrays.asList(task));
+  public void testGetAllTasksByUserIdWithUserNotFound() {
+    when(restTemplate.getForObject("http://user-service/api/v1/user/" + taskRequest.getUserId(), UserResponse.class))
+        .thenReturn(null);
 
-    List<TaskResponse> result = taskService.getAllTasksByUserId("user1");
-
-    assertNotNull(result);
-    assertEquals(1, result.size());
-    assertEquals(taskResponse, result.get(0));
-
-    verify(taskRepository, times(1)).findByUserId("user1");
+    assertThrows(UserNotFoundException.class, () -> taskService.getAllTasksByUserId("user1"));
   }
 
-  @Description("Get /api/v1/task/user/{userId} - Test get all empty tasks by user id")
+  @Description("GET /api/v1/task/user/{userId} - Test get all tasks by user id with internal communication exception")
   @Test
-  public void testGetAllTasksByUserIdEmpty() {
-    when(taskRepository.findByUserId("user1"))
-        .thenReturn(Arrays.asList());
+  public void testGetAllTasksByUserIdWithInternalCommunicationException() {
+    when(restTemplate.getForObject("http://user-service/api/v1/user/" + taskRequest.getUserId(), UserResponse.class))
+        .thenThrow(new RestClientException("Internal error"));
 
-    List<TaskResponse> result = taskService.getAllTasksByUserId("user1");
-
-    assertNotNull(result);
-    assertEquals(0, result.size());
-
-    verify(taskRepository, times(1)).findByUserId("user1");
+    assertThrows(TaskInternalCommunicationException.class, () -> taskService.getAllTasksByUserId("user1"));
   }
 
-  @Description("Get /api/v1/task/user/{userId} - Test TaskNotFoundException when getting all tasks by user id")
+  @Description("GET /api/v1/task/user/{userId} - Test get all tasks by user id success")
   @Test
-  public void testGetAllTasksByUserIdNotFound() {
-    assertThrows(TaskNotFoundException.class, () -> taskService.getAllTasksByUserId(null));
+  public void testGetAllTasksByUserIdSuccess() {
+    List<Task> tasks = Arrays.asList(task);
 
-    verify(taskRepository, times(0)).findByUserId(null);
+    when(restTemplate.getForObject("http://user-service/api/v1/user/" + taskRequest.getUserId(), UserResponse.class))
+        .thenReturn(userResponse);
+    when(taskRepository.findByUserId(anyString())).thenReturn(tasks);
+
+    List<TaskResponse> responses = taskService.getAllTasksByUserId("user1");
+
+    assertNotNull(responses);
+    assertEquals(1, responses.size());
+    assertEquals(taskResponse, responses.get(0));
+
+    verify(restTemplate, times(1)).getForObject("http://user-service/api/v1/user/" + taskRequest.getUserId(),
+        UserResponse.class);
+    verify(taskRepository, times(1)).findByUserId(anyString());
   }
 
-  // @Description("Get /api/v1/task - Test get all tasks")
-  // @Test
-  // public void testGetAllTasks() {
-  // when(taskRepository.findAll()).thenReturn(Arrays.asList(task));
-
-  // List<TaskResponse> result = taskService.getAllTasks();
-
-  // assertNotNull(result);
-  // assertEquals(1, result.size());
-  // assertEquals(taskResponse, result.get(0));
-
-  // verify(taskRepository, times(1)).findAll();
-  // }
-
-  // @Description("Get /api/v1/task - Test get all empty tasks")
-  // @Test
-  // public void testGetAllTasksEmpty() {
-  // when(taskRepository.findAll()).thenReturn(Arrays.asList());
-
-  // List<TaskResponse> result = taskService.getAllTasks();
-
-  // assertNotNull(result);
-  // assertEquals(0, result.size());
-
-  // verify(taskRepository, times(1)).findAll();
-  // }
-
-  @Description("PUT /api/v1/task/{id} - Test update task")
+  @Description("GET /api/v1/task/household/{householdId} - Test get all tasks by household id with invalid param")
   @Test
-  void updateTask() {
-    TaskEditMetadataRequest taskRequest = TaskEditMetadataRequest
+  public void testGetAllTasksByHouseholdIdWithInvalidParam() {
+    assertThrows(TaskInvalidParamException.class, () -> taskService.getAllTasksByHouseholdId(null));
+  }
+
+  @Description("GET /api/v1/task/household/{householdId} - Test get all tasks by household id with household not found")
+  @Test
+  public void testGetAllTasksByHouseholdIdWithHouseholdNotFound() {
+    when(restTemplate.getForObject("http://household-service/api/v1/household/" + taskRequest.getHouseholdId(),
+        HouseholdResponse.class))
+        .thenReturn(null);
+
+    assertThrows(HouseholdNotFoundException.class, () -> taskService.getAllTasksByHouseholdId("household1"));
+  }
+
+  @Description("GET /api/v1/task/household/{householdId} - Test get all tasks by household id with internal communication exception")
+  @Test
+  public void testGetAllTasksByHouseholdIdWithInternalCommunicationException() {
+    when(restTemplate.getForObject("http://household-service/api/v1/household/" + taskRequest.getHouseholdId(),
+        HouseholdResponse.class))
+        .thenThrow(new RestClientException("Internal error"));
+
+    assertThrows(TaskInternalCommunicationException.class, () -> taskService.getAllTasksByHouseholdId("household1"));
+  }
+
+  @Description("GET /api/v1/task/household/{householdId} - Test get all tasks by household id success")
+  @Test
+  public void testGetAllTasksByHouseholdIdSuccess() {
+    List<Task> tasks = Arrays.asList(task);
+
+    when(restTemplate.getForObject("http://household-service/api/v1/household/" + taskRequest.getHouseholdId(),
+        HouseholdResponse.class))
+        .thenReturn(householdResponse);
+    when(taskRepository.findByHouseholdId(anyString())).thenReturn(tasks);
+
+    List<TaskResponse> responses = taskService.getAllTasksByHouseholdId("household1");
+
+    assertNotNull(responses);
+    assertEquals(1, responses.size());
+    assertEquals(taskResponse, responses.get(0));
+
+    verify(restTemplate, times(1)).getForObject(
+        "http://household-service/api/v1/household/" + taskRequest.getHouseholdId(),
+        HouseholdResponse.class);
+    verify(taskRepository, times(1)).findByHouseholdId(anyString());
+  }
+
+  @Description("PUT /api/v1/task/{id} - Test update task with invalid param")
+  @Test
+  public void testUpdateTaskWithInvalidParam() {
+    assertThrows(TaskInvalidParamException.class,
+        () -> taskService.updateTask(null, TaskEditMetadataRequest.builder().build()));
+  }
+
+  @Description("PUT /api/v1/task/{id} - Test update task with invalid body")
+  @Test
+  public void testUpdateTaskWithInvalidBody() {
+    TaskEditMetadataRequest request = TaskEditMetadataRequest
+        .builder()
+        .build();
+
+    assertThrows(TaskInvalidBodyException.class, () -> taskService.updateTask("1", request));
+  }
+
+  @Description("PUT /api/v1/task/{id} - Test update task with task not found")
+  @Test
+  public void testUpdateTaskWithTaskNotFound() {
+    when(taskRepository.findById(anyString())).thenReturn(Optional.empty());
+
+    TaskEditMetadataRequest request = TaskEditMetadataRequest
         .builder()
         .title("Updated Task")
-        .description("Updated Description")
+        .description("Updated description")
+        .frequency("WEEKLY")
+        .tag("CLEANING")
+        .build();
+
+    assertThrows(TaskNotFoundException.class,
+        () -> taskService.updateTask("1", request));
+  }
+
+  @Description("PUT /api/v1/task/{id} - Test update task success")
+  @Test
+  public void testUpdateTaskSuccess() {
+    TaskEditMetadataRequest request = TaskEditMetadataRequest
+        .builder()
+        .title("Updated Task")
+        .description("Updated description")
         .frequency("ONCE_A_WEEK")
         .tag("KITCHEN")
         .build();
 
-    when(taskRepository.findById("1"))
-        .thenReturn(Optional.of(task));
+    when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
+    when(taskRepository.save(any(Task.class))).thenReturn(task);
 
-    when(taskRepository.save(any(Task.class)))
-        .thenReturn(task);
+    TaskResponse response = taskService.updateTask("1", request);
 
-    TaskResponse updatedTaskResponse = taskService.updateTask("1", taskRequest);
-
-    assertNotNull(updatedTaskResponse);
-    assertEquals("Updated Task", updatedTaskResponse.getTitle());
-    assertEquals("Updated Description", updatedTaskResponse.getDescription());
-    assertEquals("ONCE_A_WEEK", updatedTaskResponse.getFrequency());
-    assertEquals("KITCHEN", updatedTaskResponse.getTag());
+    assertNotNull(response);
+    assertEquals("Updated Task", response.getTitle());
+    assertEquals("Updated description", response.getDescription());
+    assertEquals("ONCE_A_WEEK", response.getFrequency());
+    assertEquals("KITCHEN", response.getTag());
 
     verify(taskRepository, times(1)).findById("1");
     verify(taskRepository, times(1)).save(any(Task.class));
   }
 
-  @Description("PUT /api/v1/task/{id} - Test update task status")
+  @Description("PUT /api/v1/task/{id}/status - Test update task status with invalid param")
   @Test
-  void updateTaskStatus() {
-    TaskEditStatusRequest taskRequest = TaskEditStatusRequest
+  public void testUpdateTaskStatusWithInvalidParam() {
+    assertThrows(TaskInvalidParamException.class,
+        () -> taskService.updateTaskStatus(null, new TaskEditStatusRequest()));
+  }
+
+  @Description("PUT /api/v1/task/{id}/status - Test update task status with invalid body")
+  @Test
+  public void testUpdateTaskStatusWithInvalidBody() {
+    TaskEditStatusRequest request = TaskEditStatusRequest
+        .builder()
+        .build();
+    assertThrows(TaskInvalidBodyException.class, () -> taskService.updateTaskStatus("1", request));
+  }
+
+  @Description("PUT /api/v1/task/{id}/status - Test update task status with task not found")
+  @Test
+  public void testUpdateTaskStatusWithTaskNotFound() {
+    when(taskRepository.findById(anyString())).thenReturn(Optional.empty());
+
+    TaskEditStatusRequest request = TaskEditStatusRequest
         .builder()
         .status("COMPLETED")
         .userId("user1")
         .build();
 
-    when(taskRepository.findById("1"))
-        .thenReturn(Optional.of(task));
+    assertThrows(TaskNotFoundException.class,
+        () -> taskService.updateTaskStatus("1", request));
+  }
 
-    when(taskRepository.save(any(Task.class)))
-        .thenReturn(task);
+  @Description("PUT /api/v1/task/{id}/status - Test update task status with forbidden action")
+  @Test
+  public void testUpdateTaskStatusWithForbiddenAction() {
+    TaskEditStatusRequest request = TaskEditStatusRequest
+        .builder()
+        .status("COMPLETED")
+        .userId("user2")
+        .build();
 
-    TaskResponse updatedTaskResponse = taskService.updateTaskStatus("1", taskRequest);
+    task.setUserId("user1");
 
-    assertNotNull(updatedTaskResponse);
-    assertEquals("COMPLETED", updatedTaskResponse.getStatus());
+    when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
+
+    assertThrows(TaskUnforbiddenActionException.class, () -> taskService.updateTaskStatus("1", request));
+  }
+
+  @Description("PUT /api/v1/task/{id}/status - Test update task status success")
+  @Test
+  public void testUpdateTaskStatusSuccess() {
+    TaskEditStatusRequest request = TaskEditStatusRequest
+        .builder()
+        .status("COMPLETED")
+        .userId("user1")
+        .build();
+
+    task.setUserId("user1");
+
+    when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
+
+    when(taskRepository.save(any(Task.class))).thenReturn(task);
+
+    TaskResponse response = taskService.updateTaskStatus("1", request);
+
+    assertNotNull(response);
+    assertEquals("COMPLETED", response.getStatus());
 
     verify(taskRepository, times(1)).findById("1");
     verify(taskRepository, times(1)).save(any(Task.class));
   }
 
-  @Description("DELETE /api/v1/task/{id} - Test delete task")
+  @Description("DELETE /api/v1/task/{id} - Test delete task with invalid param")
   @Test
-  void deleteTask() {
-    when(taskRepository.existsById("1"))
-        .thenReturn(true);
+  public void testDeleteTaskWithInvalidParam() {
+    assertThrows(TaskInvalidParamException.class, () -> taskService.deleteTask(null));
+  }
 
-    assertDoesNotThrow(() -> taskService.deleteTask("1"));
+  @Description("DELETE /api/v1/task/{id} - Test delete task with task not found")
+  @Test
+  public void testDeleteTaskWithTaskNotFound() {
+    when(taskRepository.existsById(anyString())).thenReturn(false);
+
+    assertThrows(TaskNotFoundException.class, () -> taskService.deleteTask("1"));
+  }
+
+  @Description("DELETE /api/v1/task/{id} - Test delete task success")
+  @Test
+  public void testDeleteTaskSuccess() {
+    when(taskRepository.existsById(anyString())).thenReturn(true);
+
+    doNothing().when(taskRepository).deleteById(anyString());
+
+    taskService.deleteTask("1");
 
     verify(taskRepository, times(1)).deleteById("1");
   }
 
-  @Description("PUT /api/v1/task/{id}/unassign/{uid} - Test unassign task")
+  @Description("PUT /api/v1/task/{id}/unassign - Test unassign task with invalid param")
   @Test
-  void unassignTask() {
-    when(taskRepository.findById("1"))
-        .thenReturn(Optional.of(task));
+  public void testUnassignTaskWithInvalidParam() {
+    assertThrows(TaskInvalidParamException.class, () -> taskService.unassignTask(null, "user1"));
+    assertThrows(TaskInvalidParamException.class, () -> taskService.unassignTask("1", null));
+  }
 
-    when(taskRepository.save(any(Task.class)))
-        .thenReturn(task);
+  @Description("PUT /api/v1/task/{id}/unassign - Test unassign task with task not found")
+  @Test
+  public void testUnassignTaskWithTaskNotFound() {
+    when(taskRepository.findById(anyString())).thenReturn(Optional.empty());
 
-    TaskResponse unassignedTaskResponse = taskService.unassignTask("1", "user1");
+    assertThrows(TaskNotFoundException.class, () -> taskService.unassignTask("1", "user1"));
+  }
 
-    assertNotNull(unassignedTaskResponse);
-    assertNull(unassignedTaskResponse.getUserId());
+  @Description("PUT /api/v1/task/{id}/unassign - Test unassign task with forbidden action")
+  @Test
+  public void testUnassignTaskWithForbiddenAction() {
+    task.setUserId("user1");
+
+    when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
+
+    assertThrows(TaskUnforbiddenActionException.class, () -> taskService.unassignTask("1", "user2"));
+  }
+
+  @Description("PUT /api/v1/task/{id}/unassign - Test unassign task success")
+  @Test
+  public void testUnassignTaskSuccess() {
+    task.setUserId("user1");
+
+    when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
+    when(taskRepository.save(any(Task.class))).thenReturn(task);
+
+    TaskResponse response = taskService.unassignTask("1", "user1");
+
+    assertNotNull(response);
+    assertNull(response.getUserId());
+    assertEquals(Status.PENDING.name(), response.getStatus());
 
     verify(taskRepository, times(1)).findById("1");
     verify(taskRepository, times(1)).save(any(Task.class));
   }
 
-  @Description("PUT /api/v1/task/{id}/assign/{uid} - Test assign task")
+  @Description("PUT /api/v1/task/{id}/assign - Test assign task with invalid param")
   @Test
-  void assignTask() {
-    Task task2 = Task.builder()
-        .id("2")
-        .title(taskRequest.getTitle())
-        .description(taskRequest.getDescription())
-        .status(Status.PENDING)
-        .frequency(Frequency.EVERYDAY)
-        .tag(Tag.GENERAL)
-        .userId(null)
-        .createdAt(new Date())
-        .updatedAt(new Date())
-        .build();
+  public void testAssignTaskWithInvalidParam() {
+    assertThrows(TaskInvalidParamException.class, () -> taskService.assignTask(null, "user1"));
+    assertThrows(TaskInvalidParamException.class, () -> taskService.assignTask("1", null));
+  }
 
-    when(taskRepository.findById("2"))
-        .thenReturn(Optional.of(task2));
-    when(taskRepository.save(any(Task.class)))
-        .thenReturn(task2);
+  @Description("PUT /api/v1/task/{id}/assign - Test assign task with task not found")
+  @Test
+  public void testAssignTaskWithTaskNotFound() {
+    when(taskRepository.findById(anyString())).thenReturn(Optional.empty());
 
-    TaskResponse assignedTaskResponse = taskService.assignTask("2", "user2");
+    assertThrows(TaskNotFoundException.class, () -> taskService.assignTask("1", "user1"));
+  }
 
-    assertNotNull(assignedTaskResponse);
-    assertEquals("user2", assignedTaskResponse.getUserId());
+  @Description("PUT /api/v1/task/{id}/assign - Test assign task with forbidden action")
+  @Test
+  public void testAssignTaskWithForbiddenAction() {
+    task.setUserId("user1");
 
-    verify(taskRepository, times(1)).findById("2");
+    when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
+
+    assertThrows(TaskUnforbiddenActionException.class, () -> taskService.assignTask("1", "user1"));
+  }
+
+  @Description("PUT /api/v1/task/{id}/assign - Test assign task success")
+  @Test
+  public void testAssignTaskSuccess() {
+    when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
+    when(taskRepository.save(any(Task.class))).thenReturn(task);
+
+    TaskResponse response = taskService.assignTask("1", "user1");
+
+    assertNotNull(response);
+    assertEquals("user1", response.getUserId());
+
+    verify(taskRepository, times(1)).findById("1");
     verify(taskRepository, times(1)).save(any(Task.class));
-  }
-
-  @Description("PUT /api/v1/task/{id} - Test TaskCreationException when updating task")
-  @Test
-  void updateTask_invalidRequest_throwsException() {
-    TaskEditMetadataRequest taskRequest = new TaskEditMetadataRequest(null, null, null, null);
-
-    assertThrows(TaskInvalidBodyException.class, () -> {
-      taskService.updateTask("1", taskRequest);
-    });
-
-    verify(taskRepository, times(0)).findById("1");
-    verify(taskRepository, times(0)).save(any(Task.class));
-  }
-
-  @Description("PUT /api/v1/task/{id} - Test TaskCreationException when updating task")
-  @Test
-  void updateTaskStatus_invalidRequest_throwsException() {
-    TaskEditStatusRequest taskRequest = new TaskEditStatusRequest(null, null);
-
-    assertThrows(TaskInvalidBodyException.class, () -> {
-      taskService.updateTaskStatus("1", taskRequest);
-    });
-
-  }
-
-  @Description("DELETE /api/v1/task/{id} - Test TaskNotFoundException when deleting task")
-  @Test
-  void deleteTask_notFound_throwsException() {
-    when(taskRepository.existsById("1")).thenReturn(false);
-
-    assertThrows(TaskNotFoundException.class, () -> {
-      taskService.deleteTask("1");
-    });
-
-    verify(taskRepository, times(1)).existsById("1");
-    verify(taskRepository, times(0)).deleteById("1");
-  }
-
-  @Description("PUT /api/v1/task/{id}/unassign/{uid} - Test TaskNotFoundException when unassigning task")
-  @Test
-  void unassignTask_notFound_throwsException() {
-    when(taskRepository.findById("1")).thenReturn(java.util.Optional.empty());
-
-    assertThrows(TaskNotFoundException.class, () -> {
-      taskService.unassignTask("1", "123");
-    });
-
-    verify(taskRepository, times(1)).findById("1");
-    verify(taskRepository, times(0)).save(any(Task.class));
-  }
-
-  @Description("PUT /api/v1/task/{id}/unassign/{uid} - Test TaskUnforbiddenActionException when unassigning task")
-  @Test
-  void unassignTask_unauthorized_throwsException() {
-    when(taskRepository.findById("1"))
-        .thenReturn(Optional.of(task));
-
-    assertThrows(TaskUnforbiddenActionException.class, () -> {
-      taskService.unassignTask("1", "123");
-    });
-
-    verify(taskRepository, times(1)).findById("1");
-    verify(taskRepository, times(0)).save(any(Task.class));
-  }
-
-  @Description("PUT /api/v1/task/{id}/assign/{uid} - Test TaskNotFoundException when assigning task")
-  @Test
-  void assignTask_alreadyAssigned_throwsException() {
-
-    when(taskRepository.findById("1"))
-        .thenReturn(Optional.of(task));
-
-    assertThrows(TaskUnforbiddenActionException.class, () -> {
-      taskService.assignTask("1", "123");
-    });
-
-    verify(taskRepository, times(1)).findById("1");
-    verify(taskRepository, times(0)).save(any(Task.class));
   }
 }
