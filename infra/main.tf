@@ -1,9 +1,10 @@
 module "gce" {
   source = "./modules/gce"
 
+  REGION        = var.REGION
   INSTANCE_NAME = var.INSTANCE_NAME
   MACHINE_TYPE  = var.MACHINE_TYPE
-  REGION        = var.REGION
+  IMAGE_FAMILY = var.IMAGE_FAMILY
   NETWORK_NAME  = var.NETWORK_NAME
   FIREWALL_NAME = var.FIREWALL_NAME
 }

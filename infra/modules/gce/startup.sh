@@ -20,3 +20,6 @@ sudo apt-get install -y git
 
 # Install kubectl
 sudo apt-get install -y kubectl
+
+# Install Docker
+sudo apt install -y docker.io

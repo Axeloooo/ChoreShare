@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        REPO_URI = "${env.REGISTRY_URI}/${env.PROJECT_ID}/${env.REGISTRY_ID}"
+        REPO_URI = "${env.REGISTRY_URI}/${env.PROJECT_ID}/${env.REGISTRY_NAME}"
         IMAGE_TAG = "${env.BUILD_ID}"
     }
 
@@ -13,38 +13,14 @@ pipeline {
                     $class: 'GitSCM', 
                     branches: [[name: '*/main']], 
                     extensions: [], 
-                    userRemoteConfigs: [[credentialsId: 'github', url: "https://github.com/Axeloooo/ChoreSync.git"]]
+                    userRemoteConfigs: [[credentialsId: 'GITHUB', url: "https://github.com/Axeloooo/ChoreSync.git"]]
                 ])
             }
         }
 
-        stage("Build Images") {
+        stage("Build and Push Images") {
             steps {
-                script {
-                    def services = [
-                        "registry-service",
-                        "config-service",
-                        "api-gateway",
-                        "auth-service",
-                        "user-service",
-                        "task-service",
-                        "household-service",
-                        "userhousehold-service",
-                        "announcement-service",
-                        "event-service",
-                        "email-service"
-                    ]
-
-                    services.each { service ->
-                        sh "sudo docker build -t ${service}:${IMAGE_TAG} ./${service}"
-                    }
-                }
-            }
-        }
-
-        stage("Push Images") {
-            steps {
-                withCredentials([file(credentialsId: "gcp", variable: "GCP_KEY")]) {
+                withCredentials([file(credentialsId: "GCP_CREDENTIALS", variable: "GCP_KEY")]) {
                     sh "gcloud auth activate-service-account --key-file=${GCP_KEY}"
                     sh "gcloud auth configure-docker ${env.REGISTRY_URI}"
                     script {
@@ -63,7 +39,8 @@ pipeline {
                         ]
 
                         services.each { service ->
-                            sh "sudo docker push ${REPO_URI}/${service}:${IMAGE_TAG}"
+                            def image = docker.build("${REPO_URI}/${service}:${IMAGE_TAG}", "./${service}")
+                            image.push()
                         }
                     }
                 }
@@ -89,3 +66,4 @@ pipeline {
         }
     }
 }
+
