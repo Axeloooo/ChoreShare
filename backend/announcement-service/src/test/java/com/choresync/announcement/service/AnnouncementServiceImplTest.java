@@ -3,7 +3,10 @@ package com.choresync.announcement.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -18,10 +21,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.annotation.Description;
+import org.springframework.web.client.RestTemplate;
 
 import com.choresync.announcement.entity.Announcement;
 import com.choresync.announcement.exception.AnnouncementInvalidBodyException;
+import com.choresync.announcement.exception.AnnouncementInvalidParamException;
 import com.choresync.announcement.exception.AnnouncementNotFoundException;
+import com.choresync.announcement.external.response.HouseholdResponse;
+import com.choresync.announcement.external.response.UserResponse;
 import com.choresync.announcement.model.AnnouncementRequest;
 import com.choresync.announcement.model.AnnouncementResponse;
 import com.choresync.announcement.repository.AnnouncementRepository;
@@ -35,31 +42,59 @@ public class AnnouncementServiceImplTest {
   private AnnouncementServiceImpl announcementService;
 
   private Announcement announcement;
+  private AnnouncementRequest invalidAnnouncementRequest;
   private AnnouncementRequest announcementRequest;
   private AnnouncementResponse announcementResponse;
+
+  @Mock
+  private RestTemplate restTemplate;
 
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
 
+    when(restTemplate.getForObject(
+        anyString(),
+        eq(HouseholdResponse.class),
+        any(Object[].class))).thenReturn(new HouseholdResponse());
+
+    when(restTemplate.getForObject(
+        anyString(),
+        eq(UserResponse.class),
+        any(Object[].class))).thenReturn(new UserResponse());
+
     announcement = Announcement.builder()
         .id("1")
         .message("Test Announcement")
         .userId("user1")
+        .householdId("house 1")
+        .author(null)
         .createdAt(new Date())
         .updatedAt(new Date())
+        .build();
+
+    invalidAnnouncementRequest = AnnouncementRequest
+        .builder()
+        .message(null)
+        .author(null)
+        .userId("user1")
+        .householdId("house 1")
         .build();
 
     announcementRequest = AnnouncementRequest
         .builder()
         .message("Test Announcement")
+        .author(null)
         .userId("user1")
+        .householdId("house 1")
         .build();
 
     announcementResponse = AnnouncementResponse.builder()
         .id("1")
         .message("Test Announcement")
         .userId("user1")
+        .householdId("house 1")
+        .author(null)
         .createdAt(new Date())
         .updatedAt(new Date())
         .build();
@@ -83,7 +118,7 @@ public class AnnouncementServiceImplTest {
   @Test
   public void testCreateAnnouncementNullRequest() {
     assertThrows(AnnouncementInvalidBodyException.class, () -> {
-      announcementService.createAnnouncement(null);
+      announcementService.createAnnouncement(invalidAnnouncementRequest);
     });
 
     verify(announcementRepository, times(0)).save(any(Announcement.class));
@@ -113,34 +148,33 @@ public class AnnouncementServiceImplTest {
     verify(announcementRepository, times(1)).findById("1");
   }
 
-  // @Description("GET /api/v1/announcement - Test get all announcements")
-  // @Test
-  // public void testGetAllAnnouncements() {
-  // when(announcementRepository.findAll()).thenReturn(Arrays.asList(announcement));
+  @Description("GET /api/v1/announcement - Test get all announcements")
+  @Test
+  public void testGetAllAnnouncements() {
+    when(announcementRepository.findByHouseholdId("house1")).thenReturn(Arrays.asList(announcement));
 
-  // List<AnnouncementResponse> responses =
-  // announcementService.getAllAnnouncements();
+    List<AnnouncementResponse> responses = announcementService.getAllAnnouncementsByHouseholdId("house1");
 
-  // assertNotNull(responses);
-  // assertEquals(1, responses.size());
-  // assertEquals(announcementResponse, responses.get(0));
+    assertNotNull(responses, "The response should not be null");
+    assertEquals(1, responses.size(), "The response size should be 1");
+    assertEquals(announcementResponse, responses.get(0),
+        "The announcement response should match the expected response");
 
-  // verify(announcementRepository, times(1)).findAll();
-  // }
+    verify(announcementRepository, times(1)).findByHouseholdId("house1");
+  }
 
-  // @Description("GET /api/v1/announcement - Test get all empty announcements")
-  // @Test
-  // public void testGetAllAnnouncementsEmpty() {
-  // when(announcementRepository.findAll()).thenReturn(Collections.emptyList());
+  @Description("GET /api/v1/announcement - Test get all empty announcements")
+  @Test
+  public void testGetAllAnnouncementsEmpty() {
+    when(announcementRepository.findByHouseholdId("house1")).thenReturn(Collections.emptyList());
 
-  // List<AnnouncementResponse> responses =
-  // announcementService.getAllAnnouncements();
+    List<AnnouncementResponse> responses = announcementService.getAllAnnouncementsByHouseholdId("house1");
 
-  // assertNotNull(responses);
-  // assertEquals(0, responses.size());
+    assertNotNull(responses, "The response list should not be null");
+    assertTrue(responses.isEmpty(), "The response list should be empty");
 
-  // verify(announcementRepository, times(1)).findAll();
-  // }
+    verify(announcementRepository, times(1)).findByHouseholdId("house1");
+  }
 
   @Description("GET /api/v1/announcement/user/{uid} - Test get all announcements by user id")
   @Test
@@ -172,7 +206,7 @@ public class AnnouncementServiceImplTest {
   @Description("GET /api/v1/announcement/user/{uid} - Test AnnouncementNotFoundException when user id is not found")
   @Test
   public void testGetAllAnnouncementsByUserIdNotFound() {
-    assertThrows(AnnouncementNotFoundException.class, () -> {
+    assertThrows(AnnouncementInvalidParamException.class, () -> {
       announcementService.getAllAnnouncementsByUserId(null);
     });
 
@@ -207,9 +241,9 @@ public class AnnouncementServiceImplTest {
 
   @Description("PUT /api/v1/announcement/{id} - Test AnnouncementCreationException when request is null")
   @Test
-  public void testEditAnnouncementNullRequest() {
+  public void testEditAnnouncementNullFields() {
     assertThrows(AnnouncementInvalidBodyException.class, () -> {
-      announcementService.editAnnouncement("1", null);
+      announcementService.editAnnouncement("1", invalidAnnouncementRequest);
     });
 
     verify(announcementRepository, times(0)).save(any(Announcement.class));
