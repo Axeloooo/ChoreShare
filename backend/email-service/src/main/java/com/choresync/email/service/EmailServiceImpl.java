@@ -74,8 +74,7 @@ public class EmailServiceImpl implements EmailService {
    */
   @Override
   public EmailResponse sendEmail(EmailRequest emailRequest) {
-    if (emailRequest.getTo().isBlank() || emailRequest.getTo() == null || emailRequest.getHouseholdId().isBlank()
-        || emailRequest.getHouseholdId() == null) {
+    if (emailRequest.getTo() == null || emailRequest.getHouseholdId() == null) {
       throw new EmailInvalidBodyException("Invalid request body");
     }
 
