@@ -86,8 +86,7 @@ public class TaskServiceImpl implements TaskService {
     if (taskRequest.getTitle().isBlank() || taskRequest.getTitle() == null || taskRequest.getHouseholdId().isBlank()
         || taskRequest.getHouseholdId() == null
         || taskRequest.getFrequency().isBlank()
-        || taskRequest.getFrequency() == null || taskRequest.getTag().isBlank() || taskRequest.getTag() == null
-        || taskRequest.getUserId().isBlank() || taskRequest.getUserId() == null) {
+        || taskRequest.getFrequency() == null || taskRequest.getTag().isBlank() || taskRequest.getTag() == null) {
       throw new TaskInvalidBodyException("Invalid request body");
     }
 
