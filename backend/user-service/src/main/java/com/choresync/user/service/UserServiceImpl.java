@@ -36,12 +36,9 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public UserAuthResponse createUser(UserRequest userRequest) {
-    if (userRequest.getFirstName().isBlank() || userRequest.getFirstName() == null ||
-        userRequest.getLastName().isBlank() || userRequest.getLastName() == null ||
-        userRequest.getUsername().isBlank() || userRequest.getUsername() == null ||
-        userRequest.getPassword().isBlank() || userRequest.getPassword() == null ||
-        userRequest.getEmail().isBlank() || userRequest.getEmail() == null ||
-        userRequest.getPhone().isBlank() || userRequest.getPhone() == null) {
+    if (userRequest.getFirstName() == null || userRequest.getLastName() == null ||
+        userRequest.getUsername() == null || userRequest.getPassword() == null ||
+        userRequest.getEmail() == null || userRequest.getPhone() == null) {
       throw new UserInvalidBodyException("Invalid request body");
     }
 
@@ -135,7 +132,7 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public UserResponse getUserById(String id) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new UserInvalidParamException("Invalid request parameter");
     }
 
@@ -169,7 +166,7 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public void deleteUserById(String id) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new UserInvalidParamException("Invalid request parameter");
     }
 
@@ -199,14 +196,14 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public UserResponse editUser(String id, UserEditMetadataRequest userRequest) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new UserInvalidParamException("Invalid request parameter");
     }
 
-    if (userRequest.getFirstName().isBlank() || userRequest.getFirstName() == null ||
-        userRequest.getLastName().isBlank() || userRequest.getLastName() == null ||
-        userRequest.getEmail().isBlank() || userRequest.getEmail() == null ||
-        userRequest.getPhone().isBlank() || userRequest.getPhone() == null) {
+    if (userRequest.getFirstName() == null ||
+        userRequest.getLastName() == null ||
+        userRequest.getEmail() == null ||
+        userRequest.getPhone() == null) {
       throw new UserInvalidBodyException("Invalid request body");
     }
 
@@ -266,7 +263,7 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public UserAuthResponse getUserByUsername(String username) {
-    if (username.isBlank() || username == null) {
+    if (username == null) {
       throw new UserInvalidParamException("Invalid request parameter");
     }
 
