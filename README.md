@@ -62,7 +62,7 @@ Roommate task board application. Many roommates living together can add and remo
 
 ## 🧩 Architecture Overview
 
-![ChoreSync Architecture](./images/choresync_architecture.png)
+![ChoreSync Architecture](./images/choreshare_architecture.png)
 
 ## 📱 Frontend Documentation
 

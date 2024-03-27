@@ -51,6 +51,7 @@ pipeline {
         stage("Deploy to GKE") {
             steps {
                 script {
+                    sh "rm -r backend/k8s/combined.yml"
                     sh "sed -i 's|axeloooo|${REPO_URI}|g' backend/k8s/*.yml"
                     sh "sed -i 's|latest|${IMAGE_TAG}|g' backend/k8s/*.yml"
                     sh "cat backend/k8s/*.yml > backend/k8s/combined.yml"

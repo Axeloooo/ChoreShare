@@ -5,4 +5,3 @@ resource "google_container_cluster" "choreshare" {
   enable_autopilot    = true
   deletion_protection = false
 }
-

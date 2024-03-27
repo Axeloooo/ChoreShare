@@ -1,10 +1,13 @@
 package com.choresync.auth.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,14 +22,21 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.annotation.Description;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.choresync.auth.exception.AuthInternalCommunicationException;
+import com.choresync.auth.exception.AuthInvalidParamException;
 import com.choresync.auth.exception.AuthRequestBodyException;
+import com.choresync.auth.external.exception.UserNotFoundException;
 import com.choresync.auth.external.request.UserRequest;
 import com.choresync.auth.external.response.UserAuthResponse;
 import com.choresync.auth.model.AuthLoginRequest;
 import com.choresync.auth.model.AuthRegisterRequest;
+import com.choresync.auth.model.AuthTokenResponse;
+import com.choresync.auth.model.AuthValidateResponse;
+
+import io.jsonwebtoken.JwtException;
 
 public class AuthServiceImplTest {
   @Mock
@@ -43,15 +53,22 @@ public class AuthServiceImplTest {
 
   private AuthRegisterRequest authRegisterRequest;
   private AuthLoginRequest authLoginRequest;
-
   private UserRequest userRequest;
   private UserAuthResponse userResponse;
-
-  private final String token = "jwtToken";
+  private AuthRegisterRequest invalidAuthRegisterRequest;
+  private AuthLoginRequest invalidAuthLoginRequest;
 
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
+
+    invalidAuthRegisterRequest = AuthRegisterRequest
+        .builder()
+        .build();
+
+    invalidAuthLoginRequest = AuthLoginRequest
+        .builder()
+        .build();
 
     authRegisterRequest = AuthRegisterRequest.builder()
         .firstName("John")
@@ -59,6 +76,7 @@ public class AuthServiceImplTest {
         .username("johndoe")
         .email("john.doe@example.com")
         .password("password")
+        .phone("1234567890")
         .build();
 
     authLoginRequest = AuthLoginRequest.builder()
@@ -88,101 +106,111 @@ public class AuthServiceImplTest {
     reset(restTemplate);
   }
 
-  // @Description("POST /api/v1/auth/register - Test register a new user")
-  // @Test
-  // public void testRegisterUser() {
-  // when(passwordEncoder.encode(any(String.class)))
-  // .thenReturn(userResponse.getPassword());
-
-  // when(restTemplate.postForObject(
-  // "http://user-service/api/v1/user",
-  // userRequest,
-  // UserAuthResponse.class))
-  // .thenReturn(userResponse);
-
-  // when(jwtService.generateToken(any(String.class)))
-  // .thenReturn(token);
-
-  // String result = authService.registerUser(authRegisterRequest);
-
-  // assertNotNull(result);
-  // assertEquals(token, result);
-
-  // verify(passwordEncoder, times(1)).encode(any(String.class));
-  // verify(restTemplate, times(1)).postForObject(anyString(), any(), any());
-  // verify(jwtService, times(1)).generateToken(any(String.class));
-  // }
-
-  @Description("POST /api/v1/auth/register - Test AuthInternalCommunicationException when communication with user-service fails")
+  @Description("POST /api/v1/auth/register - Test register user with invalid body")
   @Test
-  public void testRegisterUserCommunicationError() {
-    when(passwordEncoder.encode(any(String.class)))
-        .thenReturn(userResponse.getPassword());
-    when(restTemplate.postForObject(
-        "http://user-service/api/v1/user",
-        userRequest,
-        UserAuthResponse.class))
-        .thenThrow(new RuntimeException("Invalid request body"));
+  public void testRegisterUserWithInvalidBody() {
+    assertThrows(AuthRequestBodyException.class, () -> authService.registerUser(invalidAuthRegisterRequest));
+  }
 
-    assertThrows(AuthInternalCommunicationException.class, () -> {
-      authService.registerUser(authRegisterRequest);
-    });
+  @Description("POST /api/v1/auth/register - Test register user with internal communication exception")
+  @Test
+  public void testRegisterUserWithInternalCommunicationException() {
+    when(passwordEncoder.encode(authRegisterRequest.getPassword())).thenReturn(userRequest.getPassword());
+    when(restTemplate.postForObject("http://user-service/api/v1/user", userRequest, UserAuthResponse.class))
+        .thenThrow(new RestClientException("Internal error"));
 
-    verify(passwordEncoder, times(1)).encode(any(String.class));
-    verify(restTemplate, times(1)).postForObject(
-        "http://user-service/api/v1/user",
-        userRequest,
+    assertThrows(AuthInternalCommunicationException.class, () -> authService.registerUser(authRegisterRequest));
+  }
+
+  @Description("POST /api/v1/auth/register - Test register user success")
+  @Test
+  public void testRegisterUserSuccess() {
+    when(passwordEncoder.encode(authRegisterRequest.getPassword())).thenReturn(userRequest.getPassword());
+    when(restTemplate.postForObject("http://user-service/api/v1/user", userRequest, UserAuthResponse.class))
+        .thenReturn(userResponse);
+    when(jwtService.generateToken(userResponse.getId())).thenReturn("token");
+
+    AuthTokenResponse response = authService.registerUser(authRegisterRequest);
+
+    assertNotNull(response);
+    assertEquals("token", response.getToken());
+
+    verify(passwordEncoder, times(1)).encode(anyString());
+    verify(restTemplate, times(1)).postForObject("http://user-service/api/v1/user", userRequest,
         UserAuthResponse.class);
-    verify(jwtService, times(0)).generateToken(any(String.class));
+    verify(jwtService, times(1)).generateToken(userResponse.getId());
   }
 
-  @Description("POST /api/v1/auth/register - Test AuthRequestBodyException when request body is invalid")
+  @Description("POST /api/v1/auth/login - Test login user with invalid body")
   @Test
-  public void testRegisterUserInvalidRequest() {
-    AuthRegisterRequest invalidRequest = AuthRegisterRequest.builder().build();
+  public void testLoginUserWithInvalidBody() {
+    assertThrows(AuthRequestBodyException.class, () -> authService.loginUser(invalidAuthLoginRequest));
+  }
 
-    assertThrows(AuthRequestBodyException.class, () -> {
-      authService.registerUser(invalidRequest);
-    });
+  @Description("POST /api/v1/auth/login - Test login user with user not found")
+  @Test
+  public void testLoginUserWithUserNotFound() {
+    when(restTemplate.getForObject("http://user-service/api/v1/user/username/" + authLoginRequest.getUsername(),
+        UserAuthResponse.class)).thenReturn(null);
 
-    verify(passwordEncoder, times(0)).encode(any(String.class));
-    verify(restTemplate, times(0)).postForObject(
-        "http://user-service/api/v1/user",
-        userRequest,
+    assertThrows(UserNotFoundException.class, () -> authService.loginUser(authLoginRequest));
+  }
+
+  @Description("POST /api/v1/auth/login - Test login user with internal communication exception")
+  @Test
+  public void testLoginUserWithInternalCommunicationException() {
+    when(restTemplate.getForObject("http://user-service/api/v1/user/username/" + authLoginRequest.getUsername(),
+        UserAuthResponse.class)).thenThrow(new RestClientException("Internal error"));
+
+    assertThrows(AuthInternalCommunicationException.class, () -> authService.loginUser(authLoginRequest));
+  }
+
+  @Description("POST /api/v1/auth/login - Test login user success")
+  @Test
+  public void testLoginUserSuccess() {
+    when(restTemplate.getForObject("http://user-service/api/v1/user/username/" + authLoginRequest.getUsername(),
+        UserAuthResponse.class)).thenReturn(userResponse);
+    when(jwtService.generateToken(userResponse.getId())).thenReturn("token");
+
+    AuthTokenResponse response = authService.loginUser(authLoginRequest);
+
+    assertNotNull(response);
+    assertEquals("token", response.getToken());
+
+    verify(restTemplate, times(1)).getForObject(
+        "http://user-service/api/v1/user/username/" + authLoginRequest.getUsername(),
         UserAuthResponse.class);
-    verify(jwtService, times(0)).generateToken(any(String.class));
+
+    verify(jwtService, times(1)).generateToken(userResponse.getId());
   }
 
-  // @Description("POST /api/v1/auth/login - Test login user")
-  // @Test
-  // public void testLoginUser() {
-  // when(jwtService.generateToken(any(String.class))).thenReturn(token);
-
-  // String result = authService.loginUser(authLoginRequest);
-
-  // assertNotNull(result);
-  // assertEquals(token, result);
-
-  // verify(jwtService, times(1)).generateToken(any(String.class));
-  // }
-
-  @Description("POST /api/v1/auth/login - Test AuthRequestBodyException when request body is invalid")
+  @Description("GET /api/v1/auth/validate - Test validate token with invalid param")
   @Test
-  public void testLoginUserInvalidRequest() {
-    AuthLoginRequest invalidRequest = AuthLoginRequest.builder().build();
-
-    assertThrows(AuthRequestBodyException.class, () -> {
-      authService.loginUser(invalidRequest);
-    });
-
-    verify(jwtService, times(0)).generateToken(any(String.class));
+  public void testValidateTokenWithInvalidParam() {
+    assertThrows(AuthInvalidParamException.class, () -> authService.validateToken(null));
   }
 
-  @Description("POST /api/v1/auth/validate - Test validate token")
+  @Description("GET /api/v1/auth/validate - Test validate token with invalid token")
   @Test
-  public void testValidateToken() {
-    authService.validateToken(token);
+  public void testValidateTokenWithInvalidToken() {
+    doThrow(new JwtException("Invalid token")).when(jwtService).validateToken("invalidToken");
 
-    verify(jwtService, times(1)).validateToken(token);
+    AuthValidateResponse authValidateResponse = authService.validateToken("invalidToken");
+
+    assertNotNull(authValidateResponse);
+    assertFalse(authValidateResponse.getIsValid());
+  }
+
+  @Description("GET /api/v1/auth/validate - Test validate token success")
+  @Test
+  public void testValidateTokenSuccess() {
+    doNothing().when(jwtService).validateToken("validToken");
+
+    AuthValidateResponse authValidateResponse = authService.validateToken("validToken");
+
+    assertNotNull(authValidateResponse);
+    assertTrue(authValidateResponse.getIsValid());
+
+    verify(jwtService, times(1)).validateToken("validToken");
   }
 }

@@ -72,12 +72,8 @@ public class AuthServiceImpl implements AuthService {
    */
   @Override
   public AuthTokenResponse registerUser(AuthRegisterRequest authRequest) {
-    if (authRequest.getFirstName().isBlank() || authRequest.getFirstName() == null
-        || authRequest.getLastName().isBlank() || authRequest.getLastName() == null
-        || authRequest.getUsername().isBlank() || authRequest.getUsername() == null
-        || authRequest.getEmail().isBlank() || authRequest.getEmail() == null
-        || authRequest.getPassword().isBlank() || authRequest.getPassword() == null
-        || authRequest.getPhone().isBlank() || authRequest.getPhone() == null) {
+    if (authRequest.getFirstName() == null || authRequest.getLastName() == null || authRequest.getUsername() == null
+        || authRequest.getEmail() == null || authRequest.getPassword() == null || authRequest.getPhone() == null) {
       throw new AuthRequestBodyException("Invalid request body");
     }
 
@@ -126,8 +122,7 @@ public class AuthServiceImpl implements AuthService {
    */
   @Override
   public AuthTokenResponse loginUser(AuthLoginRequest authRequest) {
-    if (authRequest.getUsername().isBlank() || authRequest.getUsername() == null || authRequest.getPassword().isBlank()
-        || authRequest.getPassword() == null) {
+    if (authRequest.getUsername() == null || authRequest.getPassword() == null) {
       throw new AuthRequestBodyException("Invalid request body");
     }
 
@@ -164,7 +159,7 @@ public class AuthServiceImpl implements AuthService {
    */
   @Override
   public AuthValidateResponse validateToken(String token) {
-    if (token.isBlank() || token.isEmpty()) {
+    if (token == null) {
       throw new AuthInvalidParamException("Invalid request query");
     }
     try {
@@ -180,5 +175,4 @@ public class AuthServiceImpl implements AuthService {
           .build();
     }
   }
-
 }
