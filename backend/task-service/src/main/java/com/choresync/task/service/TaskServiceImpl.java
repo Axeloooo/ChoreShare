@@ -84,8 +84,8 @@ public class TaskServiceImpl implements TaskService {
   @Override
   public TaskResponse createTask(TaskRequest taskRequest) {
     if (taskRequest.getTitle().isBlank() || taskRequest.getTitle() == null || taskRequest.getHouseholdId().isBlank()
-        || taskRequest.getHouseholdId() == null || taskRequest.getDescription().isBlank()
-        || taskRequest.getDescription() == null || taskRequest.getFrequency().isBlank()
+        || taskRequest.getHouseholdId() == null
+        || taskRequest.getFrequency().isBlank()
         || taskRequest.getFrequency() == null || taskRequest.getTag().isBlank() || taskRequest.getTag() == null
         || taskRequest.getUserId().isBlank() || taskRequest.getUserId() == null) {
       throw new TaskInvalidBodyException("Invalid request body");
@@ -309,8 +309,8 @@ public class TaskServiceImpl implements TaskService {
       throw new TaskInvalidParamException("Invalid request parameter");
     }
 
-    if (taskRequest.getTitle() == null || taskRequest.getTitle().isBlank() || taskRequest.getDescription() == null
-        || taskRequest.getDescription().isBlank() || taskRequest.getFrequency() == null
+    if (taskRequest.getTitle() == null || taskRequest.getTitle().isBlank()
+        || taskRequest.getFrequency() == null
         || taskRequest.getFrequency().isBlank() || taskRequest.getTag() == null || taskRequest.getTag().isBlank()) {
       throw new TaskInvalidBodyException("Invalid request body");
     }
