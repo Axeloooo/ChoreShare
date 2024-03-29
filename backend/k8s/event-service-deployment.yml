@@ -19,7 +19,7 @@ spec:
             [
               "sh",
               "-c",
-              'until nc -z config-service-svc 80; do echo "Waiting for Eureka"; sleep 2; done',
+              'until nc -z config-service-svc 80; do echo "Waiting for Config Service"; sleep 2; done',
             ]
       containers:
         - name: event-service-app
