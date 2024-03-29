@@ -13,7 +13,7 @@ spec:
         app: api-gateway-app
     spec:
       initContainers:
-        - name: wait for config service
+        - name: wait-for-config-service
           image: busybox
           command:
             [
