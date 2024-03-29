@@ -12,13 +12,22 @@ spec:
       labels:
         app: config-service-app
     spec:
+      initContainers:
+        - name: wait for eureka
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              'until nc -z eureka-svc 8761; do echo "Waiting for Eureka"; sleep 2; done',
+            ]
       containers:
         - name: config-service-app
           image: axeloooo/config-service:latest
           resources:
             limits:
-              cpu: "1"
-              memory: "512Mi"
+              cpu: "60m"
+              memory: "256Mi"
           ports:
             - containerPort: 8080
           env:

@@ -17,8 +17,8 @@ spec:
           image: dpage/pgadmin4
           resources:
             limits:
-              cpu: "1"
-              memory: "512Mi"
+              cpu: "60m"
+              memory: "256Mi"
           ports:
             - containerPort: 80
           env:
@@ -39,7 +39,7 @@ kind: Service
 metadata:
   name: pgadmin-svc
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: pgadmin
   ports:
