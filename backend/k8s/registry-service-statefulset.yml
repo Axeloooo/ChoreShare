@@ -14,13 +14,22 @@ spec:
       labels:
         app: eureka
     spec:
+      initContainers:
+        - name: wait for postgres service
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              'until nc -z postgres-svc 5432; do echo "Waiting for Postgres"; sleep 2; done',
+            ]
       containers:
         - name: eureka
           image: axeloooo/registry-service:latest
           resources:
             limits:
-              cpu: "1"
-              memory: "512Mi"
+              cpu: "60m"
+              memory: "256Mi"
           ports:
             - containerPort: 8761
 
@@ -43,7 +52,7 @@ kind: Service
 metadata:
   name: eureka-lb-svc
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: eureka
   ports:
