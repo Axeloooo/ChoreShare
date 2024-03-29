@@ -12,6 +12,9 @@ spring:
       port: 6379
   cloud:
     gateway:
+      httpClient:
+        connect-timeout: 5000
+        response-timeout: 5000
       discovery:
         locator:
           enabled: true
