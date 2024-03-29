@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         REPO_URI = "${env.REGISTRY_URI}/${env.PROJECT_ID}/${env.REGISTRY_NAME}"
-        IMAGE_TAG = "${env.BUILD_ID}"
     }
 
     stages {
@@ -39,7 +38,7 @@ pipeline {
                         ]
 
                         services.each { service ->
-                            def image = docker.build("${REPO_URI}/${service}:${IMAGE_TAG}", "backend/${service}")
+                            def image = docker.build("${REPO_URI}/${service}:latest", "backend/${service}")
                             image.push()
                         }
                     }
@@ -53,7 +52,6 @@ pipeline {
                 script {
                     sh "rm -r backend/k8s/combined.yml"
                     sh "sed -i 's|axeloooo|${REPO_URI}|g' backend/k8s/*.yml"
-                    sh "sed -i 's|latest|${IMAGE_TAG}|g' backend/k8s/*.yml"
                     sh "cat backend/k8s/*.yml > backend/k8s/combined.yml"
                     step([
                         $class: 'KubernetesEngineBuilder', 

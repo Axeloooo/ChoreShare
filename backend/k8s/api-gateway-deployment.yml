@@ -12,13 +12,22 @@ spec:
       labels:
         app: api-gateway-app
     spec:
+      initContainers:
+        - name: wait for config service
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              'until nc -z config-service-svc 80; do echo "Waiting for Eureka"; sleep 2; done',
+            ]
       containers:
         - name: api-gateway-app
           image: axeloooo/api-gateway:latest
           resources:
             limits:
-              cpu: "1"
-              memory: "512Mi"
+              cpu: "60m"
+              memory: "256Mi"
           ports:
             - containerPort: 8888
           env:
