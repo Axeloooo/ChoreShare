@@ -13,7 +13,7 @@ spec:
         app: config-service-app
     spec:
       initContainers:
-        - name: wait for eureka
+        - name: wait-for-eureka
           image: busybox
           command:
             [

@@ -15,7 +15,7 @@ spec:
         app: eureka
     spec:
       initContainers:
-        - name: wait for postgres service
+        - name: wait-for-postgres
           image: busybox
           command:
             [
