@@ -1,7 +1,5 @@
 package com.choresync.gateway;
 
-import java.time.Duration;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
@@ -12,7 +10,6 @@ import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.context.annotation.Bean;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
-import io.github.resilience4j.timelimiter.TimeLimiterConfig;
 import reactor.core.publisher.Mono;
 
 @SpringBootApplication
@@ -33,9 +30,6 @@ public class ApiGatewayApplication {
         id -> new Resilience4JConfigBuilder(id)
             .circuitBreakerConfig(
                 CircuitBreakerConfig.ofDefaults())
-            .timeLimiterConfig(
-                TimeLimiterConfig.custom().timeoutDuration(
-                    Duration.ofSeconds(10)).build())
             .build());
   }
 }

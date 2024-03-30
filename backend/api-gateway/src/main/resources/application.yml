@@ -12,9 +12,6 @@ spring:
       port: 6379
   cloud:
     gateway:
-      httpClient:
-        connect-timeout: 10000
-        response-timeout: 10000
       discovery:
         locator:
           enabled: true
@@ -37,10 +34,10 @@ spring:
             - Path=/api/v1/userhousehold/**
           filters:
             - AuthFilter
-            - name: CircuitBreaker
-              args:
-                name: userhousehold-service
-                fallbackUri: forward:/userhousehold-service-fallback
+            # - name: CircuitBreaker
+            #   args:
+            #     name: userhousehold-service
+            #     fallbackUri: forward:/userhousehold-service-fallback
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 1
@@ -52,10 +49,10 @@ spring:
             - Path=/api/v1/task/**
           filters:
             - AuthFilter
-            - name: CircuitBreaker
-              args:
-                name: task-service
-                fallbackUri: forward:/task-service-fallback
+            # - name: CircuitBreaker
+            #   args:
+            #     name: task-service
+            #     fallbackUri: forward:/task-service-fallback
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 1
@@ -67,10 +64,10 @@ spring:
             - Path=/api/v1/household/**
           filters:
             - AuthFilter
-            - name: CircuitBreaker
-              args:
-                name: household-service
-                fallbackUri: forward:/household-service-fallback
+            # - name: CircuitBreaker
+            #   args:
+            #     name: household-service
+            #     fallbackUri: forward:/household-service-fallback
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 1
@@ -82,10 +79,10 @@ spring:
             - Path=/api/v1/event/**
           filters:
             - AuthFilter
-            - name: CircuitBreaker
-              args:
-                name: event-service
-                fallbackUri: forward:/event-service-fallback
+            # - name: CircuitBreaker
+            #   args:
+            #     name: event-service
+            #     fallbackUri: forward:/event-service-fallback
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 1
@@ -97,10 +94,10 @@ spring:
             - Path=/api/v1/announcement/**
           filters:
             - AuthFilter
-            - name: CircuitBreaker
-              args:
-                name: announcement-service
-                fallbackUri: forward:/announcement-service-fallback
+            # - name: CircuitBreaker
+            #   args:
+            #     name: announcement-service
+            #     fallbackUri: forward:/announcement-service-fallback
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 1
@@ -112,10 +109,10 @@ spring:
             - Path=/api/v1/auth/**
           filters:
             - AuthFilter
-            - name: CircuitBreaker
-              args:
-                name: auth-service
-                fallbackUri: forward:/auth-service-fallback
+            # - name: CircuitBreaker
+            #   args:
+            #     name: auth-service
+            #     fallbackUri: forward:/auth-service-fallback
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 1
@@ -127,10 +124,10 @@ spring:
             - Path=/api/v1/user/**
           filters:
             - AuthFilter
-            - name: CircuitBreaker
-              args:
-                name: user-service
-                fallbackUri: forward:/user-service-fallback
+            # - name: CircuitBreaker
+            #   args:
+            #     name: user-service
+            #     fallbackUri: forward:/user-service-fallback
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 1
@@ -142,10 +139,10 @@ spring:
             - Path=/api/v1/email/**
           filters:
             - AuthFilter
-            - name: CircuitBreaker
-              args:
-                name: email-service
-                fallbackUri: forward:/email-service-fallback
+            # - name: CircuitBreaker
+            #   args:
+            #     name: email-service
+            #     fallbackUri: forward:/email-service-fallback
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 1
