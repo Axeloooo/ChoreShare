@@ -1243,6 +1243,7 @@ function App() {
   };
 
   const inviteMember = async (email) => {
+    setIsLoading(true);
     try {
       const res = await fetch(
         `${process.env.REACT_APP_SERVER_URI}/api/v1/email/send`,
@@ -1260,13 +1261,14 @@ function App() {
       );
 
       if (!res.ok) {
-        if (res.status === 405) {
-          toast.success("Email sent successfully!");
-        } else {
-          toast.error("Oops! Something went wrong. Please try again.");
-        }
+        setIsLoading(false);
+        toast.error("Oops! Something went wrong. Please try again.");
         return;
       }
+
+      const message = await res.json();
+      setIsLoading(false);
+      toast.success(message.message);
     } catch (error) {
       console.error(error);
     }
