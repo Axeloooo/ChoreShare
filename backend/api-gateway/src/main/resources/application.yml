@@ -13,8 +13,8 @@ spring:
   cloud:
     gateway:
       httpClient:
-        connect-timeout: 5000
-        response-timeout: 5000
+        connect-timeout: 10000
+        response-timeout: 10000
       discovery:
         locator:
           enabled: true
