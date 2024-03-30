@@ -90,11 +90,11 @@ public class EmailServiceImpl implements EmailService {
       throw new EmailInternalCommunicationException(extractErrorMessage(e));
     }
 
-    String subject = "ChoreSync: Invitation to join a household!";
+    String subject = "ChoreShare: Invitation to join a household!";
     String htmlMessage = String.format("<h1>Hi there!</h1>" +
-        "<p>You have been invited to join a household on ChoreSync!</p>" +
+        "<p>You have been invited to join a household on ChoreShare!</p>" +
         "<p>Click the link below to create an account:</p>" +
-        "<a href='https://choreshare.netlify.app/register' style='background-color:#3498FF; color: white; padding: 10px 18px; text-align: center; text-decoration: none; display: inline-block; margin: 10px 0 10px 0;'>Join ChoreSync</a>"
+        "<a href='https://choreshare.netlify.app/register' style='background-color:#3498FF; color: white; padding: 10px 18px; text-align: center; text-decoration: none; display: inline-block; margin: 10px 0 10px 0;'>Join ChoreShare</a>"
         +
         "<p>Use the following code to join the household:</p>" +
         "<strong>%s</strong>",
