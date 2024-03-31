@@ -24,10 +24,6 @@ spec:
       containers:
         - name: config-service-app
           image: axeloooo/config-service:latest
-          resources:
-            limits:
-              cpu: "60m"
-              memory: "256Mi"
           ports:
             - containerPort: 8080
           env:

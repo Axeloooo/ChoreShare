@@ -1,10 +1,11 @@
 # 📌 ChoreShare
 
-![GitHub repo size](https://img.shields.io/github/repo-size/2BlackCats/ENSF401_Final_Project?logo=github&color=blue)
-![Github tag](https://img.shields.io/github/v/tag/2BlackCats/ENSF401_Final_Project?logo=github&color=red)
-![GitHub contributors](https://img.shields.io/github/contributors/2BlackCats/ENSF401_Final_Project?logo=github&color=yellow)
-![Github pull requests](https://img.shields.io/github/issues-pr/2BlackCats/ENSF401_Final_Project?logo=github)
-![Github license](https://img.shields.io/github/license/2BlackCats/ENSF401_Final_Project?logo=github&color=orange)
+![GitHub repo size](https://img.shields.io/github/repo-size/Axeloooo/ChoreShare?logo=github&color=blue&style=flat-square)
+![Github tag](https://img.shields.io/github/v/tag/Axeloooo/ChoreShare?logo=github&color=red&style=flat-square)
+![GitHub contributors](https://img.shields.io/github/contributors/Axeloooo/ChoreShare?logo=github&color=yellow&style=flat-square)
+![Github issues](https://img.shields.io/github/issues/Axeloooo/ChoreShare?logo=github&style=flat-square)
+![Github pull requests](https://img.shields.io/github/issues-pr/Axeloooo/ChoreShare?logo=github&style=flat-square)
+![Github license](https://img.shields.io/github/license/Axeloooo/ChoreShare?logo=github&color=orange&style=flat-square)
 
 ## 📖 Table of Contents
 

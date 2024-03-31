@@ -15,10 +15,6 @@ spec:
       containers:
         - name: zipkin
           image: openzipkin/zipkin
-          resources:
-            limits:
-              cpu: "60m"
-              memory: "256Mi"
           ports:
             - containerPort: 9411
 

@@ -24,10 +24,6 @@ spec:
       containers:
         - name: user-service-app
           image: axeloooo/user-service:latest
-          resources:
-            limits:
-              cpu: "60m"
-              memory: "256Mi"
           ports:
             - containerPort: 8086
           env:
