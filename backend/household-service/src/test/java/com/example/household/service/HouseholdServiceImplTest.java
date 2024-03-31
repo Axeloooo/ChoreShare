@@ -1,14 +1,18 @@
 package com.example.household.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +26,7 @@ import org.springframework.context.annotation.Description;
 
 import com.choresync.household.entity.Household;
 import com.choresync.household.exception.HouseholdInvalidBodyException;
+import com.choresync.household.exception.HouseholdInvalidParamException;
 import com.choresync.household.exception.HouseholdNotFoundException;
 import com.choresync.household.model.HouseholdRequest;
 import com.choresync.household.model.HouseholdResponse;
@@ -63,72 +68,100 @@ public class HouseholdServiceImplTest {
         .build();
   }
 
-  @Description("POST /api/v1/household - Test create household")
+  @Description("POST /api/v1/household - Test create household with invalid body")
   @Test
-  public void testCreateHousehold() {
-    when(householdRepository.save(any(Household.class)))
-        .thenReturn(household);
+  public void testCreateHouseholdWithInvalidBody() {
+    HouseholdRequest invalidRequest = new HouseholdRequest();
+    assertThrows(HouseholdInvalidBodyException.class, () -> householdService.createHousehold(invalidRequest));
+  }
 
-    HouseholdResponse result = householdService.createHousehold(householdRequest);
+  @Description("POST /api/v1/household - Test create household success")
+  @Test
+  public void testCreateHouseholdSuccess() {
+    when(householdRepository.save(any(Household.class))).thenReturn(household);
 
-    assertNotNull(result);
-    assertEquals(householdResponse, result);
+    HouseholdResponse response = householdService.createHousehold(householdRequest);
+
+    assertNotNull(response);
+    assertEquals(householdResponse, response);
 
     verify(householdRepository, times(1)).save(any(Household.class));
   }
 
-  @Description("POST /api/v1/household - Test HouseholdCreationException when household request is null")
+  @Description("GET /api/v1/household/{id} - Test get household by id with invalid param")
   @Test
-  public void testCreateHouseholdWithNullRequest() {
-    assertThrows(HouseholdInvalidBodyException.class, () -> householdService.createHousehold(null));
-
-    verify(householdRepository, times(0)).save(any(Household.class));
+  public void testGetHouseholdByIdWithInvalidParam() {
+    assertThrows(HouseholdInvalidParamException.class, () -> householdService.getHouseholdById(null));
   }
 
-  @Description("GET /api/v1/household/{id} - Test get household by id")
+  @Description("GET /api/v1/household/{id} - Test get household by id with household not found")
   @Test
-  public void testGetHouseholdById() {
-    when(householdRepository.findById("1"))
-        .thenReturn(Optional.ofNullable(household));
+  public void testGetHouseholdByIdWithHouseholdNotFound() {
+    when(householdRepository.findById(anyString())).thenReturn(Optional.empty());
 
-    HouseholdResponse result = householdService.getHouseholdById("1");
-
-    assertNotNull(result);
-    assertEquals(householdResponse, result);
-
-    verify(householdRepository, times(1)).findById("1");
-  }
-
-  @Description("GET /api/v1/household/{id} - Test HouseholdNotFoundException when household is not found")
-  @Test
-  public void testGetHouseholdByIdNotFound() {
     assertThrows(HouseholdNotFoundException.class, () -> householdService.getHouseholdById("1"));
-
-    verify(householdRepository, times(1)).findById("1");
   }
 
-  @Description("GET /api/v1/household - Test get all households")
+  @Description("GET /api/v1/household/{id} - Test get household by id success")
   @Test
-  public void testGetAllHouseholds() {
-    when(householdRepository.findAll())
-        .thenReturn(Arrays.asList(household));
+  public void testGetHouseholdByIdSuccess() {
+    when(householdRepository.findById(anyString())).thenReturn(Optional.of(household));
 
-    List<HouseholdResponse> result = householdService.getAllHouseholds();
+    HouseholdResponse response = householdService.getHouseholdById("1");
 
-    assertNotNull(result);
-    assertEquals(1, result.size());
-    assertEquals(householdResponse, result.get(0));
+    assertNotNull(response);
+    assertEquals(householdResponse, response);
+
+    verify(householdRepository, times(1)).findById(anyString());
+
   }
 
-  @Description("GET /api/v1/household - Test get all empty households")
+  @Description("GET /api/v1/household - Test get all households when no households exist")
   @Test
-  public void testGetAllHouseholdsEmpty() {
-    when(householdRepository.findAll())
-        .thenReturn(Arrays.asList());
+  public void testGetAllHouseholdsWhenNoHouseholdsExist() {
+    when(householdRepository.findAll()).thenReturn(Collections.emptyList());
 
-    List<HouseholdResponse> result = householdService.getAllHouseholds();
+    List<HouseholdResponse> response = householdService.getAllHouseholds();
 
-    assertNotNull(result);
-    assertEquals(0, result.size());
+    assertTrue(response.isEmpty());
+  }
+
+  @Description("GET /api/v1/household - Test get all households when households exist")
+  @Test
+  public void testGetAllHouseholdsWhenHouseholdsExist() {
+    List<Household> households = Collections.singletonList(household);
+    when(householdRepository.findAll()).thenReturn(households);
+
+    List<HouseholdResponse> response = householdService.getAllHouseholds();
+    assertNotNull(response);
+    assertFalse(response.isEmpty());
+    assertEquals(1, response.size());
+    assertEquals(householdResponse, response.get(0));
+
+    verify(householdRepository, times(1)).findAll();
+  }
+
+  @Description("DELETE /api/v1/household/{id} - Test delete household by id with invalid param")
+  @Test
+  public void testDeleteHouseholdByIdWithInvalidParam() {
+    assertThrows(HouseholdInvalidParamException.class, () -> householdService.deleteHousehold(null));
+  }
+
+  @Description("DELETE /api/v1/household/{id} - Test delete household by id with household not found")
+  @Test
+  public void testDeleteHouseholdByIdWithHouseholdNotFound() {
+    when(householdRepository.existsById(anyString())).thenReturn(false);
+
+    assertThrows(HouseholdNotFoundException.class, () -> householdService.deleteHousehold("1"));
+  }
+
+  @Description("DELETE /api/v1/household/{id} - Test delete household by id success")
+  @Test
+  public void testDeleteHouseholdByIdSuccess() {
+    when(householdRepository.existsById(anyString())).thenReturn(true);
+    doNothing().when(householdRepository).deleteById(anyString());
+    householdService.deleteHousehold("1");
+
+    verify(householdRepository, times(1)).deleteById("1");
   }
 }

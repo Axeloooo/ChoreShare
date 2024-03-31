@@ -30,7 +30,7 @@ public class HouseholdServiceImpl implements HouseholdService {
    */
   @Override
   public HouseholdResponse createHousehold(HouseholdRequest householdRequest) {
-    if (householdRequest.getName().isBlank() || householdRequest.getName() == null) {
+    if (householdRequest.getName() == null) {
       throw new HouseholdInvalidBodyException("Invalid request body");
     }
 
@@ -65,7 +65,7 @@ public class HouseholdServiceImpl implements HouseholdService {
    */
   @Override
   public HouseholdResponse getHouseholdById(String id) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new HouseholdInvalidParamException("Invalid requets parameter");
     }
 
@@ -118,7 +118,7 @@ public class HouseholdServiceImpl implements HouseholdService {
    */
   @Override
   public void deleteHousehold(String id) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new HouseholdInvalidParamException("Invalid requets parameter");
     }
 

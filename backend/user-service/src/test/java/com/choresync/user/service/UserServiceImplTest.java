@@ -4,7 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Description;
 import com.choresync.user.entity.User;
 import com.choresync.user.exception.UserAlreadyExistsException;
 import com.choresync.user.exception.UserInvalidBodyException;
+import com.choresync.user.exception.UserInvalidParamException;
 import com.choresync.user.exception.UserNotFoundException;
 import com.choresync.user.model.UserAuthResponse;
 import com.choresync.user.model.UserEditMetadataRequest;
@@ -57,8 +58,8 @@ class UserServiceImplTest {
     userMetadata = UserEditMetadataRequest.builder()
         .firstName("John")
         .lastName("Doe")
-        .email("john.doe@example.com")
-        .phone("1234567890")
+        .email("axel.doe@example.com")
+        .phone("1234567899")
         .build();
 
     invalidUserRequest = UserRequest.builder()
@@ -85,77 +86,104 @@ class UserServiceImplTest {
         .build();
   }
 
+  @Description("POST /api/v1/user - Test create user with invalid body")
+  @Test
+  public void testCreateUserWithInvalidBody() {
+    assertThrows(UserInvalidBodyException.class, () -> userService.createUser(invalidUserRequest));
+  }
+
+  @Description("POST /api/v1/user - Test create user with user already exists by email")
+  @Test
+  public void testCreateUserWithUserAlreadyExistsByEmail() {
+    when(userRepository.findByEmail(userRequest.getEmail())).thenReturn(user);
+
+    assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(userRequest));
+  }
+
+  @Description("POST /api/v1/user - Test create user with user already exists by username")
+  @Test
+  public void testCreateUserWithUserAlreadyExistsByUsername() {
+    when(userRepository.findByUsername(userRequest.getUsername())).thenReturn(user);
+
+    assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(userRequest));
+  }
+
+  @Description("POST /api/v1/user - Test create user with user already exists by phone")
+  @Test
+  public void testCreateUserWithUserAlreadyExistsByPhone() {
+    when(userRepository.findByPhone(userRequest.getPhone())).thenReturn(user);
+    assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(userRequest));
+  }
+
   @Description("POST /api/v1/user - Test create user success")
   @Test
   public void testCreateUserSuccess() {
-    UserAuthResponse authResponse = UserAuthResponse
-        .builder()
-        .id(user.getId())
-        .username(user.getUsername())
-        .password(user.getPassword())
-        .createdAt(user.getCreatedAt())
-        .updatedAt(user.getUpdatedAt())
-        .build();
-
-    when(userRepository.findByEmail(anyString())).thenReturn(null);
+    when(userRepository.findByEmail(userRequest.getEmail())).thenReturn(null);
+    when(userRepository.findByUsername(userRequest.getUsername())).thenReturn(null);
+    when(userRepository.findByPhone(userRequest.getPhone())).thenReturn(null);
     when(userRepository.save(any(User.class))).thenReturn(user);
 
-    UserAuthResponse result = userService.createUser(userRequest);
+    UserAuthResponse response = userService.createUser(userRequest);
 
-    assertNotNull(result);
-    assertEquals(authResponse, result);
-    assertEquals(user.getUsername(), authResponse.getUsername());
+    assertNotNull(response);
+    assertEquals(user.getId(), response.getId());
+    assertEquals(user.getUsername(), response.getUsername());
+    assertEquals(user.getPassword(), response.getPassword());
 
     verify(userRepository, times(1)).findByEmail(anyString());
+    verify(userRepository, times(1)).findByUsername(anyString());
+    verify(userRepository, times(1)).findByPhone(anyString());
     verify(userRepository, times(1)).save(any(User.class));
   }
 
-  @Description("POST /api/v1/user - Test UserAlreadyExistsException")
+  @Description("GET /api/v1/user - Test get all users when no users exist")
   @Test
-  public void testUserAlreadyExistsException() {
-    when(userRepository.findByEmail(anyString())).thenReturn(user);
+  public void testGetAllUsersWhenNoUsersExist() {
+    when(userRepository.findAll()).thenReturn(Collections.emptyList());
 
-    assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(userRequest));
+    List<UserResponse> response = userService.getAllUsers();
 
-    verify(userRepository, times(1)).findByEmail(anyString());
-    verify(userRepository, times(0)).save(any(User.class));
+    assertTrue(response.isEmpty());
   }
 
-  @Description("POST /api/v1/user - Test UserCreationException")
+  @Description("GET /api/v1/user - Test get all users when users exist")
   @Test
-  public void testUserCreationException() {
-    assertThrows(UserInvalidBodyException.class, () -> userService.createUser(invalidUserRequest));
+  public void testGetAllUsersWhenUsersExist() {
+    List<User> users = Collections.singletonList(user);
 
-    verify(userRepository, times(0)).findByEmail(anyString());
-    verify(userRepository, times(0)).save(any(User.class));
-  }
+    when(userRepository.findAll()).thenReturn(users);
 
-  @Description("GET /api/v1/user - Test get all users success")
-  @Test
-  public void testGetAllUsersNonEmpty() {
-    List<User> userList = Arrays.asList(user);
-    when(userRepository.findAll()).thenReturn(userList);
+    List<UserResponse> response = userService.getAllUsers();
 
-    List<UserResponse> userResponses = userService.getAllUsers();
-
-    assertNotNull(userResponses);
-    assertFalse(userResponses.isEmpty());
-    assertEquals(userList.size(), userResponses.size());
+    assertNotNull(response);
+    assertFalse(response.isEmpty());
+    assertEquals(1, response.size());
+    assertEquals(user.getId(), response.get(0).getId());
+    assertEquals(user.getFirstName(), response.get(0).getFirstName());
+    assertEquals(user.getLastName(), response.get(0).getLastName());
+    assertEquals(user.getUsername(), response.get(0).getUsername());
+    assertEquals(user.getEmail(), response.get(0).getEmail());
+    assertEquals(user.getPhone(), response.get(0).getPhone());
+    assertEquals(user.getStreak(), response.get(0).getStreak());
+    assertEquals(user.getMissedChores(), response.get(0).getMissedChores());
+    assertEquals(user.getCreatedAt(), response.get(0).getCreatedAt());
+    assertEquals(user.getUpdatedAt(), response.get(0).getUpdatedAt());
 
     verify(userRepository, times(1)).findAll();
   }
 
-  @Description("GET /api/v1/user - Test get all empty users")
+  @Description("GET /api/v1/user/{id} - Test get user by id with invalid param")
   @Test
-  public void testGetAllUsersEmpty() {
-    when(userRepository.findAll()).thenReturn(Arrays.asList());
+  public void testGetUserByIdWithInvalidParam() {
+    assertThrows(UserInvalidParamException.class, () -> userService.getUserById(null));
+  }
 
-    List<UserResponse> userResponses = userService.getAllUsers();
+  @Description("GET /api/v1/user/{id} - Test get user by id with user not found")
+  @Test
+  public void testGetUserByIdWithUserNotFound() {
+    when(userRepository.findById(anyString())).thenReturn(Optional.empty());
 
-    assertNotNull(userResponses);
-    assertTrue(userResponses.isEmpty());
-
-    verify(userRepository, times(1)).findAll();
+    assertThrows(UserNotFoundException.class, () -> userService.getUserById("1"));
   }
 
   @Description("GET /api/v1/user/{id} - Test get user by id success")
@@ -163,71 +191,126 @@ class UserServiceImplTest {
   public void testGetUserByIdSuccess() {
     when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
 
-    UserResponse userResponse = userService.getUserById("1");
+    UserResponse response = userService.getUserById("1");
 
-    assertNotNull(userResponse);
-    assertEquals(user.getId(), userResponse.getId());
+    assertNotNull(response);
+    assertEquals(user.getId(), response.getId());
+    assertEquals(user.getFirstName(), response.getFirstName());
+    assertEquals(user.getLastName(), response.getLastName());
+    assertEquals(user.getUsername(), response.getUsername());
+    assertEquals(user.getEmail(), response.getEmail());
+    assertEquals(user.getPhone(), response.getPhone());
+    assertEquals(user.getStreak(), response.getStreak());
+    assertEquals(user.getMissedChores(), response.getMissedChores());
+    assertEquals(user.getCreatedAt(), response.getCreatedAt());
+    assertEquals(user.getUpdatedAt(), response.getUpdatedAt());
 
     verify(userRepository, times(1)).findById(anyString());
   }
 
-  @Description("GET /api/v1/user/{id} - Test UserNotFoundException")
+  @Description("DELETE /api/v1/user/{id} - Test delete user by id with invalid param")
   @Test
-  public void testGetUserByIdNotFound() {
-    when(userRepository.findById(anyString())).thenReturn(Optional.empty());
+  public void testDeleteUserByIdWithInvalidParam() {
+    assertThrows(UserInvalidParamException.class, () -> userService.deleteUserById(null));
+  }
 
-    assertThrows(UserNotFoundException.class, () -> userService.getUserById("1"));
+  @Description("DELETE /api/v1/user/{id} - Test delete user by id with user not found")
+  @Test
+  public void testDeleteUserByIdWithUserNotFound() {
+    when(userRepository.existsById(anyString())).thenReturn(false);
 
-    verify(userRepository, times(1)).findById(anyString());
+    assertThrows(UserNotFoundException.class, () -> userService.deleteUserById("1"));
   }
 
   @Description("DELETE /api/v1/user/{id} - Test delete user by id success")
   @Test
   public void testDeleteUserByIdSuccess() {
     when(userRepository.existsById(anyString())).thenReturn(true);
+    doNothing().when(userRepository).deleteById(anyString());
 
-    assertDoesNotThrow(() -> userService.deleteUserById("1"));
+    userService.deleteUserById("1");
 
-    verify(userRepository, times(1)).existsById(anyString());
-    verify(userRepository, times(1)).deleteById(anyString());
+    verify(userRepository, times(1)).deleteById("1");
   }
 
-  @Description("DELETE /api/v1/user/{id} - Test UserNotFoundException")
+  @Description("PUT /api/v1/user/{id} - Test edit user by id with invalid param")
   @Test
-  public void testDeleteUserByIdNotFound() {
-    when(userRepository.existsById(anyString())).thenReturn(false);
-
-    assertThrows(UserNotFoundException.class, () -> userService.deleteUserById("1"));
-
-    verify(userRepository, times(1)).existsById(anyString());
-    verify(userRepository, times(0)).deleteById(anyString());
+  public void testEditUserByIdWithInvalidParam() {
+    assertThrows(UserInvalidParamException.class, () -> userService.editUser(null, userMetadata));
   }
 
-  @Description("PUT /api/v1/user/{id} - Test edit user success")
+  @Description("PUT /api/v1/user/{id} - Test edit user by id with invalid body")
   @Test
-  public void testEditUserSuccess() {
+  public void testEditUserByIdWithInvalidBody() {
+    assertThrows(UserInvalidBodyException.class, () -> userService.editUser("1", new UserEditMetadataRequest()));
+  }
+
+  @Description("PUT /api/v1/user/{id} - Test edit user by id with user not found")
+  @Test
+  public void testEditUserByIdWithUserNotFound() {
+    when(userRepository.findById(anyString())).thenReturn(Optional.empty());
+
+    assertThrows(UserNotFoundException.class, () -> userService.editUser("1", userMetadata));
+  }
+
+  @Description("PUT /api/v1/user/{id} - Test edit user by id with email already exists")
+  @Test
+  public void testEditUserByIdWithEmailAlreadyExists() {
     when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+    when(userRepository.findByEmail(anyString())).thenReturn(new User());
+
+    assertThrows(UserAlreadyExistsException.class, () -> userService.editUser("1", userMetadata));
+  }
+
+  @Description("PUT /api/v1/user/{id} - Test edit user by id with phone already exists")
+  @Test
+  public void testEditUserByIdWithPhoneAlreadyExists() {
+    when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+    when(userRepository.findByPhone(anyString())).thenReturn(new User());
+
+    assertThrows(UserAlreadyExistsException.class, () -> userService.editUser("1", userMetadata));
+  }
+
+  @Description("PUT /api/v1/user/{id} - Test edit user by id success")
+  @Test
+  public void testEditUserByIdSuccess() {
+    when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+    when(userRepository.findByEmail(anyString())).thenReturn(null);
+    when(userRepository.findByPhone(anyString())).thenReturn(null);
     when(userRepository.save(any(User.class))).thenReturn(user);
 
-    UserResponse userResponse = userService.editUser("1", userMetadata);
+    UserResponse response = userService.editUser("1", userMetadata);
 
-    assertNotNull(userResponse);
-    assertEquals(user.getId(), userResponse.getId());
+    assertNotNull(response);
+    assertEquals(user.getId(), response.getId());
+    assertEquals(user.getFirstName(), response.getFirstName());
+    assertEquals(user.getLastName(), response.getLastName());
+    assertEquals(user.getUsername(), response.getUsername());
+    assertEquals(user.getEmail(), response.getEmail());
+    assertEquals(user.getPhone(), response.getPhone());
+    assertEquals(user.getStreak(), response.getStreak());
+    assertEquals(user.getMissedChores(), response.getMissedChores());
+    assertEquals(user.getCreatedAt(), response.getCreatedAt());
+    assertEquals(user.getUpdatedAt(), response.getUpdatedAt());
 
     verify(userRepository, times(1)).findById(anyString());
+    verify(userRepository, times(1)).findByEmail(anyString());
+    verify(userRepository, times(1)).findByPhone(anyString());
     verify(userRepository, times(1)).save(any(User.class));
   }
 
-  @Description("PUT /api/v1/user/{id} - Test UserNotFoundException")
+  @Description("GET /api/v1/user/username/{username} - Test get user by username with invalid param")
   @Test
-  public void testEditUserNotFound() {
-    when(userRepository.findById(anyString())).thenReturn(Optional.empty());
+  public void testGetUserByUsernameWithInvalidParam() {
+    assertThrows(UserInvalidParamException.class, () -> userService.getUserByUsername(null));
+  }
 
-    assertThrows(UserNotFoundException.class, () -> userService.editUser("1",
-        userMetadata));
+  @Description("GET /api/v1/user/username/{username} - Test get user by username with user not found")
+  @Test
+  public void testGetUserByUsernameWithUserNotFound() {
+    when(userRepository.findByUsername(anyString())).thenReturn(null);
 
-    verify(userRepository, times(1)).findById(anyString());
-    verify(userRepository, times(0)).save(any(User.class));
+    assertThrows(UserNotFoundException.class, () -> userService.getUserByUsername("johndoe"));
   }
 
   @Description("GET /api/v1/user/username/{username} - Test get user by username success")
@@ -235,22 +318,15 @@ class UserServiceImplTest {
   public void testGetUserByUsernameSuccess() {
     when(userRepository.findByUsername(anyString())).thenReturn(user);
 
-    UserAuthResponse authResponse = userService.getUserByUsername("johndoe");
+    UserAuthResponse response = userService.getUserByUsername("johndoe");
 
-    assertNotNull(authResponse);
-    assertEquals(user.getUsername(), authResponse.getUsername());
-
-    verify(userRepository, times(1)).findByUsername(anyString());
-  }
-
-  @Description("GET /api/v1/username/{username} - Test UserNotFoundException")
-  @Test
-  public void testGetUserByUsernameNotFound() {
-    when(userRepository.findByUsername(anyString())).thenReturn(null);
-
-    assertThrows(UserNotFoundException.class, () -> userService.getUserByUsername("johndoe"));
+    assertNotNull(response);
+    assertEquals(user.getId(), response.getId());
+    assertEquals(user.getUsername(), response.getUsername());
+    assertEquals(user.getPassword(), response.getPassword());
+    assertEquals(user.getCreatedAt(), response.getCreatedAt());
+    assertEquals(user.getUpdatedAt(), response.getUpdatedAt());
 
     verify(userRepository, times(1)).findByUsername(anyString());
   }
-
 }

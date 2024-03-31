@@ -24,10 +24,6 @@ spec:
       containers:
         - name: userhousehold-service-app
           image: axeloooo/userhousehold-service:latest
-          resources:
-            limits:
-              cpu: "60m"
-              memory: "256Mi"
           ports:
             - containerPort: 8084
           env:
