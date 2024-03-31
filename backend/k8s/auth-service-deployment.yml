@@ -24,10 +24,6 @@ spec:
       containers:
         - name: auth-service-app
           image: axeloooo/auth-service:latest
-          resources:
-            limits:
-              cpu: "60m"
-              memory: "256Mi"
           ports:
             - containerPort: 8087
           env:

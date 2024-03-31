@@ -82,8 +82,7 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
    */
   @Override
   public UserhouseholdResponse createUserhousehold(UserhouseholdRequest userhouseholdRequest) {
-    if (userhouseholdRequest.getName().isBlank() || userhouseholdRequest.getName() == null
-        || userhouseholdRequest.getUserId().isBlank() || userhouseholdRequest.getUserId() == null) {
+    if (userhouseholdRequest.getName() == null || userhouseholdRequest.getUserId() == null) {
       throw new UserhouseholdInvalidBodyException("Invalid request body");
     }
 
@@ -164,7 +163,7 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
    */
   @Override
   public UserhouseholdResponse getUserhouseholdById(String id) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new UserhouseholdInvalidParamException("Invalid request param");
     }
 
@@ -223,7 +222,7 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
    */
   @Override
   public List<UserhouseholdResponse> getUserhouseholdsByUserId(String userId) {
-    if (userId.isBlank() || userId == null) {
+    if (userId == null) {
       throw new UserhouseholdInvalidParamException("Invalid request param");
     }
 
@@ -297,7 +296,7 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
    */
   @Override
   public List<GetMembersResponse> getUserhouseholdsByHouseholdId(String householdId) {
-    if (householdId.isBlank() || householdId == null) {
+    if (householdId == null) {
       throw new UserhouseholdInvalidParamException("Invalid request param");
     }
 
@@ -390,7 +389,7 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
    */
   @Override
   public void deleteUserhouseholdById(String id) {
-    if (id.isBlank() || id == null) {
+    if (id == null) {
       throw new UserhouseholdInvalidParamException("Invalid request param");
     }
 
@@ -422,7 +421,7 @@ public class UserhouseholdServiceImpl implements UserhouseholdService {
    */
   @Override
   public Household joinHouseHold(String userId, String houseId) {
-    if (userId.isBlank() || userId == null || houseId.isBlank() || houseId == null) {
+    if (userId == null || houseId == null) {
       throw new UserhouseholdInvalidParamException("Invalid request param");
     }
 

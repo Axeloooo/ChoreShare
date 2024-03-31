@@ -27,8 +27,3 @@ output "choreshare_cluster_name" {
   value = module.gke.choreshare_cluster_name
   description = "The name of the GKE cluster"
 }
-
-output "choreshare_cluster_endpoint" {
-  value       = module.gke.choreshare_cluster_endpoint
-  description = "The endpoint for the GKE cluster"
-}
