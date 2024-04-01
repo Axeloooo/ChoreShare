@@ -31,31 +31,6 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!token) return;
-    const validateToken = async () => {
-      const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI}/api/v1/auth/validate?token=${token}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (res.ok) {
-        return;
-      }
-
-      logout();
-      toast.warn("Oops. You've been logged out.");
-    };
-
-    validateToken();
-  }, [token]);
-
-  useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
     if (storedUserId) {
       setUserId(JSON.parse(storedUserId));
