@@ -42,8 +42,8 @@ spring:
             #     fallbackUri: forward:/userhousehold-service-fallback
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 1
-                redis-rate-limiter.burstCapacity: 1
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
 
         - id: task-service
           uri: lb://task-service
@@ -57,8 +57,8 @@ spring:
             #     fallbackUri: forward:/task-service-fallback
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 1
-                redis-rate-limiter.burstCapacity: 1
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
 
         - id: household-service
           uri: lb://household-service
@@ -72,8 +72,8 @@ spring:
             #     fallbackUri: forward:/household-service-fallback
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 1
-                redis-rate-limiter.burstCapacity: 1
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
 
         - id: event-service
           uri: lb://event-service
@@ -87,8 +87,8 @@ spring:
             #     fallbackUri: forward:/event-service-fallback
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 1
-                redis-rate-limiter.burstCapacity: 1
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
 
         - id: announcement-service
           uri: lb://announcement-service
@@ -102,8 +102,8 @@ spring:
             #     fallbackUri: forward:/announcement-service-fallback
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 1
-                redis-rate-limiter.burstCapacity: 1
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
 
         - id: auth-service
           uri: lb://auth-service
@@ -117,8 +117,8 @@ spring:
             #     fallbackUri: forward:/auth-service-fallback
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 1
-                redis-rate-limiter.burstCapacity: 1
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
 
         - id: user-service
           uri: lb://user-service
@@ -132,8 +132,8 @@ spring:
             #     fallbackUri: forward:/user-service-fallback
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 1
-                redis-rate-limiter.burstCapacity: 1
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
 
         - id: email-service
           uri: lb://email-service
@@ -147,5 +147,5 @@ spring:
             #     fallbackUri: forward:/email-service-fallback
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 1
-                redis-rate-limiter.burstCapacity: 1
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
