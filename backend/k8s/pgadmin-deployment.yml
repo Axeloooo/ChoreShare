@@ -17,7 +17,7 @@ spec:
           image: dpage/pgadmin4
           ports:
             - containerPort: 80
-          livenessProbe:
+          readinessProbe:
             httpGet:
               path: /login
               port: 80
