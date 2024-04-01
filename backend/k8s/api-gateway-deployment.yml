@@ -24,12 +24,14 @@ spec:
       containers:
         - name: api-gateway-app
           image: axeloooo/api-gateway:latest
-          resources:
-            limits:
-              cpu: "60m"
-              memory: "256Mi"
           ports:
             - containerPort: 8888
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8888
+            initialDelaySeconds: 30
+            periodSeconds: 15
           env:
             - name: REGISTRY_SERVICE_URI
               valueFrom:
@@ -53,7 +55,6 @@ kind: Service
 metadata:
   name: api-gateway-svc
 spec:
-  type: LoadBalancer
   selector:
     app: api-gateway-app
   ports:

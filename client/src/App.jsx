@@ -101,7 +101,7 @@ function App() {
     }
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/user/${userId}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/user/${userId}`,
         {
           method: "GET",
           headers: {
@@ -131,7 +131,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/user/${userId}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/user/${userId}`,
         {
           method: "PUT",
           headers: {
@@ -170,7 +170,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/userhousehold/join/${householdId}/user/${userId}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/userhousehold/join/${householdId}/user/${userId}`,
         {
           method: "POST",
           headers: {
@@ -234,7 +234,7 @@ function App() {
   const fetchHouseholdById = async (householdId) => {
     try {
       const householdRes = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/household/${householdId}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/household/${householdId}`,
         {
           method: "GET",
           headers: {
@@ -253,7 +253,7 @@ function App() {
       const householdData = await householdRes.json();
 
       const choresRes = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/household/${householdData.id}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/task/household/${householdData.id}`,
         {
           method: "GET",
           headers: {
@@ -276,7 +276,7 @@ function App() {
       );
 
       const membersRes = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/userhousehold/household/${householdData.id}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/userhousehold/household/${householdData.id}`,
         {
           method: "GET",
           headers: {
@@ -295,7 +295,7 @@ function App() {
       const membersData = await membersRes.json();
 
       const announcementsRes = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/announcement/household/${householdData.id}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/announcement/household/${householdData.id}`,
         {
           method: "GET",
           headers: {
@@ -314,7 +314,7 @@ function App() {
       const announcementsData = await announcementsRes.json();
 
       const eventsRes = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/event/household/${householdData.id}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/event/household/${householdData.id}`,
         {
           method: "GET",
           headers: {
@@ -355,7 +355,7 @@ function App() {
   const fetchHousehold = async () => {
     try {
       const householdRes = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/userhousehold/user/${userId}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/userhousehold/user/${userId}`,
         {
           method: "GET",
           headers: {
@@ -377,7 +377,7 @@ function App() {
 
       if (householdsData.length > 0) {
         const choresRes = await fetch(
-          `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/household/${householdsData[0].id}`,
+          `${process.env.REACT_APP_SERVER_URI}/api/v1/task/household/${householdsData[0].id}`,
           {
             method: "GET",
             headers: {
@@ -400,7 +400,7 @@ function App() {
         );
 
         const membersRes = await fetch(
-          `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/userhousehold/household/${householdsData[0].id}`,
+          `${process.env.REACT_APP_SERVER_URI}/api/v1/userhousehold/household/${householdsData[0].id}`,
           {
             method: "GET",
             headers: {
@@ -419,7 +419,7 @@ function App() {
         const membersData = await membersRes.json();
 
         const announcementsRes = await fetch(
-          `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/announcement/household/${householdsData[0].id}`,
+          `${process.env.REACT_APP_SERVER_URI}/api/v1/announcement/household/${householdsData[0].id}`,
           {
             method: "GET",
             headers: {
@@ -438,7 +438,7 @@ function App() {
         const announcementsData = await announcementsRes.json();
 
         const eventsRes = await fetch(
-          `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/event/household/${householdsData[0].id}`,
+          `${process.env.REACT_APP_SERVER_URI}/api/v1/event/household/${householdsData[0].id}`,
           {
             method: "GET",
             headers: {
@@ -496,7 +496,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/userhousehold`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/userhousehold`,
         {
           method: "POST",
           headers: {
@@ -550,7 +550,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/task`,
         {
           method: "POST",
           headers: {
@@ -603,7 +603,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/${choreId}/assign/${userId}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/task/${choreId}/assign/${userId}`,
         {
           method: "PUT",
           headers: {
@@ -651,7 +651,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/${choreId}/unassign/${userId}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/task/${choreId}/unassign/${userId}`,
         {
           method: "PUT",
           headers: {
@@ -701,7 +701,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/${choreId}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/task/${choreId}`,
         {
           method: "DELETE",
           headers: {
@@ -756,7 +756,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/${choreId}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/task/${choreId}`,
         {
           method: "PUT",
           headers: {
@@ -813,7 +813,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/task/${choreId}/status`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/task/${choreId}/status`,
         {
           method: "PUT",
           headers: {
@@ -868,7 +868,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/announcement`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/announcement`,
         {
           method: "POST",
           headers: {
@@ -927,7 +927,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/announcement/${announcementId}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/announcement/${announcementId}`,
         {
           method: "PUT",
           headers: {
@@ -982,7 +982,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/announcement/${announcementId}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/announcement/${announcementId}`,
         {
           method: "DELETE",
           headers: {
@@ -1027,7 +1027,7 @@ function App() {
     console.log("endTime", endTime);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/event`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/event`,
         {
           method: "POST",
           headers: {
@@ -1079,7 +1079,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/event/${eventId}`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/event/${eventId}`,
         {
           method: "DELETE",
           headers: {
@@ -1122,7 +1122,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/auth/login`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/auth/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1167,7 +1167,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/auth/register`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/auth/register`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1221,7 +1221,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_SERVER_URI_DEV}/api/v1/email/send`,
+        `${process.env.REACT_APP_SERVER_URI}/api/v1/email/send`,
         {
           method: "POST",
           headers: {

@@ -15,12 +15,14 @@ spec:
       containers:
         - name: pgadmin
           image: dpage/pgadmin4
-          resources:
-            limits:
-              cpu: "60m"
-              memory: "256Mi"
           ports:
             - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 15
           env:
             - name: PGADMIN_DEFAULT_EMAIL
               valueFrom:
@@ -39,7 +41,6 @@ kind: Service
 metadata:
   name: pgadmin-svc
 spec:
-  type: LoadBalancer
   selector:
     app: pgadmin
   ports:

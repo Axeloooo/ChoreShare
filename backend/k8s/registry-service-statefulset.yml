@@ -26,12 +26,14 @@ spec:
       containers:
         - name: eureka
           image: axeloooo/registry-service:latest
-          resources:
-            limits:
-              cpu: "60m"
-              memory: "256Mi"
           ports:
             - containerPort: 8761
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8761
+            initialDelaySeconds: 30
+            periodSeconds: 15
 
 ---
 apiVersion: v1
@@ -50,9 +52,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: eureka-lb-svc
+  name: eureka-rest-svc
 spec:
-  type: LoadBalancer
   selector:
     app: eureka
   ports:
