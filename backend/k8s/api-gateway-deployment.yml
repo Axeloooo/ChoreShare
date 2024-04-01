@@ -26,7 +26,7 @@ spec:
           image: axeloooo/api-gateway:latest
           ports:
             - containerPort: 8888
-          livenessProbe:
+          readinessProbe:
             httpGet:
               path: /actuator/health
               port: 8888

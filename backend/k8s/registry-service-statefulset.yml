@@ -28,7 +28,7 @@ spec:
           image: axeloooo/registry-service:latest
           ports:
             - containerPort: 8761
-          livenessProbe:
+          readinessProbe:
             httpGet:
               path: /actuator/health
               port: 8761
