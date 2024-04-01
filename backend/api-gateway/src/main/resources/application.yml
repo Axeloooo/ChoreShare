@@ -18,7 +18,9 @@ spring:
       globalcors:
         corsConfigurations:
           "[/**]":
-            allowedOrigins: "https://choreshare.netlify.app"
+            allowedOrigins:
+              - "https://choreshare.netlify.app"
+              - "http://localhost:3000"
             allowedMethods:
               - GET
               - POST
