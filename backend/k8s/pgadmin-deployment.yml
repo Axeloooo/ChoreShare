@@ -35,7 +35,6 @@ kind: Service
 metadata:
   name: pgadmin-svc
 spec:
-  type: LoadBalancer
   selector:
     app: pgadmin
   ports:
