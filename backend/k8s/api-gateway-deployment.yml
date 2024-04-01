@@ -26,6 +26,16 @@ spec:
           image: axeloooo/api-gateway:latest
           ports:
             - containerPort: 8888
+          livenessProbe:
+            exec:
+              command:
+                [
+                  "/bin/grpc_health_probe",
+                  "-addr=:5000",
+                  "-connect-timeout=100ms",
+                  "-rpc-timeout=150ms",
+                ]
+            initialDelaySeconds: 5
           env:
             - name: REGISTRY_SERVICE_URI
               valueFrom:

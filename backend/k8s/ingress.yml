@@ -15,7 +15,7 @@ metadata:
   labels:
     name: choreshare-ingress
   annotations:
-    kubernetes.io/ingress.global-static-ip-name: choreshare-ip
+    kubernetes.io/ingress.global-static-ip-name: choreshare
     networking.gke.io/managed-certificates: choreshare-managed-certificate
 spec:
   rules:
@@ -42,11 +42,11 @@ spec:
               service:
                 name: zipkin-svc
                 port:
-                  number: 80
+                  number: 9411
           - pathType: Prefix
             path: "/eureka"
             backend:
               service:
-                name: eureka-svc
+                name: eureka-rest-svc
                 port:
                   number: 80
