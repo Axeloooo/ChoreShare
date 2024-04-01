@@ -35,7 +35,7 @@ spec:
               service:
                 name: pgadmin-svc
                 port:
-                  number: 80
+                  number: 5050
           - pathType: Prefix
             path: "/zipkin"
             backend:
@@ -49,4 +49,4 @@ spec:
               service:
                 name: eureka-rest-svc
                 port:
-                  number: 80
+                  number: 8761
