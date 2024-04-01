@@ -18,15 +18,11 @@ spec:
           ports:
             - containerPort: 80
           livenessProbe:
-            exec:
-              command:
-                [
-                  "/bin/grpc_health_probe",
-                  "-addr=:5000",
-                  "-connect-timeout=100ms",
-                  "-rpc-timeout=150ms",
-                ]
-            initialDelaySeconds: 5
+            httpGet:
+              path: /login
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 15
           env:
             - name: PGADMIN_DEFAULT_EMAIL
               valueFrom:
