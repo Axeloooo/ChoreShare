@@ -1,0 +1,52 @@
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: choreshare-managed-certificate
+spec:
+  domains:
+    - choreshare.app
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: choreshare-ingress
+  labels:
+    name: choreshare-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: choreshare-ip
+    networking.gke.io/managed-certificates: choreshare-managed-certificate
+spec:
+  rules:
+    - host: choreshare.app
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: api-gateway-svc
+                port:
+                  number: 80
+          - pathType: Prefix
+            path: "/pgadmin"
+            backend:
+              service:
+                name: pgadmin-svc
+                port:
+                  number: 80
+          - pathType: Prefix
+            path: "/zipkin"
+            backend:
+              service:
+                name: zipkin-svc
+                port:
+                  number: 80
+          - pathType: Prefix
+            path: "/eureka"
+            backend:
+              service:
+                name: eureka-svc
+                port:
+                  number: 80

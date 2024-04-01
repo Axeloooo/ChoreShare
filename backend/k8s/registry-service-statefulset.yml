@@ -46,9 +46,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: eureka-lb-svc
+  name: eureka-svc
 spec:
-  type: LoadBalancer
   selector:
     app: eureka
   ports:
