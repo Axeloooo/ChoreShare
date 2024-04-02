@@ -44,7 +44,7 @@ function ChoreList({
               <h3>11-17 Feb</h3>
               <p onClick={handleShowCreateChore}>+ Add Chore</p>
             </div>
-            {data.events.length > 0 ? (
+            {data.allChores.length > 0 ? (
               <div className="chore-list">
                 {threeColumns.map((column) => (
                   <div className="column">
