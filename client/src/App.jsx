@@ -573,6 +573,7 @@ function App() {
     closeOverlay
   ) => {
     setIsLoading(true);
+
     try {
       const res = await fetch(
         `${process.env.REACT_APP_SERVER_URI}/api/v1/task`,
@@ -586,7 +587,7 @@ function App() {
             title: title,
             householdId: data.currentHousehold.id,
             description: description,
-            status: null,
+            status: "PENDING",
             frequency: frequence,
             tag: tag,
             userId: userId,
@@ -602,6 +603,8 @@ function App() {
       }
 
       const fetchData = await res.json();
+
+      console.log(fetchData);
 
       setData((prevData) => {
         const updatedData = {
