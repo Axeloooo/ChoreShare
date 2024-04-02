@@ -92,7 +92,6 @@ function CreateChore({ createChore, closeOverlay }) {
         tag = option.value;
       }
     });
-    console.log(title, description, frequency, tag);
     createChore(title, description, frequency, tag, closeOverlay);
   };
 
