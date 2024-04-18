@@ -1,0 +1,38 @@
+[
+  {
+    "id": "1",
+    "title": "Task 1",
+    "householdId": "1",
+    "description": "Task 1 description",
+    "status": "PENDING",
+    "frequency": "ONCE_A_WEEK",
+    "tag": "KITCHEN",
+    "userId": "1",
+    "createdAt": "2021-01-01T00:00:00Z",
+    "updatedAt": "2021-01-01T00:00:00Z"
+  },
+  {
+    "id": "2",
+    "title": "Task 2",
+    "householdId": "1",
+    "description": "Task 2 description",
+    "status": "PENDING",
+    "frequency": "TWICE_A_WEEK",
+    "tag": "KITCHEN",
+    "userId": "1",
+    "createdAt": "2021-01-01T00:00:00Z",
+    "updatedAt": "2021-01-01T00:00:00Z"
+  },
+  {
+    "id": "3",
+    "title": "Task 3",
+    "householdId": "1",
+    "description": "Task 3 description",
+    "status": "PENDING",
+    "frequency": "TWICE_A_WEEK",
+    "tag": "GENERAL",
+    "userId": "1",
+    "createdAt": "2021-01-01T00:00:00Z",
+    "updatedAt": "2021-01-01T00:00:00Z"
+  }
+]
