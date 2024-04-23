@@ -4,6 +4,12 @@ kind: Deployment
 metadata:
   name: email-service-app
 spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: email-service-app
@@ -24,8 +30,15 @@ spec:
       containers:
         - name: email-service-app
           image: axeloooo/email-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8088
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8088
+            initialDelaySeconds: 120
+            periodSeconds: 10
           env:
             - name: REGISTRY_SERVICE_URI
               valueFrom:

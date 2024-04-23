@@ -4,6 +4,12 @@ kind: Deployment
 metadata:
   name: task-service-app
 spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: task-service-app
@@ -24,8 +30,15 @@ spec:
       containers:
         - name: task-service-app
           image: axeloooo/task-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8081
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8081
+            initialDelaySeconds: 120
+            periodSeconds: 10
           env:
             - name: REGISTRY_SERVICE_URI
               valueFrom:

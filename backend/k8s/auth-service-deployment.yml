@@ -4,6 +4,12 @@ kind: Deployment
 metadata:
   name: auth-service-app
 spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: auth-service-app
@@ -24,8 +30,15 @@ spec:
       containers:
         - name: auth-service-app
           image: axeloooo/auth-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8087
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8087
+            initialDelaySeconds: 120
+            periodSeconds: 10
           env:
             - name: REGISTRY_SERVICE_URI
               valueFrom:
