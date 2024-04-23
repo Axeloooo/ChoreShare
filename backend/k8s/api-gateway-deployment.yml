@@ -4,6 +4,12 @@ kind: Deployment
 metadata:
   name: api-gateway-app
 spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: api-gateway-app
@@ -24,8 +30,15 @@ spec:
       containers:
         - name: api-gateway-app
           image: axeloooo/api-gateway:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8888
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8888
+            initialDelaySeconds: 120
+            periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /actuator/health

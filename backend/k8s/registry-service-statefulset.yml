@@ -8,7 +8,7 @@ spec:
     matchLabels:
       app: eureka
   serviceName: eureka
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -26,6 +26,7 @@ spec:
       containers:
         - name: eureka
           image: axeloooo/registry-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8761
           readinessProbe:
@@ -34,6 +35,12 @@ spec:
               port: 8761
             initialDelaySeconds: 30
             periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8761
+            initialDelaySeconds: 120
+            periodSeconds: 10
 
 ---
 apiVersion: v1

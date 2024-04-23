@@ -4,6 +4,12 @@ kind: Deployment
 metadata:
   name: user-service-app
 spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: user-service-app
@@ -24,8 +30,15 @@ spec:
       containers:
         - name: user-service-app
           image: axeloooo/user-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8086
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8086
+            initialDelaySeconds: 120
+            periodSeconds: 10
           env:
             - name: REGISTRY_SERVICE_URI
               valueFrom:
