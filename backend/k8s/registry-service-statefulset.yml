@@ -35,12 +35,6 @@ spec:
               port: 8761
             initialDelaySeconds: 30
             periodSeconds: 15
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8761
-            initialDelaySeconds: 120
-            periodSeconds: 10
 
 ---
 apiVersion: v1
