@@ -33,12 +33,6 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8082
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8082
-            initialDelaySeconds: 120
-            periodSeconds: 10
           env:
             - name: REGISTRY_SERVICE_URI
               valueFrom:
