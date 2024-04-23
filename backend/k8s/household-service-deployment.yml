@@ -4,6 +4,12 @@ kind: Deployment
 metadata:
   name: household-service-app
 spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: household-service-app
@@ -24,8 +30,15 @@ spec:
       containers:
         - name: household-service-app
           image: axeloooo/household-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8082
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            initialDelaySeconds: 120
+            periodSeconds: 10
           env:
             - name: REGISTRY_SERVICE_URI
               valueFrom:
