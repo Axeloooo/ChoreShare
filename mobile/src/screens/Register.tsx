@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   Button,
   Pressable,
   StyleSheet,
@@ -9,16 +11,53 @@ import {
 } from "react-native";
 import { AuthStackParamList } from "../navigation/AuthStackNavigator";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { usePostRegisterMutation } from "../redux/services/authService";
+import { DecodedToken, jwtDecode } from "../utils/jwt";
+import { useAppDispatch } from "../hooks/store";
+import { setAuth } from "../redux/slices/authSlice";
+import { insertSession } from "../database";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "RegisterScreen">;
 
 const Register = ({ route, navigation }: Props) => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const dispatch = useAppDispatch();
+
+  const [postRegister, response] = usePostRegisterMutation();
+
+  useEffect(() => {
+    if (response.isSuccess && response.data?.token) {
+      try {
+        const decodedToken: DecodedToken = jwtDecode(response.data.token);
+        dispatch(
+          setAuth({ userId: decodedToken.sub, token: response.data.token })
+        );
+        insertSession(decodedToken.sub, response.data.token);
+      } catch (error) {
+        console.error("Failed to decode token:", error);
+      }
+    } else if (response.isError) {
+      console.error(response.error);
+      Alert.alert("Wrong Credentials", "Please try again.");
+    }
+  }, [response, dispatch]);
+
+  const handleRegister = async () => {
+    postRegister({
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      phone: phone,
+      username: username,
+      password: password,
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -44,6 +83,7 @@ const Register = ({ route, navigation }: Props) => {
         onChangeText={(text) => setEmail(text)}
         placeholder="Email"
         autoCorrect={false}
+        autoCapitalize="none"
       ></TextInput>
       <TextInput
         style={styles.input}
@@ -58,6 +98,7 @@ const Register = ({ route, navigation }: Props) => {
         onChangeText={(text) => setUsername(text)}
         placeholder="Username"
         autoCorrect={false}
+        autoCapitalize="none"
       ></TextInput>
       <TextInput
         style={styles.input}
@@ -65,13 +106,18 @@ const Register = ({ route, navigation }: Props) => {
         onChangeText={(text) => setPassword(text)}
         autoCorrect={false}
         placeholder="Password"
+        autoCapitalize="none"
         secureTextEntry
       ></TextInput>
-      <Pressable style={styles.button} onPress={() => console.log(username)}>
-        <View>
-          <Text style={styles.buttonText}>Register</Text>
-        </View>
-      </Pressable>
+      {response.isLoading ? (
+        <ActivityIndicator size="small" color="#3498ff"></ActivityIndicator>
+      ) : (
+        <Pressable style={styles.button} onPress={handleRegister}>
+          <View>
+            <Text style={styles.buttonText}>Register</Text>
+          </View>
+        </Pressable>
+      )}
       <Button
         title="Login"
         onPress={() => navigation.navigate("LoginScreen")}

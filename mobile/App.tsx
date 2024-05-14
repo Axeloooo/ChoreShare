@@ -1,10 +1,13 @@
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Navigator from "./src/navigation/Navigator";
 import { Provider } from "react-redux";
-import store from "./src/store";
+import Navigator from "./src/navigation/Navigator";
+import store from "./src/redux/store";
+import { createTables } from "./src/database";
 
-export default function App() {
+createTables();
+
+const App = (): React.JSX.Element => {
   return (
     <SafeAreaView style={styles.container}>
       <Provider store={store}>
@@ -12,7 +15,9 @@ export default function App() {
       </Provider>
     </SafeAreaView>
   );
-}
+};
+
+export default App;
 
 const styles = StyleSheet.create({
   container: {
