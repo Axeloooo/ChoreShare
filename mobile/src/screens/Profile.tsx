@@ -1,4 +1,11 @@
-import { Alert, Button, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Button,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { deleteSession } from "../database";
 import { Auth, clearAuth } from "../redux/slices/authSlice";
 import { useAppDispatch, useAppSelector } from "../hooks/store";
@@ -19,8 +26,10 @@ type User = {
   updatedAt: Date;
 };
 
-const Profile = () => {
+const Profile = (): React.JSX.Element => {
   const [user, setUser] = useState<User | null>(null);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const auth: Auth = useAppSelector((state: RootState) => state.auth);
 
@@ -34,6 +43,7 @@ const Profile = () => {
   };
 
   const fetchUser = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(
         `http://localhost:8888/api/v1/user/${auth.userId}`,
@@ -49,8 +59,10 @@ const Profile = () => {
       }
       const data: User = await response.json();
       setUser(data);
+      setIsLoading(false);
     } catch (error) {
       Alert.alert("Failed to fetch user", "Please try again.");
+      setIsLoading(false);
     }
   };
 
@@ -62,16 +74,20 @@ const Profile = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Profile</Text>
-
-      <Text>
-        Name: {user?.firstName} {user?.lastName}
-      </Text>
-      <Text>Username: {user?.username}</Text>
-      <Text>Email: {user?.email}</Text>
-      <Text>Phone: {user?.phone}</Text>
-      <Text>Streak: {user?.streak}</Text>
-      <Text>Missed Chores: {user?.missedChores}</Text>
+      {isLoading ? (
+        <ActivityIndicator size="small" color="#2f95dc" />
+      ) : (
+        <View>
+          <Text>
+            Name: {user?.firstName} {user?.lastName}
+          </Text>
+          <Text>Username: {user?.username}</Text>
+          <Text>Email: {user?.email}</Text>
+          <Text>Phone: {user?.phone}</Text>
+          <Text>Streak: {user?.streak}</Text>
+          <Text>Missed Chores: {user?.missedChores}</Text>
+        </View>
+      )}
 
       <Button title="Logout" onPress={handleLogout} />
     </View>

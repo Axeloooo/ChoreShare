@@ -70,7 +70,7 @@ const Login = ({ route, navigation }: Props) => {
         secureTextEntry
       ></TextInput>
       {response.isLoading ? (
-        <ActivityIndicator size="small" color="#3498ff" />
+        <ActivityIndicator size="small" color="#2f95dc" />
       ) : (
         <Pressable style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Login</Text>
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     width: "80%",
     height: 40,
     margin: 12,
-    backgroundColor: "#3498ff",
+    backgroundColor: "#2f95dc",
     borderRadius: 5,
     justifyContent: "center",
     alignItems: "center",
