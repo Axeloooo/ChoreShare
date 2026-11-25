@@ -12,9 +12,11 @@ spring:
       port: 6379
   cloud:
     gateway:
+      # Only the explicit routes below are exposed. The discovery locator would
+      # auto-create /<SERVICE-ID>/** routes that skip AuthFilter.
       discovery:
         locator:
-          enabled: true
+          enabled: false
       globalcors:
         corsConfigurations:
           "[/**]":

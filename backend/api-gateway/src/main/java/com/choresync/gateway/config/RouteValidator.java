@@ -9,12 +9,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class RouteValidator {
 
+	/*
+	 * Exact paths that may be called without a token. Matching is exact on
+	 * purpose: a substring match let any path containing e.g. "/auth/login"
+	 * skip authentication.
+	 */
 	public static final List<String> openApiEndpoints = List.of(
-			"/auth/register",
-			"/auth/login",
-			"/eureka");
+			"/api/v1/auth/register",
+			"/api/v1/auth/login");
 
-	public Predicate<ServerHttpRequest> isSecured = request -> openApiEndpoints
-			.stream()
-			.noneMatch(uri -> request.getURI().getPath().contains(uri));
+	public Predicate<ServerHttpRequest> isSecured = request -> !openApiEndpoints
+			.contains(request.getURI().getPath());
 }
