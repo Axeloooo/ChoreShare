@@ -29,7 +29,7 @@ services:
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:?see .env.example}
     ports:
       - "5050:80"
     volumes:
@@ -40,6 +40,9 @@ services:
     build: ./registry-service
     ports:
       - "8761:8761"
+    environment:
+      EUREKA_USERNAME: ${EUREKA_USERNAME:?see .env.example}
+      EUREKA_PASSWORD: ${EUREKA_PASSWORD:?see .env.example}
     healthcheck:
       test:
         ["CMD", "curl", "-f", "http://registry-service:8761/actuator/health"]
@@ -53,7 +56,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      REGISTRY_SERVICE_URI: http://${EUREKA_USERNAME:?see .env.example}:${EUREKA_PASSWORD:?see .env.example}@registry-service:8761/eureka
     healthcheck:
       test: ["CMD", "curl", "-f", "http://config-service:8080/actuator/health"]
       interval: 10s
@@ -69,8 +72,9 @@ services:
     ports:
       - "8888:8888"
     environment:
+      JWT_SECRET: ${JWT_SECRET:?see .env.example}
       CONFIG_SERVICE_URI: http://config-service:8080
-      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      REGISTRY_SERVICE_URI: http://${EUREKA_USERNAME:?see .env.example}:${EUREKA_PASSWORD:?see .env.example}@registry-service:8761/eureka
       ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
     depends_on:
       config-service:
@@ -82,8 +86,9 @@ services:
     ports:
       - "8087:8087"
     environment:
+      JWT_SECRET: ${JWT_SECRET:?see .env.example}
       CONFIG_SERVICE_URI: http://config-service:8080
-      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      REGISTRY_SERVICE_URI: http://${EUREKA_USERNAME:?see .env.example}:${EUREKA_PASSWORD:?see .env.example}@registry-service:8761/eureka
       ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
     depends_on:
       config-service:
@@ -96,7 +101,7 @@ services:
       - "8086:8086"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
-      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      REGISTRY_SERVICE_URI: http://${EUREKA_USERNAME:?see .env.example}:${EUREKA_PASSWORD:?see .env.example}@registry-service:8761/eureka
       ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
       DB_HOST: postgres
     depends_on:
@@ -110,7 +115,7 @@ services:
       - "8085:8085"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
-      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      REGISTRY_SERVICE_URI: http://${EUREKA_USERNAME:?see .env.example}:${EUREKA_PASSWORD:?see .env.example}@registry-service:8761/eureka
       ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
       DB_HOST: postgres
     depends_on:
@@ -124,7 +129,7 @@ services:
       - "8083:8083"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
-      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      REGISTRY_SERVICE_URI: http://${EUREKA_USERNAME:?see .env.example}:${EUREKA_PASSWORD:?see .env.example}@registry-service:8761/eureka
       ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
       DB_HOST: postgres
     depends_on:
@@ -138,7 +143,7 @@ services:
       - "8082:8082"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
-      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      REGISTRY_SERVICE_URI: http://${EUREKA_USERNAME:?see .env.example}:${EUREKA_PASSWORD:?see .env.example}@registry-service:8761/eureka
       ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
       DB_HOST: postgres
     depends_on:
@@ -152,7 +157,7 @@ services:
       - "8081:8081"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
-      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      REGISTRY_SERVICE_URI: http://${EUREKA_USERNAME:?see .env.example}:${EUREKA_PASSWORD:?see .env.example}@registry-service:8761/eureka
       ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
       DB_HOST: postgres
     depends_on:
@@ -166,7 +171,7 @@ services:
       - "8084:8084"
     environment:
       CONFIG_SERVICE_URI: http://config-service:8080
-      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      REGISTRY_SERVICE_URI: http://${EUREKA_USERNAME:?see .env.example}:${EUREKA_PASSWORD:?see .env.example}@registry-service:8761/eureka
       ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
       DB_HOST: postgres
     depends_on:
@@ -179,8 +184,10 @@ services:
     ports:
       - "8088:8088"
     environment:
+      MAIL_USERNAME: ${MAIL_USERNAME:-choresync@gmail.com}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:?see .env.example}
       CONFIG_SERVICE_URI: http://config-service:8080
-      REGISTRY_SERVICE_URI: http://registry-service:8761/eureka
+      REGISTRY_SERVICE_URI: http://${EUREKA_USERNAME:?see .env.example}:${EUREKA_PASSWORD:?see .env.example}@registry-service:8761/eureka
       ZIPKIN_SERVICE_URI: http://zipkin:9411/api/v2/spans
     depends_on:
       config-service:

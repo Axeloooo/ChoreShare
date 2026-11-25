@@ -31,8 +31,8 @@ spec:
                   key: PGADMIN_DEFAULT_EMAIL
             - name: PGADMIN_DEFAULT_PASSWORD
               valueFrom:
-                configMapKeyRef:
-                  name: pgadmin-cm
+                secretKeyRef:
+                  name: choreshare-secrets
                   key: PGADMIN_DEFAULT_PASSWORD
 
 ---

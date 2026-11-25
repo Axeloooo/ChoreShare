@@ -34,11 +34,18 @@ spec:
           ports:
             - containerPort: 8082
           env:
-            - name: REGISTRY_SERVICE_URI
+            - name: EUREKA_USERNAME
               valueFrom:
-                configMapKeyRef:
-                  name: eureka-cm
-                  key: REGISTRY_SERVICE_URI
+                secretKeyRef:
+                  name: choreshare-secrets
+                  key: EUREKA_USERNAME
+            - name: EUREKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: choreshare-secrets
+                  key: EUREKA_PASSWORD
+            - name: REGISTRY_SERVICE_URI
+              value: http://$(EUREKA_USERNAME):$(EUREKA_PASSWORD)@eureka-svc:8761/eureka
             - name: CONFIG_SERVICE_URI
               valueFrom:
                 configMapKeyRef:
