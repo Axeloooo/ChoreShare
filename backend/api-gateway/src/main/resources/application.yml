@@ -1,6 +1,10 @@
 server:
   port: 8888
 
+jwt:
+  # Base64-encoded HMAC key (>= 256 bits), shared with auth-service.
+  secret: ${JWT_SECRET}
+
 spring:
   application:
     name: api-gateway

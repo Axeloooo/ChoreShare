@@ -2,6 +2,7 @@ package com.choresync.gateway.util;
 
 import java.security.Key;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Jwts;
@@ -11,14 +12,17 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtil {
 
-  public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+  private final Key signKey;
 
-  public void validateToken(final String token) {
-    Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
+  /*
+   * The signing key is a base64-encoded HMAC-SHA key (at least 256 bits) supplied
+   * via the JWT_SECRET environment variable. It must match the auth-service's key.
+   */
+  public JwtUtil(@Value("${jwt.secret}") String secret) {
+    this.signKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
   }
 
-  private Key getSignKey() {
-    byte[] keyBytes = Decoders.BASE64.decode(SECRET);
-    return Keys.hmacShaKeyFor(keyBytes);
+  public void validateToken(final String token) {
+    Jwts.parserBuilder().setSigningKey(signKey).build().parseClaimsJws(token);
   }
 }
