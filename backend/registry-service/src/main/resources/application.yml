@@ -4,6 +4,12 @@ server:
 spring:
   application:
     name: registry-service
+  security:
+    user:
+      # Clients put these in their defaultZone URL:
+      # http://${EUREKA_USERNAME}:${EUREKA_PASSWORD}@<host>:8761/eureka
+      name: ${EUREKA_USERNAME}
+      password: ${EUREKA_PASSWORD}
 
 eureka:
   server:
