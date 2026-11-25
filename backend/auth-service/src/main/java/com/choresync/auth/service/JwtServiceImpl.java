@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Jwts;
@@ -14,7 +15,15 @@ import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtServiceImpl implements JwtService {
-  public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+  private final Key signKey;
+
+  /*
+   * The signing key is a base64-encoded HMAC-SHA key (at least 256 bits) supplied
+   * via the JWT_SECRET environment variable. It must match the api-gateway's key.
+   */
+  public JwtServiceImpl(@Value("${jwt.secret}") String secret) {
+    this.signKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+  }
 
   public void validateToken(final String token) {
     Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
@@ -36,7 +45,6 @@ public class JwtServiceImpl implements JwtService {
   }
 
   public Key getSignKey() {
-    byte[] keyBytes = Decoders.BASE64.decode(SECRET);
-    return Keys.hmacShaKeyFor(keyBytes);
+    return signKey;
   }
 }

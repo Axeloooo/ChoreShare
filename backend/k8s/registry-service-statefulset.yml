@@ -29,6 +29,17 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8761
+          env:
+            - name: EUREKA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: choreshare-secrets
+                  key: EUREKA_USERNAME
+            - name: EUREKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: choreshare-secrets
+                  key: EUREKA_PASSWORD
           readinessProbe:
             httpGet:
               path: /actuator/health
@@ -48,15 +59,3 @@ spec:
   ports:
     - port: 8761
       name: eureka
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: eureka-rest-svc
-spec:
-  selector:
-    app: eureka
-  ports:
-    - port: 8761
-      targetPort: 8761

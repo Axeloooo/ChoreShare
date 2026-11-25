@@ -10,8 +10,9 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: choresync@gmail.com
-    password: tiww epiq vgfh zyuk
+    username: ${MAIL_USERNAME:choresync@gmail.com}
+    # Gmail app password, injected from the choreshare-secrets Secret / .env
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:

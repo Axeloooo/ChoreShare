@@ -29,24 +29,3 @@ spec:
                 name: api-gateway-svc
                 port:
                   number: 80
-          - pathType: Prefix
-            path: "/pgadmin"
-            backend:
-              service:
-                name: pgadmin-svc
-                port:
-                  number: 5050
-          - pathType: Prefix
-            path: "/zipkin"
-            backend:
-              service:
-                name: zipkin-svc
-                port:
-                  number: 9411
-          - pathType: Prefix
-            path: "/eureka"
-            backend:
-              service:
-                name: eureka-rest-svc
-                port:
-                  number: 8761

@@ -8,24 +8,26 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
 import org.springframework.context.annotation.Description;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.WeakKeyException;
 
 public class JwtServiceImplTest {
   private String userName;
 
-  @InjectMocks
+  // Throwaway 256-bit test key; the real key comes from the JWT_SECRET env var.
+  private static final String TEST_SECRET = "dGVzdC1vbmx5LWtleS10ZXN0LW9ubHkta2V5LXRlc3Qtb25seQ==";
+
   private JwtServiceImpl jwtService;
 
   @BeforeEach
   public void setUp() {
-    MockitoAnnotations.openMocks(this);
+    jwtService = new JwtServiceImpl(TEST_SECRET);
 
     userName = "testUser";
   }
@@ -99,5 +101,20 @@ public class JwtServiceImplTest {
     assertEquals(userName, parsedClaims.getSubject());
     assertNotNull(parsedClaims.getIssuedAt());
     assertNotNull(parsedClaims.getExpiration());
+  }
+
+  @Description("Test that tokens signed with a different key are rejected")
+  @Test
+  public void testValidateTokenSignedWithOtherKey() {
+    JwtServiceImpl otherService = new JwtServiceImpl("b3RoZXIta2V5LW90aGVyLWtleS1vdGhlci1rZXktb3RoZXIta2V5");
+    String foreignToken = otherService.generateToken(userName);
+
+    assertThrows(JwtException.class, () -> jwtService.validateToken(foreignToken));
+  }
+
+  @Description("Test that a key shorter than 256 bits is refused at startup")
+  @Test
+  public void testRejectsWeakKey() {
+    assertThrows(WeakKeyException.class, () -> new JwtServiceImpl("c2hvcnQ="));
   }
 }

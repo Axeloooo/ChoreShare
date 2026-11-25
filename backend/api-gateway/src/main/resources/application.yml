@@ -1,6 +1,10 @@
 server:
   port: 8888
 
+jwt:
+  # Base64-encoded HMAC key (>= 256 bits), shared with auth-service.
+  secret: ${JWT_SECRET}
+
 spring:
   application:
     name: api-gateway
@@ -12,9 +16,11 @@ spring:
       port: 6379
   cloud:
     gateway:
+      # Only the explicit routes below are exposed. The discovery locator would
+      # auto-create /<SERVICE-ID>/** routes that skip AuthFilter.
       discovery:
         locator:
-          enabled: true
+          enabled: false
       globalcors:
         corsConfigurations:
           "[/**]":
